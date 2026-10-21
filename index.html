@@ -85,6 +85,38 @@
       animation-delay: var(--delay, 0s);
     }
 
+    /* Симетричне розташування: л/р 1–4 ліворуч, л/р 5–8 праворуч;
+       центральна частина фонового зображення залишається вільною. */
+    @media (min-width: 901px) {
+      .laboratory {
+        display: block;
+      }
+      .side {
+        position: absolute;
+        top: 50%;
+        width: clamp(230px, 22vw, 330px);
+        gap: clamp(10px, 1.5vh, 15px);
+        transform: translateY(-50%);
+      }
+      .side-left {
+        left: clamp(24px, 3vw, 48px);
+      }
+      .side-right {
+        right: clamp(24px, 3vw, 48px);
+      }
+      .side .lab-card {
+        width: 100%;
+        min-height: 72px;
+      }
+      .centerpiece {
+        left: 50%;
+        width: max-content;
+      }
+      footer {
+        z-index: 3;
+      }
+    }
+
     .side-right .lab-card { --tilt: 1deg; }
     .lab-card > span { position: relative; z-index: 1; }
     .lab-card::marker { content: ""; }
