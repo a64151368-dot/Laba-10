@@ -1,0 +1,978 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Лабораторна робота № 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Literata:wght@400;600;700&family=Marck+Script&display=swap">
+<style>
+:root{
+  --desk:#cdd6e2;--bar:#f1f5fb;--paper:#fcfdff;--grid:#d2e4f6;--grid-s:#a9c8e9;
+  --margin:#e2707b;--print:#1f2430;--muted:#5a6579;--ink:#1b3fb0;--ink-line:#8196d8;
+  --note:#eef4fc;--edge:#b4c0d3;--ok:#17794a;--bad:#bd2f2f;--btn-fg:#ffffff;
+  --tbl:#3c4557;--sky:#e6f2fc;--hov:#e2eafb;--cell:20px;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:60px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{background:var(--desk);color:var(--print);font:17px/1.65 'Literata',Georgia,'Times New Roman',serif;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bar)}
+b,strong{font-weight:700}
+a{color:var(--ink)}
+:focus-visible{outline:2px solid var(--margin);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);border-bottom:1px solid var(--edge)}
+.bar-in{max-width:900px;margin:0 auto;padding-block:6px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;gap:4px 16px;align-items:center;flex-wrap:wrap}
+.nav{display:flex;gap:4px;overflow-x:auto;flex:1 1 300px;min-width:0}
+.nav a{white-space:nowrap;padding:3px 10px;border-radius:3px;color:var(--print);text-decoration:none;font-size:14px;font-weight:600}
+.nav a:hover{background:var(--hov)}
+.nav a[aria-current="true"]{background:var(--ink);color:var(--btn-fg)}
+.status{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--print);flex-wrap:wrap;font-weight:500}
+.meter{width:70px;height:6px;background:var(--note);border:1px solid var(--edge);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle}
+.meter i{display:block;height:100%;width:0;background:var(--ink);transition:width .25s}
+
+.page{max-width:980px;margin:0 auto;padding-block:10px 24px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{position:relative;background-color:var(--paper);
+  background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);padding:14px 20px 28px 50px;border-radius:3px;box-shadow:0 10px 28px rgba(10,20,40,.22)}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:40px;width:2px;background:var(--margin);opacity:.85}
+.sheet>section{margin-top:18px}
+h1{margin:0;text-align:center;font-size:24px;line-height:1.6;letter-spacing:.03em;font-weight:700;color:var(--print)}
+h2{margin:0 0 14px;font-size:21px;line-height:1.6;border-bottom:2.5px solid var(--margin);display:inline-block;padding-right:18px;font-weight:700;color:var(--print)}
+h3{margin:0;font-size:18px;line-height:1.5;font-weight:700;color:var(--print)}
+p{margin:0 0 10px;line-height:1.65}
+label{font-size:16px}
+.small{font-size:15px;line-height:1.6;color:var(--print);font-weight:500}
+.fio{display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:12px}
+.fio label{display:inline-flex;align-items:baseline;gap:8px;font-size:16px;font-weight:600;color:var(--print)}
+.w-s{width:8em}.w-l{width:min(22em,100%)}
+
+input.ink{font:700 20px/26px 'Marck Script',cursive;color:var(--ink);background:transparent;border:0;border-bottom:2px solid var(--ink-line);border-radius:0;padding:2px 6px;min-width:0}
+input.ink:focus{background:var(--note);border-bottom-color:var(--ink);outline:none}
+input.ink::placeholder,textarea.work::placeholder{color:var(--muted);opacity:.55}
+input.num{width:6em;text-align:center}
+input[type=checkbox]{accent-color:var(--ink);width:17px;height:17px;margin:1px 0 0;flex:none}
+textarea.work{display:block;width:100%;min-height:70px;resize:vertical;border:2px solid var(--edge);border-radius:4px;
+  background-color:var(--paper);background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);background-attachment:local;font:700 20px/26px 'Marck Script',cursive;color:var(--ink);padding:6px 10px}
+textarea.work:focus{outline:none;border-color:var(--ink)}
+
+.btn{font:600 14px/18px 'Literata',serif;padding:6px 12px;border:1.5px solid #344054;background:#fff;color:#000!important;border-radius:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:background .15s,box-shadow .15s}
+.btn:hover,.btn:focus-visible{background:#fff0ad!important;color:#000!important;box-shadow:0 0 0 2px rgba(0,0,0,.12)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:#f3e7a5;color:#000!important;border-color:#8b7a2b}
+.btn.primary:hover{background:#ffe680!important}
+.btn.sm{padding:2px 9px;font-size:13px}
+.btn[aria-pressed="true"]{background:#ffe680!important;color:#000!important;border-color:#8b7a2b;box-shadow:inset 0 0 0 1.5px #8b7a2b}
+.row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+
+.box{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px;margin-block:8px}
+.box.simbox{background:#e8f3e8;border:1.5px solid #5f8c63;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);color:#111!important;font-size:16px}
+.box.simbox h3,.box.simbox label,.box.simbox .small,.box.simbox .sl output,.box.simbox #simMsg,.box.simbox summary{color:#111!important;opacity:1}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:9px;margin-block:7px;align-items:flex-start}
+.steps li>div{min-width:0}
+.launch{display:flex;gap:12px 18px;align-items:center;flex-wrap:wrap}
+.launch .txt{flex:1 1 260px;min-width:0}
+.qr{background:#fff;padding:5px;border-radius:3px;line-height:0}
+.qr img,.qr canvas{max-width:100%}
+
+canvas.simcv{display:block;width:100%;height:auto;border:1.5px solid #5f8c63;border-radius:4px;background:#9fd6f5;margin-block:8px}
+.sl{display:grid;grid-template-columns:9em 1fr 7.5em;gap:8px;align-items:center;margin-top:6px}
+.sl input[type=range]{accent-color:#b45309;width:100%;min-width:0}
+.sl output{font:500 15px/20px 'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;text-align:right}
+.sim-ctl{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+.sw{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:10px}
+.sw-disp{font:500 26px/32px 'IBM Plex Mono',ui-monospace,Menlo,monospace;background:#fff;color:#111;border:1.5px solid #5f8c63;border-radius:4px;padding:0 12px;font-variant-numeric:tabular-nums;min-width:7em;text-align:center}
+.sw-disp.run{color:#c1121f}
+details{margin-top:6px}
+summary{cursor:pointer;font-weight:600}
+
+.tbl-wrap{overflow-x:auto;margin-block:10px;background:var(--paper);border-radius:3px}
+.tbl{border-collapse:collapse;min-width:760px;width:100%;background:var(--paper)}
+.tbl th,.tbl td{border:1.5px solid var(--tbl);padding:7px 8px;text-align:center;vertical-align:middle;font-size:15px;line-height:1.5;color:var(--print)}
+.tbl th{background:var(--note);font-weight:700;color:var(--print)}
+.tbl td input.ink{width:100%;text-align:center}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 3px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px 1px}
+.frac>span:last-child{padding:1px 4px 0}
+.step{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px 10px;margin-block:8px}
+.step header{display:flex;align-items:center;gap:9px}
+.no{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1.5px solid var(--margin);color:var(--margin);border-radius:50%;font-weight:700;font-size:13px}
+.formula{font-size:16.5px;line-height:26px;padding:7px 12px;background:var(--note);border-left:4px solid var(--margin);margin-block:10px;overflow-x:auto;color:var(--print);font-weight:500}
+.formula div{white-space:nowrap}
+.wl{display:block;font-size:16px;font-weight:700;color:var(--print);margin-bottom:6px;letter-spacing:.01em}
+.ans-row{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:flex-end;margin-top:8px}
+.af{display:inline-flex;align-items:baseline;gap:5px}
+.af .u{color:var(--muted);font-size:13px}
+.fb{min-height:20px;margin:8px 0 0;font-size:15px;line-height:1.55;font-weight:600}
+.fb.ok{color:var(--ok)}.fb.ok::before{content:"✓ "}
+.fb.bad{color:var(--bad)}.fb.bad::before{content:"✗ "}
+.ans{font:700 21px/26px 'Marck Script',cursive;color:var(--ink);margin-left:8px;text-shadow:0 0 1px rgba(0,0,0,.15)}
+.final{font:700 26px/32px 'Marck Script',cursive;color:var(--ink);text-align:center;margin:10px 0 0;min-height:32px;text-shadow:0 0 1px rgba(0,0,0,.15)}
+.cb{display:grid;grid-template-columns:5em 1fr 4.5em;gap:4px 10px;align-items:center;margin-top:6px;font-size:13px}
+.cb .bar2{height:12px;background:var(--note);border:1px solid var(--edge);border-radius:2px;overflow:hidden}
+.cb .bar2 i{display:block;height:100%;background:var(--margin)}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-block:6px;align-items:center}
+.chip{min-width:42px;padding:4px 12px;border:1.5px solid #344054;background:#fff;color:#000;border-radius:3px;font:600 14px/20px 'Literata',serif;cursor:pointer}
+.chip:hover{background:#fff0ad}
+.chip[aria-checked="true"]{background:#ffe680;border-color:#8b7a2b;box-shadow:inset 0 0 0 1.5px #8b7a2b}
+.q{margin-block:12px}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:6px 22px}
+.qgrid>.q{min-width:0}
+.fig{display:block;width:100%;max-width:380px;height:auto;margin:6px auto}
+.fig text{fill:var(--print);font:12.5px 'Literata',serif}
+.fig .ax{stroke:var(--print);stroke-width:1.6}
+.fig .ln{stroke:var(--print);stroke-width:1.6;fill:none}
+.fig .body{fill:var(--note);stroke:var(--print);stroke-width:1.6}
+.fig .dash{stroke:var(--muted);stroke-width:1.3;stroke-dasharray:5 4}
+.checks{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:8px}
+.checks label{display:inline-flex;gap:6px;align-items:center}
+
+/* Поле побудови графіка */
+.gz{border:1.5px solid var(--edge);border-radius:4px;background:var(--paper);margin-block:8px;padding:8px}
+.gz-tools{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;align-items:center}
+.gz-tools .sep{width:1px;align-self:stretch;background:var(--edge);margin-inline:3px}
+.gz-axes{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;margin-bottom:6px;font-size:14px}
+.gz-axes label{display:inline-flex;gap:6px;align-items:baseline}
+.gz-axes input[type=number]{width:6em}
+canvas#gCv{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1.5px solid var(--edge);border-radius:3px;background:#fffefa}
+.probe{margin-top:6px;padding:5px 10px;background:var(--note);border-left:3px solid var(--ink);display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:14px}
+
+.response-editor{margin:5px 0 10px;border:1px solid var(--edge);border-radius:4px;background:var(--paper);overflow:hidden}
+.response-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:5px;background:var(--note);border-bottom:1px solid var(--edge)}
+.response-tabs .btn{font-size:12px;padding:3px 9px}
+.response-panel{padding:7px}
+.response-canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1px solid var(--edge);border-radius:3px;background-color:#fff;
+  background-image:linear-gradient(to right,#d9e7f5 1px,transparent 1px),linear-gradient(to bottom,#d9e7f5 1px,transparent 1px);background-size:20px 20px}
+.response-image-preview{display:block;max-width:100%;max-height:420px;margin:8px auto;border:1px solid var(--edge);border-radius:3px}
+.response-upload{display:inline-block;padding:7px 11px;border:1px dashed var(--ink-line);border-radius:3px;cursor:pointer;background:var(--note);color:var(--print);font:600 12.5px 'Literata',serif}
+.response-tools{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px}
+.response-hint{font-size:14px;color:var(--print);margin:6px 0}
+
+.creative-task{margin-top:14px;padding:14px 16px;background:#fff3c4;border:2px solid #9a6a00;border-left:7px solid #9a6a00;border-radius:8px;color:#241900;font-size:16px;line-height:1.65}
+.creative-task h3{font-size:20px;color:#241900;margin-bottom:8px;font-weight:700}
+.creative-task .wl{color:#241900;font-weight:700}
+
+.report{width:100%;min-height:130px;font:12.5px/17px 'IBM Plex Mono',ui-monospace,monospace;background:var(--note);color:var(--print);border:1.5px solid var(--edge);border-radius:3px;padding:8px;margin-top:8px}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:28px;align-items:flex-start}
+
+/* Поля введення: білий контрастний текст на темному тлі */
+input.ink,.tbl td input.ink{
+  color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;caret-color:#ffe680;
+  background:#1a2540!important;border:0!important;border-bottom:2.5px solid #8196d8!important;border-radius:3px;
+  font:700 20px/26px 'Marck Script',cursive!important;letter-spacing:.03em;
+  text-shadow:0 1px 3px rgba(0,0,0,.7),0 0 8px rgba(255,255,255,.15);
+  padding:2px 6px!important}
+input.ink:focus,.tbl td input.ink:focus{background:#0f1830!important;border-bottom-color:#ffe680!important;outline:none;box-shadow:0 0 0 2px rgba(255,230,128,.18)}
+input.ink::placeholder{color:#9fb4e8!important;opacity:.7;font-weight:400}
+textarea.work,.creative-task textarea.work{
+  color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;caret-color:#ffe680;
+  font:700 20px/26px 'Marck Script',cursive!important;
+  background-color:#1a2540!important;
+  background-image:linear-gradient(to right,#2e3f6a 1px,transparent 1px),linear-gradient(to bottom,#2e3f6a 1px,transparent 1px)!important;
+  border:2px solid #8196d8!important;border-radius:4px;
+  text-shadow:0 1px 3px rgba(0,0,0,.7);
+  padding:6px 10px!important;min-height:80px}
+textarea.work:focus,.creative-task textarea.work:focus{border-color:#ffe680!important;outline:none;box-shadow:0 0 0 2px rgba(255,230,128,.18)}
+textarea.work::placeholder,.creative-task textarea.work::placeholder{color:#9fb4e8!important;opacity:.7;font-weight:400}
+/* Єдине форматування пунктів 1 і 2 */
+.lead-title{font-size:16px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--margin);margin:4px 0 2px}
+ol.steps{counter-reset:st;margin:0 0 10px;padding:0;list-style:none}
+ol.steps li{counter-increment:st;display:flex;gap:12px;align-items:flex-start;font-size:16px;line-height:1.6;
+  background:var(--paper);border:1.5px solid var(--edge);border-left:5px solid var(--margin);border-radius:4px;padding:8px 12px;margin-block:8px}
+ol.steps li::before{content:counter(st);flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;
+  background:var(--margin);color:#fff;font-weight:700;font-size:14px;margin-top:1px}
+ol.steps li b{font-weight:700;background:linear-gradient(transparent 62%,rgba(255,214,64,.5) 62%)}
+.step .small,#calc .small{font-size:16px;line-height:1.65;font-weight:500}
+.step .wl,#calc .wl{font-size:16px;font-weight:700}
+.step .formula{font-size:16.5px}
+.step h3{font-size:18px;font-weight:700}
+@media(max-width:700px){.sim-ctl{grid-template-columns:1fr}}
+@media(max-width:560px){
+  .sheet{padding:16px 10px 36px 32px}.sheet::before{left:20px}
+  .sl{grid-template-columns:1fr auto}.sl label{grid-column:1/-1}
+  .box,.step{padding-inline:10px}
+}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff!important;color:#111!important;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar,.no-print,.btn,.fb,.meter,.status,.simbox,.launch,.gz-tools,.gz-axes,.probe,.response-tabs,.response-tools,.response-hint,details,.chip:not([aria-checked="true"]){display:none!important}
+  .page{max-width:none;margin:0;padding:0}
+  .sheet{box-shadow:none;border-radius:0;padding:8mm 7mm 8mm 12mm;background-color:#fff!important}
+  .sheet::before{left:9mm}
+  h1{font-size:17pt}h2{font-size:13pt}h3{font-size:11pt}
+  .box,.step,.creative-task,.tbl-wrap,.q{break-inside:avoid}
+  .tbl-wrap{overflow:visible}
+  .tbl{min-width:0;width:100%;table-layout:fixed}
+  .tbl th,.tbl td{font-size:8pt;padding:3px 2px;color:#111!important;border-color:#333!important}
+  input.ink{font:10pt Arial,sans-serif!important;color:#111!important;background:#fff!important;border:1px solid #777!important;min-height:20px;padding:2px!important}
+  textarea.work{font:10pt Arial,sans-serif!important;color:#111!important;background:#fff!important;background-image:none!important;border:1px solid #777!important;min-height:44px;resize:none;white-space:pre-wrap}
+  textarea.work::placeholder,input::placeholder{color:transparent!important}
+  input.ink,.tbl td input.ink,textarea.work,.creative-task textarea.work{color:#111!important;-webkit-text-fill-color:#111;text-shadow:none;background:#fff!important;background-image:none!important;border:1px solid #777!important}
+  .formula{background:#f3f3f3!important;color:#111!important}
+  canvas#gCv{max-height:110mm;width:auto;max-width:100%;margin:0 auto}
+  .creative-task{background:#fff!important;border-color:#777!important;color:#111!important}
+  .small{font-size:9pt;color:#222!important}
+  .report{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <nav class="nav" aria-label="Розділи роботи">
+      <a href="#exp">1. Вимірювання</a>
+      <a href="#calc">2. Обчислення</a>
+      <a href="#concl">3. Висновок і запитання</a>
+    </nav>
+    <div class="status" aria-live="polite">
+      <span>Заповнено <b id="progTxt">0 з 0</b> <span class="meter"><i id="progBar"></i></span></span>
+      <span id="saveSt">Зберігається у цьому браузері</span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+<main class="sheet" id="top">
+
+  <div class="fio">
+    <label>Клас <input class="ink w-s" id="f-klass" data-k="klass" autocomplete="off"></label>
+    <label>Прізвище та ім’я <input class="ink w-l" id="f-fio" data-k="fio" autocomplete="off"></label>
+    <label>Дата <input class="ink w-s" id="f-date" data-k="date" autocomplete="off"></label>
+  </div>
+
+  <h1>ЛАБОРАТОРНА РОБОТА № 1</h1>
+  <p><b>Тема.</b> Визначення прискорення тіла в ході рівноприскореного прямолінійного руху.</p>
+  <p><b>Мета:</b> визначити прискорення руху скейтбордиста, який з’їжджає похилим треком.</p>
+  <p><b>Обладнання:</b> вбудований тренажер (скейтбордист, трек, секундомір, рулетка).</p>
+
+  <!-- 1. ВИМІРЮВАННЯ -->
+  <section id="exp">
+    <h2>1. Підготовка і вимірювання</h2>
+
+    <p class="lead-title">Порядок виконання</p>
+    <ol class="steps">
+      <li><div><b>Налаштуйте трек.</b> У тренажері нижче розташуйте трек під невеликим кутом до горизонту повзунком <b>«Кут нахилу α»</b>.</div></li>
+      <li><div><b>Виміряйте відстань <i>s</i>.</b> Рулеткою визначте відстань від лівого кола до правого (це модуль переміщення вздовж прямої). <b>Запишіть її в таблицю самостійно.</b></div></li>
+      <li><div><b>Виміряйте час <i>t</i><sub>1</sub>.</b> Поставте скейтбордиста на верхнє коло, відпустіть його й виміряйте час руху до нижнього кола. <b>Повторіть дослід ще тричі.</b></div></li>
+      <li><div><b>Запишіть результати.</b> Час після кожного досліду можна занести в таблицю кнопкою, решту даних впишіть вручну.</div></li>
+    </ol>
+
+    <!-- Тренажер -->
+    <div class="box simbox" id="sim">
+      <div class="row" style="justify-content:space-between;align-items:baseline">
+        <h3>Тренажер: рух скейтбордиста</h3>
+        <span class="small">Секундомір запускається при «Відпустити» й зупиняється в кінці треку</span>
+      </div>
+      <canvas class="simcv" id="simCv" width="1600" height="600" role="img" aria-label="Скейтбордист на похилому треку"></canvas>
+      <div class="sim-ctl">
+        <div class="sl"><label for="slA">Кут нахилу α</label><input type="range" id="slA" min="3" max="15" step="0.5" value="6.7"><output id="oA"></output></div>
+        <div class="sl"><label for="slL">Довжина треку</label><input type="range" id="slL" min="8" max="20" step="0.1" value="14.8"><output id="oL">міряйте рулеткою</output></div>
+        <div class="sl"><label for="slM">Маса</label><input type="range" id="slM" min="40" max="90" step="1" value="60"><output id="oM"></output></div>
+        <div class="sl"><label for="slU">Тертя μ</label><input type="range" id="slU" min="0" max="0.1" step="0.005" value="0"><output id="oU"></output></div>
+      </div>
+      <div class="sw">
+        <div class="sw-disp" id="swDisp" role="timer" aria-label="Секундомір">00:00.00</div>
+        <button class="btn primary" id="bRelease" type="button">Відпустити</button>
+        <button class="btn" id="bBack" type="button">На старт</button>
+        <button class="btn" id="bRuler" type="button" aria-pressed="false">Рулетка</button>
+        <button class="btn primary" id="swSave" type="button">Записати час у таблицю</button>
+      </div>
+      <p class="small" id="simMsg" aria-live="polite" style="margin:6px 0 0"></p>
+      <details><summary>Перевірка для вчителя</summary><p id="simTheo" class="small" style="margin-top:4px"></p></details>
+    </div>
+
+    <!-- Таблиця: порожня, усе вводиться вручну (автоматично лише час) -->
+    <div class="tbl-wrap">
+    <table class="tbl" id="dataTbl">
+      <thead>
+        <tr>
+          <th rowspan="2">№</th>
+          <th rowspan="2">Переміщення<br><i>s</i>, м</th>
+          <th colspan="2">Час руху скейтбордиста</th>
+          <th rowspan="2">Прискорення<br><i>a</i><sub>сер</sub>, м/с²</th>
+          <th colspan="2">Похибка вимірювання прискорення</th>
+          <th rowspan="2">Результат<br><i>a</i> = <i>a</i><sub>сер</sub> ± Δ<i>a</i>, м/с²</th>
+        </tr>
+        <tr><th><i>t<sub>i</sub></i>, с</th><th><i>t</i><sub>сер</sub>, с</th><th>відносна<br>ε<sub><i>a</i></sub>, %</th><th>абсолютна<br>Δ<i>a</i>, м/с²</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td>
+          <td rowspan="4"><input class="ink" id="s" data-k="s" inputmode="decimal" autocomplete="off" aria-label="Переміщення s, метри"></td>
+          <td><input class="ink" id="t1" data-k="t1" inputmode="decimal" autocomplete="off" aria-label="Час t1, секунди"></td>
+          <td rowspan="4"><input class="ink" id="T_tcep" data-k="T_tcep" inputmode="decimal" autocomplete="off" aria-label="Середній час, секунди"></td>
+          <td rowspan="4"><input class="ink" id="T_a" data-k="T_a" inputmode="decimal" autocomplete="off" aria-label="Середнє прискорення"></td>
+          <td rowspan="4"><input class="ink" id="T_ea" data-k="T_ea" inputmode="decimal" autocomplete="off" aria-label="Відносна похибка, відсотки"></td>
+          <td rowspan="4"><input class="ink" id="T_da" data-k="T_da" inputmode="decimal" autocomplete="off" aria-label="Абсолютна похибка"></td>
+          <td rowspan="4"><input class="ink" id="T_res" data-k="T_res" autocomplete="off" aria-label="Результат a = a сер ± Δa"></td></tr>
+        <tr><td>2</td><td><input class="ink" id="t2" data-k="t2" inputmode="decimal" autocomplete="off" aria-label="Час t2, секунди"></td></tr>
+        <tr><td>3</td><td><input class="ink" id="t3" data-k="t3" inputmode="decimal" autocomplete="off" aria-label="Час t3, секунди"></td></tr>
+        <tr><td>4</td><td><input class="ink" id="t4" data-k="t4" inputmode="decimal" autocomplete="off" aria-label="Час t4, секунди"></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="row">
+      <button class="btn" type="button" id="bChkTbl">Перевірити таблицю</button>
+      <span class="small">Таблиця заповнюється вручну; лише час <i>t</i><sub>i</sub> тренажер заносить кнопкою «Записати час у таблицю».</span>
+    </div>
+    <p class="fb" id="fbTbl" aria-live="polite"></p>
+  </section>
+
+  <!-- 2. ОБЧИСЛЕННЯ -->
+  <section id="calc">
+    <h2>2. Опрацювання результатів</h2>
+    <p class="lead-title">Порядок виконання</p>
+    <ol class="steps">
+      <li><div><b>Запишіть хід обчислень</b> у поле картки та <b>введіть відповіді.</b></div></li>
+      <li><div>Натисніть <b>«Перевірити»</b>: сторінка порівняє відповіді з розрахунком за вашими вимірюваннями.</div></li>
+      <li><div><b>Результати перенесіть у таблицю самостійно.</b></div></li>
+    </ol>
+    <div id="steps"></div>
+
+    <article class="step" id="stepG">
+      <header><span class="no">4</span><h3>Графік <i>s</i>(<i>t</i>)</h3></header>
+      <p class="small">Побудуйте графік за точками, намалюйте від руки або вставте фото графіка із зошита.</p>
+      <div class="gz" id="gz">
+        <div class="gz-tools" role="toolbar" aria-label="Інструменти графіка">
+          <button class="btn sm" type="button" data-tool="pt" aria-pressed="true">● Точка</button>
+          <button class="btn sm" type="button" data-tool="ln" aria-pressed="false">╱ Лінія</button>
+          <button class="btn sm" type="button" data-tool="pen" aria-pressed="false">✎ Олівець</button>
+          <button class="btn sm" type="button" data-tool="rd" aria-pressed="false">⌖ Зчитати значення</button>
+          <button class="btn sm" type="button" data-tool="er" aria-pressed="false">⌫ Гумка</button>
+          <span class="sep" aria-hidden="true"></span>
+          <button class="btn sm" type="button" id="gUndo">↶ Скасувати</button>
+          <button class="btn sm" type="button" id="gClr">Очистити</button>
+          <button class="btn sm primary" type="button" id="gAuto">Точки за моїм a</button>
+        </div>
+        <div class="gz-axes">
+          <label for="gXmax">Шкала <i>t</i> до <input class="ink" type="number" id="gXmax" min="0.1" step="any" inputmode="decimal"> с</label>
+          <label for="gYmax">Шкала <i>s</i> до <input class="ink" type="number" id="gYmax" min="0.1" step="any" inputmode="decimal"> м</label>
+          <label for="gSnap"><input type="checkbox" id="gSnap" checked> Прив’язка до сітки</label>
+        </div>
+        <canvas id="gCv" width="1000" height="640" role="img" aria-label="Поле для побудови графіка s(t)"></canvas>
+        <p class="response-hint" id="gHint" aria-live="polite"></p>
+        <div class="probe" id="gProbe" hidden><span id="gProbeTxt"></span></div>
+      </div>
+    </article>
+  </section>
+
+  <!-- 3. ВИСНОВОК І ЗАПИТАННЯ -->
+  <section id="concl">
+    <h2>3. Висновок і контрольні запитання</h2>
+    <p>Проаналізуйте експеримент. У висновку вкажіть:</p>
+    <div class="checks">
+      <label><input type="checkbox" id="ck_c1" data-k="ck_c1"> величину, яку вимірювали</label>
+      <label><input type="checkbox" id="ck_c2" data-k="ck_c2"> результат вимірювання</label>
+      <label><input type="checkbox" id="ck_c3" data-k="ck_c3"> причини похибки</label>
+      <label><input type="checkbox" id="ck_c4" data-k="ck_c4"> вимірювання якої величини дає найбільшу похибку</label>
+    </div>
+    <label class="wl" for="concl-t">Висновок</label>
+    <textarea class="work" id="concl-t" data-k="concl" rows="6" spellcheck="false"></textarea>
+
+    <div class="q" style="margin-top:16px">
+      <p><b>1.</b> Скільки координат задають положення тіла, що рухається прямолінійно; по довільній траєкторії на площині?</p>
+      <div class="row">
+        <span class="af"><span>по прямій:</span><input class="ink num" id="q1a" data-k="q1a" inputmode="numeric" autocomplete="off" aria-label="Координат при прямолінійному русі"></span>
+        <span class="af"><span>на площині:</span><input class="ink num" id="q1b" data-k="q1b" inputmode="numeric" autocomplete="off" aria-label="Координат на площині"></span>
+        <button class="btn primary" type="button" data-q="1">Перевірити</button>
+      </div>
+      <p class="fb" id="fbQ1" aria-live="polite"></p>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <p><b>2.</b> Яке з тіл рухається рівносповільнено прямолінійно в напрямі, протилежному осі <i>OX</i>?</p>
+        <svg class="fig" viewBox="0 0 380 290" role="img" aria-label="Графіки проекції швидкості від часу для чотирьох тіл: I спадає з додатного значення, II зростає від нуля, III зростає від від’ємного значення до нуля, IV стала від’ємна">
+          <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="var(--print)"/></marker></defs>
+          <line class="ax" x1="70" y1="276" x2="70" y2="14" marker-end="url(#ar2)"/>
+          <line class="ax" x1="70" y1="130" x2="362" y2="130" marker-end="url(#ar2)"/>
+          <text x="40" y="24"><tspan font-style="italic">v</tspan><tspan dy="4" font-size="10" font-style="italic">x</tspan></text>
+          <text x="366" y="150" font-style="italic">t</text><text x="56" y="146">0</text>
+          <line x1="70" y1="38" x2="262" y2="236" stroke="#e0a21a" stroke-width="3" stroke-linecap="round"/>
+          <line x1="70" y1="130" x2="268" y2="40" stroke="#3b78d8" stroke-width="3" stroke-linecap="round"/>
+          <line x1="70" y1="188" x2="300" y2="130" stroke="#d64545" stroke-width="3" stroke-linecap="round"/>
+          <line x1="70" y1="246" x2="300" y2="246" stroke="#2e9a5a" stroke-width="3" stroke-linecap="round"/>
+          <text x="80" y="36" font-weight="700">I</text><text x="274" y="38" font-weight="700">II</text>
+          <text x="78" y="208" font-weight="700">III</text><text x="308" y="251" font-weight="700">IV</text>
+        </svg>
+        <div class="chips" role="radiogroup" data-k="q2" aria-label="Оберіть тіло">
+          <button class="chip" type="button" role="radio" aria-checked="false" data-v="I">I</button>
+          <button class="chip" type="button" role="radio" aria-checked="false" data-v="II">II</button>
+          <button class="chip" type="button" role="radio" aria-checked="false" data-v="III">III</button>
+          <button class="chip" type="button" role="radio" aria-checked="false" data-v="IV">IV</button>
+          <button class="btn primary" type="button" data-q="2">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ2" aria-live="polite"></p>
+      </div>
+
+      <div class="q">
+        <p><b>3.</b> Рівняння руху якого тіла може мати вигляд <i>x</i> = 280 − 25<i>t</i> + 0,3<i>t</i><sup>2</sup> і яке прискорення цього тіла?</p>
+        <svg class="fig" viewBox="0 0 420 150" role="img" aria-label="Вісь x у метрах із чотирма об’єктами: I скутер біля 40 м, II автомобіль біля 275 м, III заправна колонка біля 300 м, IV трактор біля 335 м">
+          <defs><marker id="ar3" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="var(--print)"/></marker></defs>
+          <line class="ax" x1="14" y1="118" x2="412" y2="118" marker-end="url(#ar3)"/>
+          <g class="ax"><line x1="30" y1="113" x2="30" y2="123"/><line x1="135" y1="113" x2="135" y2="123"/><line x1="240" y1="113" x2="240" y2="123"/><line x1="345" y1="113" x2="345" y2="123"/></g>
+          <text x="26" y="138">0</text><text x="122" y="138">100</text><text x="227" y="138">200</text><text x="332" y="138">300</text><text x="392" y="138" font-style="italic">x, м</text>
+          <g transform="translate(72 0)"><circle class="body" cx="-10" cy="112" r="4.5"/><circle class="body" cx="10" cy="112" r="4.5"/><line class="ax" x1="-10" y1="108" x2="8" y2="108"/><line class="ax" x1="8" y1="108" x2="6" y2="90"/><line class="ax" x1="6" y1="90" x2="12" y2="88"/><rect class="body" x="-14" y="96" width="12" height="10"/></g>
+          <g transform="translate(319 0)"><rect class="body" x="-25" y="98" width="50" height="12" rx="4"/><rect class="body" x="-13" y="88" width="26" height="11" rx="3"/><circle class="body" cx="-14" cy="112" r="5"/><circle class="body" cx="14" cy="112" r="5"/></g>
+          <g transform="translate(345 0)"><rect class="body" x="-9" y="42" width="18" height="30" rx="2"/><rect x="-5" y="47" width="10" height="8" fill="var(--margin)"/><path class="ln" d="M9 52 q8 0 8 10 v8"/><line class="dash" x1="0" y1="74" x2="0" y2="116"/></g>
+          <g transform="translate(382 0)"><rect class="body" x="-18" y="90" width="20" height="18" rx="2"/><rect class="body" x="2" y="98" width="18" height="10" rx="2"/><circle class="body" cx="-8" cy="108" r="10"/><circle class="body" cx="16" cy="112" r="6"/></g>
+          <text x="68" y="84" font-weight="700">I</text><text x="313" y="82" font-weight="700">II</text><text x="341" y="36" font-weight="700">III</text><text x="376" y="84" font-weight="700">IV</text>
+        </svg>
+        <div class="chips" role="radiogroup" data-k="q3" aria-label="Оберіть тіло">
+          <button class="chip" type="button" role="radio" aria-checked="false" data-v="I">I</button>
+          <button class="chip" type="button" role="radio" aria-checked="false" data-v="II">II</button>
+          <button class="chip" type="button" role="radio" aria-checked="false" data-v="III">III</button>
+          <button class="chip" type="button" role="radio" aria-checked="false" data-v="IV">IV</button>
+          <span class="af" style="margin-left:6px"><span><i>a</i><sub><i>x</i></sub> =</span><input class="ink num" id="q3a" data-k="q3a" inputmode="decimal" autocomplete="off" aria-label="Прискорення, м/с²"><span class="u">м/с²</span></span>
+          <button class="btn primary" type="button" data-q="3">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ3" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div class="creative-task"><h3>Творче завдання</h3>
+      <p>Від яких чинників залежить прискорення, з яким тіло скочується похилою площиною? Запишіть припущення, план експерименту, результат і висновок.</p>
+      <label class="wl" for="cr">Припущення, план і висновок</label>
+      <textarea class="work" id="cr" data-k="cr" rows="5" spellcheck="false"></textarea>
+    </div>
+  </section>
+
+  <div class="foot no-print">
+    <div style="flex:1 1 260px;min-width:0">
+      <button class="btn primary" id="bReport" type="button">Скопіювати звіт для вчителя</button>
+      <textarea class="report" id="reportTxt" readonly hidden aria-label="Текст звіту"></textarea>
+      <p class="small" id="reportMsg" aria-live="polite" style="margin:4px 0 0"></p>
+    </div>
+    <div style="flex:1 1 280px;min-width:0">
+      <button class="btn primary" id="bPdf" type="button">Завантажити роботу у PDF</button>
+      <p class="small">Завантаж свою роботу з готовими обчисленнями у форматі PDF і прикріпи файл у Classroom. У вікні друку вибери «Зберегти як PDF».</p>
+    </div>
+    <button class="btn" id="bClear" type="button">Очистити сторінку</button>
+  </div>
+
+</main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var KEY='lab1-skate-v3';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var num=function(v){var t=String(v==null?'':v).replace(',','.').replace(/\s/g,'');return /^-?(\d+\.?\d*|\.\d+)$/.test(t)?parseFloat(t):NaN};
+var fmt=function(x,d){if(d==null)d=2;return isFinite(x)?x.toFixed(d).replace('.',','):'—'};
+var trimNum=function(x,d){if(!isFinite(x))return '';var s=x.toFixed(d==null?1:d);if(s.indexOf('.')>=0)s=s.replace(/0+$/,'').replace(/\.$/,'');return s.replace('.',',')};
+
+function fresh(){return {f:{},chk:{},g:{}}}
+function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&j.f){var o=fresh();o.f=j.f;o.chk=j.chk||{};o.g=j.g||{};return o}}catch(e){}return fresh()}
+// Під час кожного відкриття сторінки всі поля порожні: старі записи не підвантажуються.
+try{localStorage.removeItem(KEY)}catch(e){}
+var S=fresh();
+var saveT;
+function setSt(t){$('#saveSt').textContent=t}
+function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem(KEY,JSON.stringify(S));setSt('Збережено у браузері')}catch(e){setSt('Не вдалося зберегти: мало місця')}},350)}
+function setFb(el,cls,t){el.className='fb '+cls;el.textContent=t}
+
+/* ---------- розрахунок ---------- */
+function calc(){
+  var s=num(S.f.s),t=[1,2,3,4].map(function(i){return num(S.f['t'+i])});
+  if(!(s>0)||t.some(function(x){return !(x>0)}))return null;
+  var tcep=t.reduce(function(a,b){return a+b},0)/4,a=2*s/(tcep*tcep);
+  var dt=t.reduce(function(q,x){return q+Math.abs(x-tcep)},0)/4,et=dt/tcep,ds=0.1,es=ds/s,ea=es+2*et,da=ea*a;
+  var p=Math.pow(10,Math.floor(Math.log10(da))),dar=Math.ceil(da/p-1e-9)*p;
+  var dec=Math.max(0,-Math.floor(Math.log10(dar)+1e-9));dar=+dar.toFixed(dec);
+  return {s:s,t:t,tcep:tcep,a:a,dt:dt,et:et,ds:ds,es:es,ea:ea,da:da,dar:dar,ar:+a.toFixed(dec),dec:dec};
+}
+
+/* ---------- картки обчислень ---------- */
+var fr=function(n,d){return '<span class="frac"><span>'+n+'</span><span>'+d+'</span></span>'};
+var STEPS=[
+ {n:1,title:'Середній час і середнє прискорення',
+  f:['<i>t</i><sub>сер</sub> = '+fr('<i>t</i><sub>1</sub> + <i>t</i><sub>2</sub> + <i>t</i><sub>3</sub> + <i>t</i><sub>4</sub>','4')+'; &nbsp;&nbsp;<i>a</i><sub>сер</sub> = '+fr('2<i>s</i>','<i>t</i><sub>сер</sub><sup>2</sup>')],
+  fields:[['p1','<i>t</i><sub>сер</sub> =','с',function(c){return c.tcep},.006,'t сер',3],['p2','<i>a</i><sub>сер</sub> =','м/с²',function(c){return c.a},.006,'a сер',3]],
+  sub:function(c){return '<i>t</i><sub>сер</sub> = '+fr('('+c.t.map(function(x){return fmt(x)}).join(' + ')+')','4')+'; &nbsp;<i>a</i><sub>сер</sub> = '+fr('2 · '+fmt(c.s,1),'<i>t</i><sub>сер</sub><sup>2</sup>')},
+  hint:'Додайте чотири часи й поділіть на 4, потім підставте у 2s/t² (час у квадраті).'},
+ {n:2,title:'Похибки вимірювань',
+  f:['Δ<i>t</i><sub>сер</sub> = '+fr('|<i>t</i><sub>1</sub> − <i>t</i><sub>сер</sub>| + |<i>t</i><sub>2</sub> − <i>t</i><sub>сер</sub>| + |<i>t</i><sub>3</sub> − <i>t</i><sub>сер</sub>| + |<i>t</i><sub>4</sub> − <i>t</i><sub>сер</sub>|','4')+'; &nbsp;ε<sub><i>t</i></sub> = '+fr('Δ<i>t</i><sub>сер</sub>','<i>t</i><sub>сер</sub>'),
+     'Δ<i>s</i> = Δ<i>s</i><sub>прил</sub> + Δ<i>s</i><sub>вип</sub>; &nbsp;ε<sub><i>s</i></sub> = '+fr('Δ<i>s</i>','<i>s</i>'),
+     'ε<sub><i>a</i></sub> = ε<sub><i>s</i></sub> + 2ε<sub><i>t</i></sub>; &nbsp;Δ<i>a</i> = ε<sub><i>a</i></sub> · <i>a</i><sub>сер</sub>'],
+  note:'Δs<sub>прил</sub> = Δs<sub>вип</sub> = 0,05 м (половина ціни поділки рулетки, вимірювання одне). Відносні похибки пишіть у відсотках, а в Δa підставляйте ε<sub>a</sub> як частку (2,5 % = 0,025).',
+  fields:[['p3a','Δ<i>t</i><sub>сер</sub> =','с',function(c){return c.dt},.006,'Δt сер',3],['p3b','ε<sub><i>t</i></sub> =','%',function(c){return c.et*100},.06,'ε_t',2],
+          ['p4a','Δ<i>s</i> =','м',function(c){return c.ds},.006,'Δs',2],['p4b','ε<sub><i>s</i></sub> =','%',function(c){return c.es*100},.06,'ε_s',2],
+          ['p5a','ε<sub><i>a</i></sub> =','%',function(c){return c.ea*100},.06,'ε_a',2],['p5b','Δ<i>a</i> =','м/с²',function(c){return c.da},.006,'Δa',3]],
+  sub:function(c){return 'Δ<i>t</i><sub>сер</sub> = '+fr(c.t.map(function(x){return '|'+fmt(x)+' − '+fmt(c.tcep,3)+'|'}).join(' + '),'4')+'; &nbsp;ε<sub><i>t</i></sub> = '+fr('Δ<i>t</i><sub>сер</sub>',fmt(c.tcep,3))+'<br>Δ<i>s</i> = 0,05 + 0,05; &nbsp;ε<sub><i>s</i></sub> = '+fr('Δ<i>s</i>',fmt(c.s,1))+'<br>ε<sub><i>a</i></sub> = ε<sub><i>s</i></sub> + 2ε<sub><i>t</i></sub>; &nbsp;Δ<i>a</i> = ε<sub><i>a</i></sub> · '+fmt(c.a,3)},
+  hint:'Перевірте по черзі Δt, ε_t, Δs, ε_s, а тоді ε_a = ε_s + 2ε_t і Δa = ε_a · a_сер.'},
+ {n:3,title:'Округлення й результат',
+  f:['<i>a</i> = <i>a</i><sub>сер</sub> ± Δ<i>a</i>'],
+  note:'Δa округліть до однієї значущої цифри із завищенням, а <i>a</i><sub>сер</sub> до розряду, що залишився в Δa.',
+  exact:true,
+  fields:[['p6a','Δ<i>a</i> =','м/с²',function(c){return c.dar},0,'Δa',null],['p6b','<i>a</i><sub>сер</sub> =','м/с²',function(c){return c.ar},0,'a сер',null]],
+  sub:function(c){return 'Δ<i>a</i> до округлення: '+fmt(c.da,3)+' м/с²; &nbsp;<i>a</i><sub>сер</sub> до округлення: '+fmt(c.a,3)+' м/с²'},
+  hint:'Δa округліть до однієї значущої цифри вгору, а a_сер до того самого розряду.'}
+];
+function buildSteps(){
+  $('#steps').innerHTML=STEPS.map(function(st){
+    var flds=st.fields.map(function(f){return '<label class="af"><span>'+f[1]+'</span><input class="ink num" id="'+f[0]+'" data-k="'+f[0]+'" inputmode="decimal" autocomplete="off" aria-label="Відповідь: '+esc(f[5])+'"><span class="u">'+f[2]+'</span></label>'}).join('');
+    var extra='';
+    if(st.n===2)extra='<div id="contrib" hidden><p class="small" style="margin:8px 0 0">Внесок у відносну похибку ε<sub>a</sub>: порівняйте, і буде що написати в п. 4 висновку.</p><div class="cb" id="contribBars"></div></div>';
+    if(st.n===3)extra='<p class="final" id="finalLine" aria-live="polite"></p>';
+    return '<article class="step" id="step'+st.n+'"><header><span class="no">'+st.n+'</span><h3>'+st.title+'</h3></header>'+
+      '<div class="formula">'+st.f.map(function(x){return '<div>'+x+'</div>'}).join('')+'</div>'+(st.note?'<p class="small">'+st.note+'</p>':'')+
+      '<label class="wl" for="w'+st.n+'">Хід обчислень</label><textarea class="work" id="w'+st.n+'" data-k="w'+st.n+'" rows="'+(st.n===2?4:3)+'" spellcheck="false"></textarea>'+
+      '<div class="ans-row">'+flds+'<button class="btn primary" type="button" data-check="'+st.n+'">Перевірити</button></div>'+
+      '<p class="fb" id="fb'+st.n+'" aria-live="polite"></p>'+extra+
+      '<details><summary>Підказка: підставити мої дані</summary><p id="sub'+st.n+'" style="margin:6px 0 4px"></p><button class="btn sm" type="button" data-reveal="'+st.n+'">Показати відповідь</button><span class="ans" id="ans'+st.n+'" hidden></span></details></article>';
+  }).join('');
+}
+function checkStep(n){
+  var st=STEPS[n-1],c=calc(),fb=$('#fb'+n);
+  if(!c){setFb(fb,'','Спочатку введіть s і чотири часи t₁–t₄ в таблиці вимірювань.');return}
+  var bad=[],empty=false;
+  st.fields.forEach(function(f){
+    var v=num(S.f[f[0]]);if(isNaN(v)){empty=true;return}
+    var e=f[3](c),lim=st.exact?1e-6:Math.max(f[4],Math.abs(e)*0.02);
+    if(Math.abs(v-e)>lim)bad.push(f[5]);
+  });
+  if(empty){setFb(fb,'','Впишіть відповідь у всі поля цієї картки.');return}
+  var ok=!bad.length;S.chk[n]=ok;
+  setFb(fb,ok?'ok':'bad',ok?'Збігається з розрахунком за вашими вимірюваннями.':'Не збігається: '+bad.join(', ')+'. '+st.hint);
+  save();refresh();
+}
+function reveal(n){
+  var st=STEPS[n-1],c=calc(),el=$('#ans'+n);
+  el.hidden=false;
+  if(!c){el.textContent='Спочатку заповніть таблицю вимірювань.';return}
+  el.textContent=st.fields.map(function(f){return f[5]+' = '+fmt(f[3](c),f[6]==null?c.dec:f[6])+' '+f[2]}).join(';  ');
+}
+
+/* ---------- перевірка таблиці ---------- */
+function near(a,b,rel,abs){return isFinite(a)&&isFinite(b)&&Math.abs(a-b)<=Math.max(Math.abs(b)*rel,abs||0)}
+$('#bChkTbl').addEventListener('click',function(){
+  var fb=$('#fbTbl'),f=S.f,c=calc(),bad=[],filled=0;
+  ['s','t1','t2','t3','t4','T_tcep','T_a','T_ea','T_da','T_res'].forEach(function(k){if(String(f[k]||'').trim()!=='')filled++});
+  if(!filled){setFb(fb,'','Спочатку заповніть таблицю.');return}
+  if(!c){setFb(fb,'','Щоб перевірити праву частину таблиці, введіть s і всі чотири часи.');return}
+  var chk=function(k,e,rel,abs,name){var v=num(f[k]);if(String(f[k]||'').trim()!==''&&!near(v,e,rel,abs))bad.push(name)};
+  chk('T_tcep',c.tcep,0.02,0.006,'t сер');
+  chk('T_a',c.a,0.02,0.006,'a сер');
+  chk('T_ea',c.ea*100,0.03,0.06,'ε_a');
+  chk('T_da',c.da,0.03,0.006,'Δa');
+  if(String(f.T_res||'').trim()!==''){
+    var m=String(f.T_res).split('±');
+    if(m.length!==2||!near(num(m[0]),c.ar,0.001,0.0005)||!near(num(m[1]),c.dar,0.001,0.0005))bad.push('результат a ± Δa (округліть за правилами)');
+  }
+  if(bad.length)setFb(fb,'bad','Перевірте: '+bad.join(', ')+'.');
+  else setFb(fb,'ok','Помилок не знайдено.');
+});
+
+/* ---------- контрольні запитання ---------- */
+function checkQ(n){
+  var f=S.f,fb=$('#fbQ'+n);
+  if(n===1){
+    var a=num(f.q1a),b=num(f.q1b);
+    if(isNaN(a)||isNaN(b)){setFb(fb,'','Впишіть обидві відповіді.');return}
+    var ok=a===1&&b===2;S.chk.q1=ok;
+    setFb(fb,ok?'ok':'bad',ok?'Так: на прямій досить однієї координати, на площині потрібні дві.':'Не зовсім. Подумайте, скільки осей потрібно, щоб указати точку на прямій і на площині.');
+  }else if(n===2){
+    if(!f.q2){setFb(fb,'','Оберіть варіант.');return}
+    var ok2=f.q2==='III';S.chk.q2=ok2;
+    setFb(fb,ok2?'ok':'bad',ok2?'Так: проекція швидкості від’ємна (рух проти осі OX), а її модуль зменшується.':'Шукайте графік, де vₓ < 0 (рух проти осі OX), а модуль швидкості зменшується з часом.');
+  }else{
+    var a3=num(f.q3a);
+    if(!f.q3||isNaN(a3)){setFb(fb,'','Оберіть тіло й уведіть прискорення.');return}
+    var msg=[];
+    if(f.q3!=='II')msg.push('Порівняйте початкову координату x₀ = 280 м із положеннями тіл на осі. Заправна колонка стоїть на місці.');
+    if(Math.abs(a3-0.6)>0.011)msg.push('Порівняйте рівняння з x = x₀ + v₀ₓt + aₓt²/2: перед t² стоїть aₓ/2.');
+    var ok3=!msg.length;S.chk.q3=ok3;
+    setFb(fb,ok3?'ok':'bad',ok3?'Так: x₀ = 280 м, v₀ₓ = −25 м/с, aₓ/2 = 0,3, отже aₓ = 0,6 м/с².':msg.join(' '));
+  }
+  save();
+}
+
+/* ---------- прив’язка полів ---------- */
+var TRACK=['s','t1','t2','t3','t4','T_tcep','T_a','T_ea','T_da','T_res','p1','p2','p3a','p3b','p4a','p4b','p5a','p5b','p6a','p6b','concl','q1a','q1b','q2','q3','q3a','cr'];
+function fillAll(){
+  $$('[data-k]').forEach(function(el){
+    var k=el.dataset.k;
+    if(el.classList.contains('chips'))return;
+    if(el.type==='checkbox')el.checked=!!S.f[k];else el.value=S.f[k]||'';
+  });
+  paintChips();
+}
+function bindAll(){
+  $$('[data-k]').forEach(function(el){
+    if(el.classList.contains('chips'))return;
+    var k=el.dataset.k;
+    el.addEventListener(el.type==='checkbox'?'change':'input',function(){
+      S.f[k]=el.type==='checkbox'?el.checked:el.value;save();refresh();
+    });
+  });
+  $$('.chips').forEach(function(ch){
+    ch.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-v]');if(!b)return;
+      S.f[ch.dataset.k]=b.dataset.v;paintChips();save();refresh();
+    });
+  });
+}
+function paintChips(){
+  $$('.chips[data-k]').forEach(function(ch){
+    $$('button[data-v]',ch).forEach(function(b){b.setAttribute('aria-checked',String(S.f[ch.dataset.k]===b.dataset.v))});
+  });
+}
+function refresh(){
+  var n=TRACK.filter(function(k){return String(S.f[k]||'').trim()!==''}).length;
+  $('#progTxt').textContent=n+' з '+TRACK.length;
+  $('#progBar').style.width=(100*n/TRACK.length)+'%';
+  var c=calc();
+  STEPS.forEach(function(st){$('#sub'+st.n).innerHTML=c?st.sub(c):'Спочатку заповніть таблицю вимірювань.'});
+  $('#finalLine').textContent=S.f.p6a&&S.f.p6b?'a = '+S.f.p6b+' ± '+S.f.p6a+' м/с²':'';
+  $('#contrib').hidden=!(S.chk[2]&&c);
+  if(c&&S.chk[2]){
+    var a=c.es*100,b=2*c.et*100,m=Math.max(a,b,1e-9);
+    $('#contribBars').innerHTML='<span>ε<sub>s</sub></span><span class="bar2"><i style="width:'+(100*a/m)+'%"></i></span><span>'+fmt(a,2)+' %</span><span>2ε<sub>t</sub></span><span class="bar2"><i style="width:'+(100*b/m)+'%"></i></span><span>'+fmt(b,2)+' %</span>';
+  }
+}
+function restoreFb(){
+  $$('.fb').forEach(function(e){e.className='fb';e.textContent=''});
+  STEPS.forEach(function(st){if(S.chk[st.n])setFb($('#fb'+st.n),'ok','Збігається з розрахунком за вашими вимірюваннями.')});
+  [1,2,3].forEach(function(q){if(S.chk['q'+q])setFb($('#fbQ'+q),'ok','Відповідь перевірено: правильно.')});
+  $$('.ans').forEach(function(e){e.hidden=true});
+}
+
+/* ---------- графік s(t) ---------- */
+var gcv=$('#gCv'),gx=gcv.getContext('2d');
+var GW=1000,GH=640,ML=88,MR=40,MT=40,MB=76;
+var GS=S.g.graph=S.g.graph||{xmax:6,ymax:16,snap:true,objs:[]};
+var gTool='pt',gTemp=null,gProbe=null,gDown=false,gPen=null;
+var HINTS={pt:'Точка: торкніться поля там, де має бути точка (t; s).',ln:'Лінія: натисніть, перетягніть і відпустіть. З’єднуйте точки або проведіть криву відрізками.',pen:'Олівець: малюйте від руки пальцем, стилусом або мишею.',rd:'Зчитати: торкніться лінії або будь-якого місця. З’являться значення t та s.',er:'Гумка: торкніться точки чи лінії, щоб стерти.'};
+function nstep(t){var p=Math.pow(10,Math.floor(Math.log10(t))),m=t/p;return (m<=1?1:m<=2?2:m<=5?5:10)*p}
+function steps(){var X=nstep(GS.xmax/5),Y=nstep(GS.ymax/5);return {X:X,Y:Y,x:X/5,y:Y/5}}
+function PX(v){return ML+v/GS.xmax*(GW-ML-MR)}
+function PY(v){return GH-MB-v/GS.ymax*(GH-MT-MB)}
+function DX(p){return (p-ML)/(GW-ML-MR)*GS.xmax}
+function DY(p){return (GH-MB-p)/(GH-MT-MB)*GS.ymax}
+function gDraw(){
+  var st=steps(),i,v,nx=Math.round(GS.xmax/st.x),ny=Math.round(GS.ymax/st.y);
+  gx.clearRect(0,0,GW,GH);gx.fillStyle='#fffefa';gx.fillRect(0,0,GW,GH);
+  for(i=0;i<=nx;i++){v=i*st.x;gx.strokeStyle=(i%5)?'#cfe0f1':'#8fb4da';gx.lineWidth=(i%5)?1:1.6;gx.beginPath();gx.moveTo(PX(v),MT);gx.lineTo(PX(v),GH-MB);gx.stroke()}
+  for(i=0;i<=ny;i++){v=i*st.y;gx.strokeStyle=(i%5)?'#cfe0f1':'#8fb4da';gx.lineWidth=(i%5)?1:1.6;gx.beginPath();gx.moveTo(ML,PY(v));gx.lineTo(GW-MR,PY(v));gx.stroke()}
+  gx.strokeStyle='#111';gx.fillStyle='#111';gx.lineWidth=2.5;
+  gx.beginPath();gx.moveTo(ML,GH-MB);gx.lineTo(GW-MR+18,GH-MB);gx.moveTo(ML,GH-MB);gx.lineTo(ML,MT-18);gx.stroke();
+  gx.beginPath();gx.moveTo(GW-MR+20,GH-MB);gx.lineTo(GW-MR+6,GH-MB-6);gx.lineTo(GW-MR+6,GH-MB+6);gx.closePath();gx.fill();
+  gx.beginPath();gx.moveTo(ML,MT-20);gx.lineTo(ML-6,MT-6);gx.lineTo(ML+6,MT-6);gx.closePath();gx.fill();
+  gx.font='17px sans-serif';gx.textBaseline='top';gx.textAlign='center';
+  for(i=5;i<=nx;i+=5){v=i*st.x;gx.fillText(trimNum(v,2),PX(v),GH-MB+8)}
+  gx.textAlign='right';gx.textBaseline='middle';
+  gx.fillText('0',ML-8,PY(0)+10);
+  for(i=5;i<=ny;i+=5){v=i*st.y;gx.fillText(trimNum(v,2),ML-8,PY(v))}
+  gx.font='italic 20px serif';gx.textAlign='right';gx.textBaseline='bottom';gx.fillText('t, с',GW-8,GH-MB+48);
+  gx.textAlign='left';gx.textBaseline='top';gx.fillText('s, м',ML+14,6);
+  gx.lineCap='round';gx.lineJoin='round';
+  GS.objs.forEach(function(o){
+    if(o.t==='pen'){gx.strokeStyle='#222';gx.lineWidth=2.5;gx.beginPath();o.p.forEach(function(q,k){k?gx.lineTo(PX(q[0]),PY(q[1])):gx.moveTo(PX(q[0]),PY(q[1]))});gx.stroke()}
+    else if(o.t==='ln')dLine(o,'#1b3fb0');
+  });
+  if(gTemp)dLine(gTemp,'rgba(27,63,176,.6)');
+  if(gPen&&gPen.length>1){gx.strokeStyle='#222';gx.lineWidth=2.5;gx.beginPath();gPen.forEach(function(q,k){k?gx.lineTo(PX(q[0]),PY(q[1])):gx.moveTo(PX(q[0]),PY(q[1]))});gx.stroke()}
+  GS.objs.forEach(function(o){if(o.t==='p'){gx.beginPath();gx.arc(PX(o.x),PY(o.y),6,0,2*Math.PI);gx.fillStyle='#c1121f';gx.fill();gx.lineWidth=2;gx.strokeStyle='#fff';gx.stroke()}});
+  if(gProbe){
+    var px=PX(gProbe.x),py=PY(gProbe.y);
+    gx.save();gx.setLineDash([7,5]);gx.strokeStyle='#0b7a43';gx.lineWidth=2;
+    gx.beginPath();gx.moveTo(px,GH-MB);gx.lineTo(px,py);gx.lineTo(ML,py);gx.stroke();gx.restore();
+    gx.beginPath();gx.arc(px,py,7,0,2*Math.PI);gx.fillStyle='#0b7a43';gx.fill();
+    var t='t = '+trimNum(gProbe.x,2)+' с;  s = '+trimNum(gProbe.y,2)+' м';
+    gx.font='bold 18px sans-serif';var w=gx.measureText(t).width+16,bx=Math.min(px+12,GW-w-6),by=Math.max(py-44,MT+4);
+    gx.fillStyle='rgba(255,255,255,.96)';gx.fillRect(bx,by,w,30);gx.strokeStyle='#0b7a43';gx.lineWidth=1.5;gx.strokeRect(bx,by,w,30);
+    gx.fillStyle='#0b4d2b';gx.textAlign='left';gx.textBaseline='middle';gx.fillText(t,bx+8,by+15);
+  }
+}
+function dLine(o,c){gx.strokeStyle=c;gx.lineWidth=3;gx.beginPath();gx.moveTo(PX(o.x1),PY(o.y1));gx.lineTo(PX(o.x2),PY(o.y2));gx.stroke()}
+function gPos(e){var r=gcv.getBoundingClientRect();return [(e.clientX-r.left)*GW/r.width,(e.clientY-r.top)*GH/r.height]}
+function inPlot(p){return p[0]>=ML-2&&p[0]<=GW-MR+2&&p[1]>=MT-2&&p[1]<=GH-MB+2}
+function toData(p,snap){
+  var x=Math.max(0,Math.min(GS.xmax,DX(p[0]))),y=Math.max(0,Math.min(GS.ymax,DY(p[1])));
+  if(snap&&GS.snap){var st=steps();x=Math.round(x/st.x)*st.x;y=Math.round(y/st.y)*st.y}
+  return [x,y];
+}
+function segDist(px,py,ax,ay,bx,by){
+  var dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy,t=l?Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/l)):0;
+  var cx=ax+t*dx,cy=ay+t*dy;return {d:Math.hypot(px-cx,py-cy),x:cx,y:cy};
+}
+function eraseAt(p){
+  var n=GS.objs.length;
+  GS.objs=GS.objs.filter(function(o){
+    if(o.t==='p')return Math.hypot(PX(o.x)-p[0],PY(o.y)-p[1])>14;
+    if(o.t==='ln')return segDist(p[0],p[1],PX(o.x1),PY(o.y1),PX(o.x2),PY(o.y2)).d>12;
+    for(var k=1;k<o.p.length;k++){if(segDist(p[0],p[1],PX(o.p[k-1][0]),PY(o.p[k-1][1]),PX(o.p[k][0]),PY(o.p[k][1])).d<=12)return false}
+    return true;
+  });
+  if(GS.objs.length!==n){gDraw();save()}
+}
+function probeAt(p){
+  var best=null;
+  GS.objs.forEach(function(o){if(o.t==='ln'){var s=segDist(p[0],p[1],PX(o.x1),PY(o.y1),PX(o.x2),PY(o.y2));if(s.d<=18&&(!best||s.d<best.d))best=s}});
+  var d=best?[DX(best.x),DY(best.y)]:toData(p,false);
+  gProbe={x:Math.max(0,Math.min(GS.xmax,d[0])),y:Math.max(0,Math.min(GS.ymax,d[1]))};
+  $('#gProbe').hidden=false;
+  $('#gProbeTxt').textContent='t = '+trimNum(gProbe.x,2)+' с, s = '+trimNum(gProbe.y,2)+' м';
+  gDraw();
+}
+gcv.addEventListener('pointerdown',function(e){
+  var p=gPos(e);e.preventDefault();
+  try{gcv.setPointerCapture(e.pointerId)}catch(x){}
+  if(gTool==='er'){gDown=true;eraseAt(p);return}
+  if(gTool==='rd'){gDown=true;if(inPlot(p))probeAt(p);return}
+  if(!inPlot(p))return;
+  gDown=true;
+  if(gTool==='pt'){var d=toData(p,true);GS.objs.push({t:'p',x:d[0],y:d[1]});gDown=false;gDraw();save()}
+  else if(gTool==='ln'){var a=toData(p,true);gTemp={t:'ln',x1:a[0],y1:a[1],x2:a[0],y2:a[1]};gDraw()}
+  else if(gTool==='pen'){gPen=[toData(p,false)];gDraw()}
+});
+gcv.addEventListener('pointermove',function(e){
+  if(!gDown)return;var p=gPos(e);
+  if(gTool==='er')eraseAt(p);
+  else if(gTool==='rd'){if(inPlot(p))probeAt(p)}
+  else if(gTool==='ln'&&gTemp){var b=toData(p,true);gTemp.x2=b[0];gTemp.y2=b[1];gDraw()}
+  else if(gTool==='pen'&&gPen){gPen.push(toData(p,false));gDraw()}
+});
+['pointerup','pointercancel'].forEach(function(ev){gcv.addEventListener(ev,function(){
+  if(!gDown)return;gDown=false;
+  if(gTool==='ln'&&gTemp){
+    if(Math.hypot(PX(gTemp.x2)-PX(gTemp.x1),PY(gTemp.y2)-PY(gTemp.y1))>8)GS.objs.push(gTemp);
+    gTemp=null;gDraw();save();
+  } else if(gTool==='pen'&&gPen){
+    if(gPen.length>1)GS.objs.push({t:'pen',p:gPen});
+    gPen=null;gDraw();save();
+  }
+})});
+$$('[data-tool]').forEach(function(b){b.addEventListener('click',function(){
+  gTool=b.dataset.tool;$$('[data-tool]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+  $('#gHint').textContent=HINTS[gTool];gcv.style.cursor=gTool==='er'?'cell':'crosshair';
+})});
+$('#gUndo').addEventListener('click',function(){GS.objs.pop();gDraw();save()});
+$('#gClr').addEventListener('click',function(){
+  if(!GS.objs.length)return;
+  if(!confirm('Стерти все з графіка?'))return;
+  GS.objs=[];gProbe=null;$('#gProbe').hidden=true;gDraw();save();
+});
+function niceCeil(v){var p=Math.pow(10,Math.floor(Math.log10(v))),m=v/p,pick=[1,1.2,1.5,2,2.5,3,4,5,6,8,10];for(var i=0;i<pick.length;i++){if(m<=pick[i]+1e-9)return pick[i]*p}return 10*p}
+$('#gAuto').addEventListener('click',function(){
+  var c=calc();
+  if(!c){$('#gHint').textContent='Спочатку заповніть s і чотири часи в таблиці: тоді точки розрахуються за вашим a.';return}
+  GS.objs=GS.objs.filter(function(o){return !o.auto});
+  for(var i=0;i<=5;i++){var t=c.tcep*i/5;GS.objs.push({t:'p',x:t,y:c.a*t*t/2,auto:true})}
+  GS.xmax=niceCeil(c.tcep*1.1);GS.ymax=niceCeil(c.s*1.1);
+  $('#gXmax').value=GS.xmax;$('#gYmax').value=GS.ymax;
+  $('#gHint').textContent='Точки s = at²/2 нанесено. З’єднайте їх інструментом «Лінія» або «Олівець».';
+  gDraw();save();
+});
+$('#gXmax').addEventListener('input',function(){var v=num(this.value);if(v>0){GS.xmax=v;gDraw();save()}});
+$('#gYmax').addEventListener('input',function(){var v=num(this.value);if(v>0){GS.ymax=v;gDraw();save()}});
+$('#gSnap').addEventListener('change',function(){GS.snap=this.checked;save()});
+
+/* ---------- тренажер з автоматичним секундоміром ---------- */
+var g=9.81,sim={a:6.7,L:14.8,m:60,mu:0,d:0,t:0,run:false,done:false,saved:false,ruler:false,prev:0};
+var cvS=$('#simCv'),cxS=cvS.getContext('2d');
+function aTh(){var r=sim.a*Math.PI/180;return g*(Math.sin(r)-sim.mu*Math.cos(r))}
+function simMsg(t){$('#simMsg').textContent=t}
+function swFmt(s){var m=Math.floor(s/60),r=s-m*60;return String(m).padStart(2,'0')+':'+r.toFixed(2).padStart(5,'0')}
+function swShow(){var e=$('#swDisp');e.textContent=swFmt(sim.t);e.classList.toggle('run',sim.run)}
+function drawSim(){
+  var C={ground:'#c2ae8a',hill:'#dde6f1',print:'#1f2430',margin:'#d1242a',ink:'#1b3fb0'};
+  cxS.setTransform(2,0,0,2,0,0);cxS.clearRect(0,0,800,300);
+  var th=sim.a*Math.PI/180,sc=34,gy=268,x0=70,H=sim.L*Math.cos(th)*sc,V=sim.L*Math.sin(th)*sc,ex=x0+H,ey=gy-6,sy=ey-V;
+  cxS.fillStyle=C.ground;cxS.fillRect(0,gy,800,32);
+  cxS.beginPath();cxS.moveTo(x0,sy);cxS.lineTo(ex,ey);cxS.lineTo(ex,gy);cxS.lineTo(x0,gy);cxS.closePath();cxS.fillStyle=C.hill;cxS.fill();
+  cxS.lineCap='round';cxS.strokeStyle=C.print;cxS.lineWidth=4;cxS.beginPath();cxS.moveTo(x0,sy);cxS.lineTo(ex,ey);cxS.stroke();
+  [[x0,sy],[ex,ey]].forEach(function(p){cxS.beginPath();cxS.arc(p[0],p[1],8,0,7);cxS.fillStyle=C.margin;cxS.fill();cxS.lineWidth=2;cxS.strokeStyle=C.print;cxS.stroke()});
+  var px=x0+Math.cos(th)*sim.d*sc,py=sy+Math.sin(th)*sim.d*sc;
+  cxS.save();cxS.translate(px,py);cxS.rotate(th);cxS.fillStyle=C.ink;cxS.fillRect(-20,-9,40,5);cxS.fillStyle=C.print;
+  [-13,13].forEach(function(w){cxS.beginPath();cxS.arc(w,-4,3.6,0,7);cxS.fill()});cxS.restore();
+  cxS.save();cxS.translate(px,py-10);cxS.strokeStyle=C.print;cxS.lineWidth=4;
+  cxS.beginPath();cxS.moveTo(-6,0);cxS.lineTo(0,-16);cxS.lineTo(6,0);cxS.moveTo(0,-16);cxS.lineTo(0,-36);cxS.moveTo(0,-32);cxS.lineTo(-13,-24);cxS.moveTo(0,-32);cxS.lineTo(13,-26);cxS.stroke();
+  cxS.beginPath();cxS.arc(0,-44,7,0,7);cxS.fillStyle=C.ink;cxS.fill();cxS.restore();
+  if(sim.ruler){
+    var nx=Math.sin(th),ny=-Math.cos(th),off=34,ax=x0+nx*off,ay=sy+ny*off,bx=ex+nx*off,by=ey+ny*off;
+    cxS.strokeStyle=C.margin;cxS.lineWidth=2;cxS.beginPath();cxS.moveTo(ax,ay);cxS.lineTo(bx,by);
+    [[ax,ay],[bx,by]].forEach(function(p){cxS.moveTo(p[0]-nx*7,p[1]-ny*7);cxS.lineTo(p[0]+nx*7,p[1]+ny*7)});cxS.stroke();
+    cxS.save();cxS.translate((ax+bx)/2,(ay+by)/2);cxS.rotate(th);cxS.fillStyle=C.margin;cxS.font='700 15px Literata, serif';cxS.textAlign='center';cxS.fillText('s = '+fmt(sim.L,1)+' м',0,-8);cxS.restore();
+  }
+}
+function theo(){var a=aTh();$('#simTheo').textContent=a>0?'a = g(sin α − μ cos α) = '+fmt(a,3)+' м/с²; очікуваний час t = √(2s/a) = '+fmt(Math.sqrt(2*sim.L/a),2)+' с (s = '+fmt(sim.L,1)+' м).':'Тертя утримує скейтбордиста: a = 0.'}
+function resetSim(){sim.run=false;sim.d=0;sim.t=0;sim.done=false;sim.saved=false;drawSim();theo();swShow()}
+function tick(ts){
+  if(!sim.run)return;
+  sim.t+=Math.max(0,(ts-sim.prev)/1000);sim.prev=ts;
+  sim.d=0.5*aTh()*sim.t*sim.t;
+  if(sim.d>=sim.L){
+    sim.d=sim.L;sim.run=false;sim.done=true;
+    simMsg('Секундомір зупинився автоматично: t = '+fmt(sim.t,2)+' с. Натисніть «Записати час у таблицю».');
+  }
+  drawSim();swShow();
+  if(sim.run)requestAnimationFrame(tick);
+}
+[['slA','a','oA',function(v){return fmt(v,1)+'°'}],['slL','L','oL',null],['slM','m','oM',function(v){return fmt(v,0)+' кг'}],['slU','mu','oU',function(v){return fmt(v,3)}]].forEach(function(d){
+  var el=$('#'+d[0]),out=$('#'+d[2]);
+  var upd=function(){sim[d[1]]=parseFloat(el.value);if(d[3])out.textContent=d[3](sim[d[1]]);resetSim()};
+  el.addEventListener('input',function(){upd();simMsg('')});upd();
+});
+$('#bRelease').addEventListener('click',function(){
+  if(sim.run)return;
+  if(aTh()<=0){simMsg('Тертя утримує скейтбордиста, він не рушає. Зменште μ або збільште кут.');return}
+  sim.d=0;sim.t=0;sim.done=false;sim.saved=false;sim.run=true;sim.prev=performance.now();
+  simMsg('Скейтбордист їде, секундомір іде разом із ним.');swShow();requestAnimationFrame(tick);
+});
+$('#bBack').addEventListener('click',function(){resetSim();simMsg('')});
+$('#bRuler').addEventListener('click',function(e){
+  sim.ruler=!sim.ruler;e.currentTarget.setAttribute('aria-pressed',String(sim.ruler));drawSim();
+  simMsg(sim.ruler?'Рулетка показує відстань s від лівого кола до правого. Запишіть її в таблицю самостійно.':'');
+});
+$('#swSave').addEventListener('click',function(){
+  if(sim.run){simMsg('Дочекайтеся, поки скейтбордист доїде до кінця треку.');return}
+  if(!sim.done){simMsg('Спочатку натисніть «Відпустити».');return}
+  if(sim.saved){simMsg('Цей час уже записано. Натисніть «Відпустити» для нового досліду.');return}
+  for(var i=1;i<=4;i++){
+    if(!String(S.f['t'+i]||'').trim()){
+      S.f['t'+i]=fmt(sim.t,2);$('#t'+i).value=S.f['t'+i];sim.saved=true;save();refresh();
+      simMsg('Записано t'+['₁','₂','₃','₄'][i-1]+' = '+S.f['t'+i]+' с.'+(i<4?' Відпустіть скейтбордиста ще раз.':' Усі чотири виміри записані.'));return;
+    }
+  }
+  simMsg('Усі чотири виміри вже записані.');
+});
+
+/* ---------- звіт, PDF, очищення ---------- */
+function report(){
+  var f=S.f,L=[];
+  L.push('ЛАБОРАТОРНА РОБОТА № 1. Визначення прискорення тіла в ході рівноприскореного прямолінійного руху');
+  L.push('Клас: '+(f.klass||'—')+'; '+(f.fio||'—')+'; дата: '+(f.date||'—'));
+  L.push('s = '+(f.s||'—')+' м; t1…t4 = '+[1,2,3,4].map(function(i){return f['t'+i]||'—'}).join('; ')+' с');
+  L.push('Таблиця: t сер = '+(f.T_tcep||'—')+' с; a сер = '+(f.T_a||'—')+' м/с²; ε_a = '+(f.T_ea||'—')+' %; Δa = '+(f.T_da||'—')+' м/с²; результат: '+(f.T_res||'—'));
+  L.push('Обчислення: t сер = '+(f.p1||'—')+' с; a сер = '+(f.p2||'—')+' м/с²; ε_a = '+(f.p5a||'—')+' %; Δa = '+(f.p6a||f.p5b||'—')+' м/с²');
+  L.push('Результат: a = '+(f.p6a&&f.p6b?f.p6b+' ± '+f.p6a:'—')+' м/с²');
+  L.push('Висновок: '+(f.concl||'—'));
+  L.push('Контрольні запитання: 1) '+(f.q1a||'—')+' і '+(f.q1b||'—')+'; 2) '+(f.q2||'—')+'; 3) '+(f.q3||'—')+', a = '+(f.q3a||'—')+' м/с²');
+  if(f.cr)L.push('Творче завдання: '+f.cr);
+  return L.join('\n');
+}
+$('#bReport').addEventListener('click',function(){
+  var ta=$('#reportTxt'),t=report();ta.value=t;ta.hidden=false;
+  var done=function(ok){$('#reportMsg').textContent=ok?'Звіт скопійовано. Вставте його в повідомлення вчителю.':'Виділіть текст вище й скопіюйте його вручну.';if(!ok){ta.focus();ta.select()}};
+  try{navigator.clipboard.writeText(t).then(function(){done(true)},function(){done(false)})}catch(e){done(false)}
+});
+$('#bPdf').addEventListener('click',function(){
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  window.print();
+});
+$('#bClear').addEventListener('click',function(){
+  if(!confirm('Очистити всі введені дані?'))return;
+  try{localStorage.removeItem(KEY)}catch(e){}
+  S=fresh();location.reload();
+});
+function initDate(){if(!S.f.date){try{S.f.date=new Date().toLocaleDateString('uk-UA')}catch(e){}}}
+document.addEventListener('click',function(e){
+  var c=e.target.closest('[data-check]');if(c){checkStep(+c.dataset.check);return}
+  var r=e.target.closest('[data-reveal]');if(r){reveal(+r.dataset.reveal);return}
+  var q=e.target.closest('[data-q]');if(q){checkQ(+q.dataset.q);return}
+  var a=e.target.closest('.nav a');
+  if(a){e.preventDefault();var el=document.getElementById(a.getAttribute('href').slice(1));if(el)el.scrollIntoView()}
+});
+
+/* ---------- редактори відповідей (текст / малювання / зображення) ---------- */
+function mountResponseEditors(){
+  S.g.responseEditors=S.g.responseEditors||{};
+  $$('.work').forEach(function(ta){
+    if(ta.dataset.editorMounted)return;ta.dataset.editorMounted='1';
+    var key=ta.dataset.k||ta.id,state=S.g.responseEditors[key]||{mode:'text',draw:'',image:''};
+    S.g.responseEditors[key]=state;
+    var wrap=document.createElement('div');wrap.className='response-editor';
+    var tabs=document.createElement('div');tabs.className='response-tabs';tabs.setAttribute('role','group');
+    [['text','Ввести текст'],['draw','Малювати від руки'],['image','Вставити зображення']].forEach(function(it){
+      var b=document.createElement('button');b.type='button';b.className='btn';b.textContent=it[1];b.dataset.mode=it[0];tabs.appendChild(b);
+    });
+    var textPanel=document.createElement('div');textPanel.className='response-panel';textPanel.style.padding='0';
+    var drawPanel=document.createElement('div');drawPanel.className='response-panel';
+    var tools=document.createElement('div');tools.className='response-tools';
+    var pen=document.createElement('button');pen.type='button';pen.className='btn sm';pen.textContent='Ручка';
+    var er=document.createElement('button');er.type='button';er.className='btn sm';er.textContent='Гумка';
+    var clr=document.createElement('button');clr.type='button';clr.className='btn sm';clr.textContent='Очистити';
+    tools.append(pen,er,clr);
+    var rCv=document.createElement('canvas');rCv.className='response-canvas';rCv.width=900;rCv.height=220;rCv.setAttribute('aria-label','Поле рукописної відповіді');
+    var hint=document.createElement('p');hint.className='response-hint';hint.textContent='Малюйте мишею, пальцем або стилусом.';
+    drawPanel.append(tools,rCv,hint);
+    var imgPanel=document.createElement('div');imgPanel.className='response-panel';imgPanel.tabIndex=0;
+    var upLabel=document.createElement('label');upLabel.className='response-upload';upLabel.textContent='Вибрати зображення ';
+    var fileEl=document.createElement('input');fileEl.type='file';fileEl.accept='image/*';upLabel.appendChild(fileEl);
+    var pHint=document.createElement('p');pHint.className='response-hint';pHint.textContent='Або вставте через Ctrl+V.';
+    var prevImg=document.createElement('img');prevImg.className='response-image-preview';prevImg.alt='';
+    var clrImg=document.createElement('button');clrImg.type='button';clrImg.className='btn sm';clrImg.textContent='Видалити';
+    imgPanel.append(upLabel,pHint,prevImg,clrImg);
+    ta.parentNode.insertBefore(wrap,ta);
+    textPanel.appendChild(ta);wrap.append(tabs,textPanel,drawPanel,imgPanel);
+    function setMode(mode){
+      state.mode=mode;S.g.responseEditors[key]=state;
+      textPanel.hidden=mode!=='text';drawPanel.hidden=mode!=='draw';imgPanel.hidden=mode!=='image';
+      Array.prototype.forEach.call(tabs.children,function(b){b.setAttribute('aria-pressed',String(b.dataset.mode===mode))});
+      save();
+    }
+    var rCtx=rCv.getContext('2d'),rDown=false,rLast=null,rTool='pen';rCtx.lineCap='round';rCtx.lineJoin='round';
+    if(state.draw){var rIm=new Image();rIm.onload=function(){rCtx.drawImage(rIm,0,0,rCv.width,rCv.height)};rIm.src=state.draw}
+    function showPrev(){if(state.image){prevImg.src=state.image;prevImg.hidden=false}else{prevImg.removeAttribute('src');prevImg.hidden=true}}
+    showPrev();
+    function rPos(e){var r=rCv.getBoundingClientRect();return [(e.clientX-r.left)*rCv.width/r.width,(e.clientY-r.top)*rCv.height/r.height]}
+    function rLine(a,b){rCtx.globalCompositeOperation=rTool==='erase'?'destination-out':'source-over';rCtx.strokeStyle='#111';rCtx.lineWidth=rTool==='erase'?25:3;rCtx.beginPath();rCtx.moveTo(a[0],a[1]);rCtx.lineTo(b[0],b[1]);rCtx.stroke()}
+    function persD(){try{var o=document.createElement('canvas');o.width=rCv.width;o.height=rCv.height;var ox=o.getContext('2d');ox.fillStyle='#fff';ox.fillRect(0,0,o.width,o.height);ox.drawImage(rCv,0,0);state.draw=o.toDataURL('image/jpeg',.72);S.g.responseEditors[key]=state;save()}catch(e){}}
+    rCv.addEventListener('pointerdown',function(e){rDown=true;rLast=rPos(e);try{rCv.setPointerCapture(e.pointerId)}catch(z){}rLine(rLast,rLast);e.preventDefault()});
+    rCv.addEventListener('pointermove',function(e){if(!rDown)return;var p=rPos(e);rLine(rLast,p);rLast=p});
+    ['pointerup','pointercancel'].forEach(function(ev){rCv.addEventListener(ev,function(){if(rDown){rDown=false;persD()}})});
+    pen.addEventListener('click',function(){rTool='pen'});er.addEventListener('click',function(){rTool='erase'});
+    clr.addEventListener('click',function(){rCtx.globalCompositeOperation='source-over';rCtx.clearRect(0,0,rCv.width,rCv.height);state.draw='';S.g.responseEditors[key]=state;save()});
+    function readImg(f){
+      if(!f||f.type.indexOf('image/')!==0)return;
+      var rd=new FileReader();
+      rd.onload=function(){var im=new Image();im.onload=function(){
+        var c=document.createElement('canvas'),sc=Math.min(1,900/im.width,700/im.height);
+        c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));
+        var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+        try{state.image=c.toDataURL('image/jpeg',.68);S.g.responseEditors[key]=state;showPrev();save()}catch(e){}
+      };im.src=rd.result};
+      rd.readAsDataURL(f);
+    }
+    fileEl.addEventListener('change',function(){readImg(fileEl.files&&fileEl.files[0])});
+    clrImg.addEventListener('click',function(){state.image='';S.g.responseEditors[key]=state;showPrev();fileEl.value='';save()});
+    imgPanel.addEventListener('paste',function(e){var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var i=0;i<items.length;i++){if(items[i].type.indexOf('image/')===0){readImg(items[i].getAsFile());e.preventDefault();return}}});
+    tabs.addEventListener('click',function(e){var b=e.target.closest('button[data-mode]');if(b)setMode(b.dataset.mode)});
+    setMode(state.mode||'text');
+  });
+}
+
+/* ---------- старт ---------- */
+buildSteps();fillAll();bindAll();refresh();restoreFb();mountResponseEditors();
+$('#gXmax').value=GS.xmax;$('#gYmax').value=GS.ymax;$('#gSnap').checked=!!GS.snap;
+$('#gHint').textContent=HINTS.pt;gDraw();
+try{
+  var links=$$('.nav a');
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting)links.forEach(function(a){a.setAttribute('aria-current',String(a.getAttribute('href')==='#'+en.target.id))})})},{rootMargin:'-25% 0px -65% 0px'});
+  $$('main.sheet>section').forEach(function(s){io.observe(s)});
+}catch(e){}
+})();
+</script>
+</body></html>

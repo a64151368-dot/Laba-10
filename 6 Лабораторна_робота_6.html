@@ -1,0 +1,930 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Лабораторна робота № 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Literata:wght@400;600;700&family=Marck+Script&display=swap">
+<style>
+:root{
+  --desk:#cdd6e2;--bar:#f1f5fb;--paper:#fcfdff;--grid:#d2e4f6;--grid-s:#a9c8e9;
+  --margin:#e2707b;--print:#1f2430;--muted:#5a6579;--ink:#1b3fb0;--ink-line:#8196d8;
+  --note:#eef4fc;--edge:#b4c0d3;--ok:#17794a;--bad:#bd2f2f;--btn-fg:#ffffff;
+  --tbl:#3c4557;--sky:#e6f2fc;--hov:#e2eafb;--sim:#fff8d4;--sim-edge:#e7da8c;--cell:20px;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;--sim:#38341d;--sim-edge:#665c2a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;--sim:#38341d;--sim-edge:#665c2a;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:60px}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{background:var(--desk);color:var(--print);font:16px/1.55 'Literata',Georgia,'Times New Roman',serif;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bar)}
+b,strong{font-weight:700}
+a{color:var(--ink)}
+:focus-visible{outline:2px solid var(--margin);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);border-bottom:1px solid var(--edge)}
+.bar-in{max-width:980px;margin:0 auto;padding-block:6px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;gap:4px 16px;align-items:center;flex-wrap:wrap}
+.nav{display:flex;gap:4px;overflow-x:auto;flex:1 1 300px;min-width:0}
+.nav a{white-space:nowrap;padding:2px 10px;border-radius:3px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:600}
+.nav a:hover{background:var(--hov)}
+.nav a[aria-current="true"]{background:var(--ink);color:var(--btn-fg)}
+.status{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.meter{width:70px;height:6px;background:var(--note);border:1px solid var(--edge);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle}
+.meter i{display:block;height:100%;width:0;background:var(--ink);transition:width .25s}
+
+.page{max-width:980px;margin:0 auto;padding-block:10px 24px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{position:relative;background-color:var(--paper);
+  background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);padding:14px 20px 28px 50px;border-radius:3px;box-shadow:0 10px 28px rgba(10,20,40,.22)}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:40px;width:2px;background:var(--margin);opacity:.85}
+.sheet>section{margin-top:20px}
+h1{margin:0;text-align:center;font-size:22px;line-height:1.6;letter-spacing:.03em}
+h2{margin:0 0 12px;font-size:19px;line-height:1.6;border-bottom:2px solid var(--margin);display:inline-block;padding-right:18px}
+h3{margin:0 0 6px;font-size:16px;line-height:1.45}
+p{margin:0 0 8px}
+.small{font-size:14px;line-height:1.5;color:var(--muted)}
+.fio{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:10px}
+.fio label{display:inline-flex;align-items:baseline;gap:6px}
+.w-s{width:7em}.w-l{width:min(20em,100%)}
+
+input.ink{font:19px/24px 'Marck Script',cursive;color:#d4a000;background:transparent;border:0;border-bottom:1.5px solid #a07800;border-radius:0;padding:1px 4px;min-width:0}
+input.ink:focus{background:#1a1200;color:#ffe040;border-bottom-color:#ffe040;outline:none}
+input.ink::placeholder,textarea.work::placeholder{color:var(--muted);opacity:.5}
+input.num{width:6em;text-align:center}
+textarea.work{display:block;width:100%;min-height:60px;resize:vertical;border:1.5px solid #a07800;border-radius:3px;
+  background-color:#100e00;background-image:linear-gradient(to right,#2a2400 1px,transparent 1px),linear-gradient(to bottom,#2a2400 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);background-attachment:local;font:18px/20px 'Marck Script',cursive;color:#ffe040;padding:2px 8px}
+textarea.work:focus{outline:none;border-color:#ffe040;background-color:#1a1400}
+
+.btn{font:600 13.5px/18px 'Literata',serif;padding:4px 11px;border:1.5px solid #344054;background:#fff;color:#000!important;border-radius:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:background .15s,box-shadow .15s}
+.btn:hover,.btn:focus-visible{background:#fff0ad!important;color:#000!important;box-shadow:0 0 0 2px rgba(0,0,0,.12)}
+.btn.primary{background:#f3e7a5;color:#000!important;border-color:#8b7a2b}
+.btn.primary:hover{background:#ffe680!important}
+.btn.sm{padding:1px 8px;font-size:12.5px}
+.btn[aria-pressed="true"]{background:#ffe680!important;color:#000!important;border-color:#8b7a2b}
+.row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+
+.box{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px;margin-block:8px}
+.box.simbox{background:#e4f0e8;border:1.5px solid #5f8c63;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);color:#111!important}
+.box.simbox h3,.box.simbox .small,.box.simbox label{color:#111!important}
+.box.simbox input.ink{color:#111!important}
+
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:9px;margin-block:7px;align-items:flex-start}
+.steps li>div{min-width:0}.step-dot{font-weight:700;min-width:18px;color:#000}
+
+.tbl-wrap{overflow-x:auto;margin-block:10px;background:var(--paper);border-radius:3px}
+.tbl{border-collapse:collapse;min-width:500px;width:100%;background:var(--paper)}
+.tbl th,.tbl td{border:1.5px solid var(--tbl);padding:6px 7px;text-align:center;vertical-align:middle;font-size:14px;line-height:1.4}
+.tbl th{background:var(--note);font-weight:600}
+.tbl td input.ink{width:100%;text-align:center;background:#1a1200!important;color:#ffe040!important;border:1.5px solid #c4a000!important;border-radius:2px;font-weight:700;font-size:17px}
+.tbl td input.ink:focus{background:#2a1e00!important;outline:2px solid #ffe040!important}
+.tbl td:last-child input.ink{background:#0d1a00!important;color:#b8ff60!important;border-color:#5a9a00!important}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 3px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px 1px}
+.frac>span:last-child{padding:1px 4px 0}
+.step{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px 10px;margin-block:8px}
+.step header{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.no{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1.5px solid var(--margin);color:var(--margin);border-radius:50%;font-weight:700;font-size:13px}
+.formula{font-size:15.5px;line-height:24px;padding:4px 10px;background:var(--note);border-left:3px solid var(--margin);margin-block:8px;overflow-x:auto}
+.formula div{white-space:nowrap}
+.wl{display:block;font-size:14px;font-weight:700;color:var(--print);margin-bottom:4px}
+.fb{min-height:20px;margin:6px 0 0;font-size:13.5px;line-height:19px}
+.fb.ok{color:var(--ok)}.fb.ok::before{content:"✓ "}
+.fb.bad{color:var(--bad)}.fb.bad::before{content:"✗ "}
+.checks{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:8px;list-style:none;padding:0}
+.checks li{position:relative;padding-left:14px}
+.checks li:before{content:"•";position:absolute;left:0;color:#000;font-weight:700}
+details{margin-top:6px}
+summary{cursor:pointer;font-weight:600;color:var(--ink)}
+
+/* Симуляція */
+canvas.simcv{display:block;width:100%;height:auto;border:1.5px solid var(--sim-edge);border-radius:4px;background:#0a1a2e;margin-block:8px;cursor:pointer}
+.sw{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:8px}
+.sim-params{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-top:8px}
+.sl{display:grid;grid-template-columns:8em 1fr 6em;gap:8px;align-items:center}
+.sl input[type=range]{accent-color:var(--ink);width:100%;min-width:0}
+.sl output{font:500 13px/18px 'IBM Plex Mono',monospace;color:var(--ink)}
+.sim-info{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:6px;font-size:13px}
+.sim-info span{display:flex;gap:5px;align-items:center}
+.sim-info b{font:500 14px/18px 'IBM Plex Mono',monospace;color:var(--ink)}
+.sw-btn-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+
+/* Відповіді */
+.response-editor{margin:5px 0 10px;border:1px solid var(--edge);border-radius:4px;background:var(--paper);overflow:hidden}
+.response-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:5px;background:var(--note);border-bottom:1px solid var(--edge)}
+.response-tabs .btn{font-size:12px;padding:3px 9px}
+.response-tabs .btn[aria-pressed="true"]{background:#ffe680!important;border-color:#8b7a2b}
+.response-panel{padding:7px}
+.response-panel[hidden]{display:none!important}
+.response-canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1px solid var(--edge);border-radius:3px;background-color:#fff;
+  background-image:linear-gradient(to right,#d9e7f5 1px,transparent 1px),linear-gradient(to bottom,#d9e7f5 1px,transparent 1px);
+  background-size:20px 20px}
+.response-image-preview{display:block;max-width:100%;max-height:420px;margin:8px auto;border:1px solid var(--edge);border-radius:3px}
+.response-upload{display:inline-block;padding:7px 11px;border:1px dashed var(--ink-line);border-radius:3px;cursor:pointer;background:var(--note);color:#000;font:600 12.5px 'Literata',serif}
+.response-tools{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px}
+.response-hint{font-size:14px;color:var(--muted);margin:6px 0}
+
+.report{width:100%;min-height:130px;font:12.5px/17px 'IBM Plex Mono',ui-monospace,monospace;background:var(--note);color:var(--print);border:1.5px solid var(--edge);border-radius:3px;padding:8px;margin-top:8px}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:28px;align-items:flex-start}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--note);border:1px solid var(--edge);color:var(--muted)}
+.badge.isothermal{background:#fde8e8;border-color:#e2707b;color:#7a1818}
+.badge.isobaric{background:#e8f0fd;border-color:#5070d0;color:#1a2f80}
+.badge.isochoric{background:#e8fded;border-color:#4a9e6b;color:#145025}
+.exp-header{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.exp-header h2{margin:0}
+
+/* Поля введення: білий, жирний, контрастний текст на темному тлі, збільшений шрифт */
+input.ink,.tbl td input.ink,.tbl td:last-child input.ink{color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;
+  background:#1c2745!important;border:0!important;border-bottom:2px solid #8196d8!important;border-radius:2px;
+  font-size:22px;line-height:28px;font-weight:700;letter-spacing:.02em;text-shadow:0 0 1px rgba(255,255,255,.35);padding:2px 6px}
+.tbl td input.ink,.tbl td:last-child input.ink{border:1px solid #8196d8!important;border-radius:3px;font-size:20px}
+input.num{width:6.5em}
+input.ink:focus,.tbl td input.ink:focus,.tbl td:last-child input.ink:focus{background:#10192e!important;border-bottom-color:#ffe680!important;outline:none}
+input.ink::placeholder{color:#c9d3ee!important;opacity:.6}
+textarea.work,textarea.work:focus{color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;font-weight:700;
+  font-size:23px;line-height:30px;padding:0 10px;
+  background-color:#1c2745!important;background-size:30px 30px;
+  background-image:linear-gradient(to right,#33436e 1px,transparent 1px),linear-gradient(to bottom,#33436e 1px,transparent 1px)!important;
+  border-color:#8196d8!important}
+textarea.work:focus{border-color:#ffe680!important}
+textarea.work::placeholder{color:#c9d3ee!important;opacity:.6!important}
+@media(max-width:700px){.sim-params{grid-template-columns:1fr}}
+@media(max-width:560px){.sheet{padding:16px 10px 36px 32px}.sheet::before{left:20px}.box,.step{padding-inline:10px}}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff!important;color:#111!important;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar,.no-print,.btn,.fb,.meter,.status,.sw-btn-row,.sim-params,.sim-info{display:none!important}
+  .page{max-width:none;margin:0;padding:0}
+  .sheet{box-shadow:none;border-radius:0;padding:8mm 7mm 8mm 12mm;background-color:#fff!important}
+  .sheet::before{left:9mm}
+  .sheet>section{break-inside:auto;margin-top:12px}
+  h1{font-size:17pt}h2{font-size:13pt}h3{font-size:11pt}
+  .box,.step,.tbl-wrap{break-inside:avoid}
+  .tbl-wrap{overflow:visible}
+  .tbl{min-width:0;width:100%;table-layout:fixed}
+  .tbl th,.tbl td{font-size:7.5pt;padding:3px 2px;color:#111!important;border-color:#333!important;overflow-wrap:anywhere}
+  input.ink,.tbl td input.ink,.tbl td:last-child input.ink,textarea.work,textarea.work:focus{font:10pt Arial,sans-serif!important;font-weight:700!important;line-height:1.3!important;color:#111!important;-webkit-text-fill-color:#111;text-shadow:none;background:#fff!important;background-image:none!important;border:1px solid #777!important;min-height:20px;padding:2px!important}
+  textarea.work{min-height:44px;resize:none;white-space:pre-wrap}
+  textarea.work::placeholder,input::placeholder{color:transparent!important}
+  .formula{background:#f3f3f3!important;color:#111!important}
+  .box.simbox{display:none!important}
+  canvas.simcv{max-height:0;overflow:hidden}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <nav class="nav" aria-label="Розділи роботи">
+      <a href="#sim-section">⚗️ Симуляція</a>
+      <a href="#exp1">1. Бойль–Маріотт</a>
+      <a href="#exp2">2. Ґей-Люссак</a>
+      <a href="#exp3">3. Шарль</a>
+      <a href="#control">Контроль</a>
+    </nav>
+    <div class="status" aria-live="polite">
+      <span>Заповнено <b id="progTxt">0 з 0</b> <span class="meter"><i id="progBar"></i></span></span>
+      <span id="saveSt">Зберігається у цьому браузері</span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+<main class="sheet" id="top">
+
+  <div class="fio">
+    <label>Клас <input class="ink w-s" id="f-klass" data-k="klass" autocomplete="off"></label>
+    <label>Прізвище та ім'я <input class="ink w-l" id="f-fio" data-k="fio" autocomplete="off"></label>
+    <label>Дата <input class="ink w-s" id="f-date" data-k="date" autocomplete="off"></label>
+  </div>
+
+  <h1>ЛАБОРАТОРНА РОБОТА № 6</h1>
+  <p style="text-align:center"><b>Тема.</b> Дослідження ізотермічного, ізобарного та ізохорного процесів.</p>
+  <p><b>Мета:</b> експериментально перевірити закони Бойля–Маріотта, Ґей-Люссака, Шарля для кількох термодинамічних станів газу.</p>
+  <p><b>Обладнання:</b> вбудована інтерактивна симуляція (резервуар змінного об'єму з газом, нагрівник, термометр, барометр).</p>
+
+  <!-- СИМУЛЯЦІЯ -->
+  <section id="sim-section">
+    <h2>Симуляція газових законів</h2>
+    <div class="box simbox" id="sim">
+      <div class="row" style="justify-content:space-between;align-items:baseline">
+        <h3>Тренажер: ідеальний газ у резервуарі</h3>
+        <span class="badge" id="modeBadge">Нічого</span>
+      </div>
+      <canvas class="simcv" id="simCv" width="1000" height="340" role="img" aria-label="Симуляція газу в резервуарі"></canvas>
+      
+      <div class="sim-params">
+        <div>
+          <b style="font-size:13px">Тримати постійним:</b>
+          <div class="row" style="margin-top:5px;gap:6px">
+            <button class="btn sm" id="mNothing" data-mode="nothing">Нічого</button>
+            <button class="btn sm" id="mVolume" data-mode="volume">Об'єм (V)</button>
+            <button class="btn sm" id="mTemp" data-mode="temp">Температура (T)</button>
+            <button class="btn sm" id="mPressV" data-mode="pressv">Тиск ↕V</button>
+          </div>
+        </div>
+        <div>
+          <div class="sl">
+            <label for="slTemp">Температура</label>
+            <input type="range" id="slTemp" min="200" max="500" step="5" value="300">
+            <output id="oTemp">300 К</output>
+          </div>
+          <div class="sl" style="margin-top:4px">
+            <label for="slWidth">Ширина (l)</label>
+            <input type="range" id="slWidth" min="4" max="16" step="0.5" value="10">
+            <output id="oWidth">10,0 нм</output>
+          </div>
+          <div class="sl" style="margin-top:4px">
+            <label for="slN">Кількість молекул</label>
+            <input type="range" id="slN" min="50" max="300" step="10" value="150">
+            <output id="oN">150</output>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-info">
+        <span>Температура: <b id="infoT">300 К</b></span>
+        <span>Тиск: <b id="infoP">— кПа</b></span>
+        <span>Ширина l: <b id="infoL">10,0 нм</b></span>
+      </div>
+      <div class="sw-btn-row">
+        <button class="btn primary" id="bRecord1" type="button">👁 Показники для Досліду 1</button>
+        <button class="btn primary" id="bRecord2" type="button">👁 Показники для Досліду 2</button>
+        <button class="btn primary" id="bRecord3" type="button">👁 Показники для Досліду 3</button>
+        <button class="btn" id="bAddMol" type="button">+ Молекули</button>
+      </div>
+      <p class="small" id="simMsg" aria-live="polite" style="margin:6px 0 0">Налаштуйте режим і параметри. Натисни кнопку «Показники» — прочитай значення і запиши у таблицю самостійно.</p>
+    </div>
+  </section>
+
+  <!-- ДОСЛІД 1 -->
+  <section id="exp1">
+    <div class="exp-header">
+      <h2>Дослід 1. Ізотермічний процес</h2>
+      <span class="badge isothermal">T = const · Закон Бойля–Маріотта</span>
+    </div>
+
+    <div class="formula">
+      <div><b>Закон Бойля–Маріотта:</b> <i>p</i><sub>1</sub><i>V</i><sub>1</sub> = <i>p</i><sub>2</sub><i>V</i><sub>2</sub> &nbsp;⟹&nbsp; <i>p·l</i> = <b>const</b></div>
+      <div style="font-size:13px;margin-top:2px">де <i>p</i> — тиск газу, <i>l</i> — ширина стовпчика газу в резервуарі</div>
+    </div>
+
+    <ul class="steps">
+      <li><span class="step-dot">1.</span><div>У симуляції встановіть режим <b>«Температура (T)»</b>. Змінюйте ширину <i>l</i> повзунком.</div></li>
+      <li><span class="step-dot">2.</span><div>Для трьох різних положень повзунка натискайте <b>«Записати → Дослід 1»</b>.</div></li>
+      <li><span class="step-dot">3.</span><div>Для кожного стану обчисліть добуток <i>p·l</i>. Порівняйте значення.</div></li>
+    </ul>
+
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Ширина стовпчика газу<br><i>l</i>, нм</th>
+          <th>Тиск газу<br><i>p</i>, кПа</th>
+          <th>Результат експерименту<br><i>p·l</i>, кПа·нм</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><input class="ink" id="e1l1" data-k="e1l1" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e1p1" data-k="e1p1" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e1pl1" data-k="e1pl1" inputmode="decimal" autocomplete="off"></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><input class="ink" id="e1l2" data-k="e1l2" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e1p2" data-k="e1p2" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e1pl2" data-k="e1pl2" inputmode="decimal" autocomplete="off"></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><input class="ink" id="e1l3" data-k="e1l3" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e1p3" data-k="e1p3" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e1pl3" data-k="e1pl3" inputmode="decimal" autocomplete="off"></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <label class="wl" for="concl1">Висновок до досліду 1</label>
+    <p class="small">Зазначте: 1) який закон перевіряли; 2) які величини вимірювали; 3) яким є результат.</p>
+    <textarea class="work" id="concl1" data-k="concl1" rows="5" spellcheck="false"></textarea>
+  </section>
+
+  <!-- ДОСЛІД 2 -->
+  <section id="exp2">
+    <div class="exp-header">
+      <h2>Дослід 2. Ізобарний процес</h2>
+      <span class="badge isobaric">p = const · Закон Ґей-Люссака</span>
+    </div>
+
+    <div class="formula">
+      <div><b>Закон Ґей-Люссака:</b> <span class="frac"><span><i>V</i><sub>1</sub></span><span><i>T</i><sub>1</sub></span></span> = <span class="frac"><span><i>V</i><sub>2</sub></span><span><i>T</i><sub>2</sub></span></span> &nbsp;⟹&nbsp; <span class="frac"><span><i>l</i></span><span><i>T</i></span></span> = <b>const</b></div>
+      <div style="font-size:13px;margin-top:2px">де <i>T</i> — температура газу (К), <i>l</i> — ширина стовпчика газу</div>
+    </div>
+
+    <ul class="steps">
+      <li><span class="step-dot">1.</span><div>У симуляції встановіть режим <b>«Тиск ↕V»</b>. Змінюйте температуру <i>T</i> повзунком.</div></li>
+      <li><span class="step-dot">2.</span><div>Для трьох різних температур натискайте <b>«Записати → Дослід 2»</b>.</div></li>
+      <li><span class="step-dot">3.</span><div>Для кожного стану обчисліть частку <i>l/T</i>. Порівняйте значення.</div></li>
+    </ul>
+
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Ширина стовпчика газу<br><i>l</i>, нм</th>
+          <th>Температура газу<br><i>T</i>, К</th>
+          <th>Результат експерименту<br><i>l/T</i>, нм/К</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><input class="ink" id="e2l1" data-k="e2l1" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e2t1" data-k="e2t1" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e2lt1" data-k="e2lt1" inputmode="decimal" autocomplete="off"></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><input class="ink" id="e2l2" data-k="e2l2" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e2t2" data-k="e2t2" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e2lt2" data-k="e2lt2" inputmode="decimal" autocomplete="off"></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><input class="ink" id="e2l3" data-k="e2l3" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e2t3" data-k="e2t3" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e2lt3" data-k="e2lt3" inputmode="decimal" autocomplete="off"></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <label class="wl" for="concl2">Висновок до досліду 2</label>
+    <p class="small">Зазначте: 1) який закон перевіряли; 2) які величини вимірювали; 3) яким є результат.</p>
+    <textarea class="work" id="concl2" data-k="concl2" rows="5" spellcheck="false"></textarea>
+  </section>
+
+  <!-- ДОСЛІД 3 -->
+  <section id="exp3">
+    <div class="exp-header">
+      <h2>Дослід 3. Ізохорний процес</h2>
+      <span class="badge isochoric">V = const · Закон Шарля</span>
+    </div>
+
+    <div class="formula">
+      <div><b>Закон Шарля:</b> <span class="frac"><span><i>p</i><sub>1</sub></span><span><i>T</i><sub>1</sub></span></span> = <span class="frac"><span><i>p</i><sub>2</sub></span><span><i>T</i><sub>2</sub></span></span> &nbsp;⟹&nbsp; <span class="frac"><span><i>p</i></span><span><i>T</i></span></span> = <b>const</b></div>
+      <div style="font-size:13px;margin-top:2px">де <i>p</i> — тиск газу, <i>T</i> — температура газу (К)</div>
+    </div>
+
+    <ul class="steps">
+      <li><span class="step-dot">1.</span><div>У симуляції встановіть режим <b>«Об'єм (V)»</b>. Змінюйте температуру <i>T</i> повзунком.</div></li>
+      <li><span class="step-dot">2.</span><div>Для трьох різних температур натискайте <b>«Записати → Дослід 3»</b>.</div></li>
+      <li><span class="step-dot">3.</span><div>Для кожного стану обчисліть частку <i>p/T</i>. Порівняйте значення.</div></li>
+    </ul>
+
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Тиск газу<br><i>p</i>, кПа</th>
+          <th>Температура газу<br><i>T</i>, К</th>
+          <th>Результат експерименту<br><i>p/T</i>, кПа/К</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><input class="ink" id="e3p1" data-k="e3p1" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e3t1" data-k="e3t1" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e3pt1" data-k="e3pt1" inputmode="decimal" autocomplete="off"></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><input class="ink" id="e3p2" data-k="e3p2" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e3t2" data-k="e3t2" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e3pt2" data-k="e3pt2" inputmode="decimal" autocomplete="off"></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><input class="ink" id="e3p3" data-k="e3p3" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e3t3" data-k="e3t3" inputmode="decimal" autocomplete="off"></td>
+          <td><input class="ink" id="e3pt3" data-k="e3pt3" inputmode="decimal" autocomplete="off"></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <label class="wl" for="concl3">Висновок до досліду 3</label>
+    <p class="small">Зазначте: 1) який закон перевіряли; 2) які величини вимірювали; 3) яким є результат.</p>
+    <textarea class="work" id="concl3" data-k="concl3" rows="5" spellcheck="false"></textarea>
+  </section>
+
+  <!-- КОНТРОЛЬНІ ЗАПИТАННЯ -->
+  <section id="control">
+    <h2>Контрольні запитання</h2>
+
+    <div class="step">
+      <header><span class="no">1</span><h3>Замкнений цикл на p–T діаграмі</h3></header>
+      <p>З деякою масою газу відбувся замкнений цикл (рис. нижче). Опишіть послідовність процесів. Яку назву має кожен з них?</p>
+      <div style="margin:8px 0;padding:6px;background:var(--note);border-radius:4px;text-align:center">
+        <svg width="200" height="140" viewBox="0 0 200 140" style="display:inline-block">
+          <line x1="20" y1="120" x2="185" y2="120" stroke="currentColor" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="20" y1="120" x2="20" y2="10" stroke="currentColor" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="currentColor"/></marker>
+            <marker id="arr2" markerWidth="8" markerHeight="8" refX="3" refY="6" orient="auto"><path d="M0,0 L6,0 L3,8 z" fill="currentColor"/></marker>
+          </defs>
+          <text x="185" y="135" font-size="12" fill="currentColor">T</text>
+          <text x="5" y="12" font-size="12" fill="currentColor">p</text>
+          <!-- цикл 3→1→2→3 -->
+          <line x1="60" y1="80" x2="150" y2="30" stroke="#1b3fb0" stroke-width="2.2" marker-end="url(#arrB)"/>
+          <line x1="150" y1="30" x2="150" y2="80" stroke="#1b3fb0" stroke-width="2.2" marker-end="url(#arrB)"/>
+          <line x1="150" y1="80" x2="60" y2="80" stroke="#1b3fb0" stroke-width="2.2" marker-end="url(#arrB)"/>
+          <defs>
+            <marker id="arrB" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#1b3fb0"/></marker>
+          </defs>
+          <circle cx="150" cy="30" r="4" fill="#e2707b"/>
+          <text x="154" y="28" font-size="12" fill="currentColor" font-weight="700">1</text>
+          <circle cx="150" cy="80" r="4" fill="#e2707b"/>
+          <text x="154" y="84" font-size="12" fill="currentColor" font-weight="700">2</text>
+          <circle cx="60" cy="80" r="4" fill="#e2707b"/>
+          <text x="44" y="84" font-size="12" fill="currentColor" font-weight="700">3</text>
+        </svg>
+      </div>
+      <label class="wl" for="q1">Відповідь</label>
+      <textarea class="work" id="q1" data-k="q1" rows="4" spellcheck="false"></textarea>
+    </div>
+
+    <div class="step">
+      <header><span class="no">2</span><h3>Закон Бойля–Маріотта: визначення початкового тиску</h3></header>
+      <p>При ізотермічному стисканні газу його об'єм зменшився з 8 л до 6 л, а тиск підвищився на 30 кПа. Визначте початковий тиск газу.</p>
+      <label class="wl" for="q2work">Розв'язання</label>
+      <textarea class="work" id="q2work" data-k="q2work" rows="5" spellcheck="false"></textarea>
+      <div class="row" style="margin-top:4px">
+        <span>p₁ = <input class="ink num" id="q2ans" data-k="q2ans" inputmode="decimal" autocomplete="off" aria-label="Початковий тиск"> кПа</span>
+        <button class="btn primary" type="button" id="bQ2">Перевірити</button>
+      </div>
+      <p class="fb" id="fbQ2" aria-live="polite"></p>
+    </div>
+
+    <div class="step">
+      <header><span class="no">3</span><h3>Ізохорний процес: концентрація молекул</h3></header>
+      <p>Під час ізохорного процесу тиск газу збільшився удвічі. Як змінилася концентрація молекул газу?</p>
+      <label class="wl" for="q3">Відповідь</label>
+      <textarea class="work" id="q3" data-k="q3" rows="3" spellcheck="false"></textarea>
+    </div>
+  </section>
+
+  <div class="foot no-print">
+    <div style="flex:1 1 260px;min-width:0">
+      <button class="btn primary" id="bReport" type="button">📄 Скопіювати звіт</button>
+      <textarea class="report" id="reportTxt" readonly hidden aria-label="Текст звіту"></textarea>
+      <p class="small" id="reportMsg" aria-live="polite" style="margin:4px 0 0"></p>
+    </div>
+    <div style="flex:1 1 280px;min-width:0">
+      <button class="btn primary" id="bPdf" type="button">⬇️ Завантажити роботу (PDF)</button>
+      <p class="small">Натисни кнопку — у вікні друку вибери <b>«Зберегти як PDF»</b>.</p>
+    </div>
+    <button class="btn" id="bClear" type="button">🗑 Очистити</button>
+  </div>
+
+</main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var KEY='lab6-gas-v3';
+
+/* ===== СХОВИЩЕ ===== */
+var S={g:{}};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S.g))}catch(e){}}
+// Під час кожного відкриття сторінки всі поля порожні: старі записи не підвантажуються.
+try{localStorage.removeItem(KEY)}catch(e){}
+
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+
+/* ===== ДАТА ===== */
+function initDate(){var el=$('#f-date');if(!S.g.date){var d=new Date();S.g.date=d.toLocaleDateString('uk-UA');save()}el.value=S.g.date}
+
+/* ===== ЗАПОВНЕННЯ ===== */
+function fillAll(){
+  $$('[data-k]').forEach(function(el){
+    var k=el.dataset.k,v=S.g[k];
+    if(v!==undefined&&v!==null){el.value=v}
+  });
+}
+
+/* ===== ЗБЕРЕЖЕННЯ ПОЛІВ ===== */
+function bindAll(){
+  $$('[data-k]').forEach(function(el){
+    el.addEventListener('input',function(){S.g[el.dataset.k]=el.value;save();refreshCalc();refreshProgress()});
+  });
+}
+
+/* ===== ОБЧИСЛЕННЯ У ТАБЛИЦЯХ ===== */
+function refreshCalc(){/* учні обчислюють самостійно */}
+
+/* ===== ПРОГРЕС ===== */
+function refreshProgress(){
+  var fields=$$('[data-k]');
+  var filled=fields.filter(function(f){return f.value&&f.value.trim()!==''}).length;
+  var total=fields.length;
+  var pct=total?Math.round(filled/total*100):0;
+  $('#progTxt').textContent=filled+' з '+total;
+  $('#progBar').style.width=pct+'%';
+}
+
+/* ===== СИМУЛЯЦІЯ ===== */
+var simMode='nothing'; // nothing|volume|temp|pressv
+var simT=300, simL=10, simN=150;
+var simP=0;
+var molecules=[];
+var simAnimId=null;
+var CV=$('#simCv'), ctx=CV.getContext('2d');
+var W=CV.width, H=CV.height;
+
+// Базові константи симуляції
+var BASE_SPEED=1.5;
+
+function computePressure(n,l,t){
+  // p ~ n*T/l (ідеальний газ, спрощено)
+  return Math.round(n*t/l*0.65);
+}
+
+function initMolecules(){
+  molecules=[];
+  var boxW=Math.round(simL/16*W*0.55);
+  var boxX=W*0.05;
+  for(var i=0;i<simN;i++){
+    var angle=Math.random()*Math.PI*2;
+    var speed=BASE_SPEED*(0.7+Math.random()*0.8)*Math.sqrt(simT/300);
+    molecules.push({
+      x:boxX+10+Math.random()*(boxW-20),
+      y:30+Math.random()*(H-60),
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed,
+      r:4
+    });
+  }
+}
+
+function getBoxW(){return Math.max(60,Math.round(simL/16*(W*0.55)));}
+
+function stepMolecules(){
+  var boxX=Math.round(W*0.05);
+  var boxW=getBoxW();
+  var boxY=10, boxH=H-20;
+  for(var i=0;i<molecules.length;i++){
+    var m=molecules[i];
+    m.x+=m.vx; m.y+=m.vy;
+    // відбиття від стінок
+    if(m.x-m.r<boxX){m.x=boxX+m.r;m.vx=Math.abs(m.vx);}
+    if(m.x+m.r>boxX+boxW){m.x=boxX+boxW-m.r;m.vx=-Math.abs(m.vx);}
+    if(m.y-m.r<boxY){m.y=boxY+m.r;m.vy=Math.abs(m.vy);}
+    if(m.y+m.r>boxY+boxH){m.y=boxY+boxH-m.r;m.vy=-Math.abs(m.vy);}
+  }
+}
+
+function applyMode(){
+  if(simMode==='volume'){
+    // l фіксований, T змінюється
+    $('#slWidth').disabled=true;
+    $('#slTemp').disabled=false;
+  } else if(simMode==='temp'){
+    // T фіксована, l змінюється
+    $('#slWidth').disabled=false;
+    $('#slTemp').disabled=true;
+  } else if(simMode==='pressv'){
+    // тиск фіксований ~ не змінюємо ні T ні l безпосередньо але симулюємо ізобарний
+    $('#slWidth').disabled=true;
+    $('#slTemp').disabled=false;
+  } else {
+    $('#slWidth').disabled=false;
+    $('#slTemp').disabled=false;
+  }
+}
+
+function drawSim(){
+  ctx.clearRect(0,0,W,H);
+  // Фон
+  ctx.fillStyle='#0a1a2e';
+  ctx.fillRect(0,0,W,H);
+
+  var boxX=Math.round(W*0.05);
+  var boxW=getBoxW();
+  var boxY=10, boxH=H-20;
+
+  // Контейнер
+  ctx.strokeStyle='#6ab0e8';
+  ctx.lineWidth=3;
+  ctx.fillStyle='rgba(30,80,140,0.18)';
+  ctx.fillRect(boxX,boxY,boxW,boxH);
+  ctx.strokeRect(boxX,boxY,boxW,boxH);
+
+  // Поршень (права стінка)
+  ctx.fillStyle='#a0c8f0';
+  ctx.fillRect(boxX+boxW-6,boxY,8,boxH);
+
+  // Стрілка ширини
+  ctx.strokeStyle='#fff8';
+  ctx.lineWidth=1;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(boxX,H-6);ctx.lineTo(boxX+boxW,H-6);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#fff8';
+  ctx.font='12px IBM Plex Mono,monospace';
+  ctx.fillText('l = '+simL.toFixed(1)+' нм',boxX+4,H-8);
+
+  // Молекули
+  for(var i=0;i<molecules.length;i++){
+    var m=molecules[i];
+    var g=ctx.createRadialGradient(m.x-1,m.y-1,1,m.x,m.y,m.r);
+    var hot=Math.min(1,(simT-200)/300);
+    var rr=Math.round(80+hot*150),gg=Math.round(120+hot*20),bb=Math.round(255-hot*200);
+    g.addColorStop(0,'rgba('+Math.min(255,rr+60)+','+Math.min(255,gg+60)+','+Math.min(255,bb+60)+',1)');
+    g.addColorStop(1,'rgba('+rr+','+gg+','+bb+',0.8)');
+    ctx.beginPath();ctx.arc(m.x,m.y,m.r,0,Math.PI*2);
+    ctx.fillStyle=g;ctx.fill();
+  }
+
+  // Панель приладів (права частина)
+  var px=W*0.68;
+  ctx.fillStyle='rgba(10,25,50,0.82)';
+  ctx.strokeStyle='#3a6090';
+  ctx.lineWidth=1.5;
+  roundRect(ctx,px,10,W-px-10,H-20,8);
+  ctx.fill();ctx.stroke();
+
+  ctx.fillStyle='#aaccff';
+  ctx.font='bold 13px IBM Plex Mono,monospace';
+  ctx.fillText('ПАРАМЕТРИ',px+14,32);
+
+  ctx.fillStyle='#7ec8ff';
+  ctx.font='12px IBM Plex Mono,monospace';
+  ctx.fillText('T = '+simT+' К',px+14,56);
+  ctx.fillText('p = '+simP+' кПа',px+14,76);
+  ctx.fillText('l = '+simL.toFixed(1)+' нм',px+14,96);
+  ctx.fillText('N = '+simN,px+14,116);
+
+  // Термометр
+  var th=100,tx=W-42,ty=H/2-th/2;
+  ctx.strokeStyle='#7ec8ff';ctx.lineWidth=2;
+  ctx.strokeRect(tx,ty,14,th);
+  var fill=Math.round(th*(simT-200)/300);
+  var tColor=simT>350?'#ff6666':simT<250?'#66aaff':'#ffaa44';
+  ctx.fillStyle=tColor;
+  ctx.fillRect(tx+2,ty+th-fill,10,fill);
+  ctx.fillStyle='#fff8';ctx.font='10px monospace';
+  ctx.fillText(simT+'К',tx-8,ty+th+14);
+
+  // Режим
+  var modeNames={nothing:'Нічого',volume:'V = const',temp:'T = const',pressv:'p = const'};
+  ctx.fillStyle='#ffdd88';
+  ctx.font='bold 11px IBM Plex Mono,monospace';
+  ctx.fillText(modeNames[simMode]||'',px+14,H-14);
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function simLoop(){
+  // Оновлення ізобарного режиму: l ~ T
+  if(simMode==='pressv'){
+    simL=parseFloat((simT/30).toFixed(1));
+    simL=Math.max(4,Math.min(16,simL));
+    // Перевірити чи молекули виходять за межі
+    adjustMoleculesForBox();
+  }
+  simP=computePressure(simN,simL,simT);
+  updateInfoPanel();
+  stepMolecules();
+  drawSim();
+  simAnimId=requestAnimationFrame(simLoop);
+}
+
+function adjustMoleculesForBox(){
+  var boxX=Math.round(W*0.05);
+  var boxW=getBoxW();
+  for(var i=0;i<molecules.length;i++){
+    var m=molecules[i];
+    if(m.x>boxX+boxW-m.r)m.x=boxX+boxW-m.r-2;
+  }
+}
+
+function updateInfoPanel(){
+  $('#infoT').textContent=simT+' К';
+  $('#infoP').textContent=simP+' кПа';
+  $('#infoL').textContent=simL.toFixed(1)+' нм';
+  $('#oTemp').textContent=simT+' К';
+  $('#oWidth').textContent=simL.toFixed(1)+' нм';
+  $('#oN').textContent=simN;
+  var modeNames={nothing:'Нічого',volume:'V = const',temp:'T = const',pressv:'p = const'};
+  $('#modeBadge').textContent=modeNames[simMode]||'Нічого';
+}
+
+function startSim(){
+  if(simAnimId)cancelAnimationFrame(simAnimId);
+  initMolecules();
+  simLoop();
+}
+
+// Слайдери
+$('#slTemp').addEventListener('input',function(){
+  simT=parseInt(this.value);
+  if(simMode==='volume'){
+    // ізохорний: оновлюємо молекули (підвищуємо швидкості)
+    var k=Math.sqrt(simT/300);
+    molecules.forEach(function(m){var spd=Math.sqrt(m.vx*m.vx+m.vy*m.vy);if(spd>0){m.vx=m.vx/spd*BASE_SPEED*k;m.vy=m.vy/spd*BASE_SPEED*k}});
+  }
+});
+$('#slWidth').addEventListener('input',function(){
+  simL=parseFloat(this.value);
+  adjustMoleculesForBox();
+});
+$('#slN').addEventListener('input',function(){
+  simN=parseInt(this.value);
+  initMolecules();
+});
+
+// Режими
+$$('[data-mode]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    simMode=this.dataset.mode;
+    applyMode();
+    $$('[data-mode]').forEach(function(b){b.setAttribute('aria-pressed','false')});
+    this.setAttribute('aria-pressed','true');
+    if(simMode==='temp'){$('#slWidth').disabled=false;$('#slTemp').disabled=true;}
+    else if(simMode==='volume'){$('#slWidth').disabled=true;$('#slTemp').disabled=false;}
+    else if(simMode==='pressv'){$('#slWidth').disabled=true;$('#slTemp').disabled=false;}
+    else{$('#slWidth').disabled=false;$('#slTemp').disabled=false;}
+    $('#simMsg').textContent='Режим змінено. Змінюйте параметри і записуйте показники.';
+  });
+});
+
+// Кнопка + молекули
+$('#bAddMol').addEventListener('click',function(){
+  simN=Math.min(300,simN+20);
+  $('#slN').value=simN;
+  initMolecules();
+  $('#simMsg').textContent='Додано 20 молекул. Усього: '+simN;
+});
+
+// Запис у досліди
+function recordRow(expNum){
+  var msgEl=$('#simMsg');
+  msgEl.textContent='📌 Дослід '+expNum+': запиши у таблицю → l = '+simL.toFixed(1)+' нм, p = '+simP+' кПа, T = '+simT+' К';
+}
+
+$('#bRecord1').addEventListener('click',function(){recordRow(1)});
+$('#bRecord2').addEventListener('click',function(){recordRow(2)});
+$('#bRecord3').addEventListener('click',function(){recordRow(3)});
+
+/* ===== КОНТРОЛЬНІ ЗАПИТАННЯ ===== */
+$('#bQ2').addEventListener('click',function(){
+  var v=parseFloat(($('#q2ans')||{}).value);
+  var fb=$('#fbQ2');
+  if(isNaN(v)){fb.className='fb bad';fb.textContent='Введіть числове значення.';return;}
+  // p1*8=(p1+30)*6 => 8p1=6p1+180 => 2p1=180 => p1=90
+  if(Math.abs(v-90)<2){fb.className='fb ok';fb.textContent='Правильно! p₁ = 90 кПа.'}
+  else{fb.className='fb bad';fb.textContent='Перевірте розв\'язання. Підказка: p₁V₁=p₂V₂, p₂=p₁+30.'}
+});
+
+/* ===== ЗВІТ ===== */
+$('#bReport').addEventListener('click',function(){
+  var lines=['=== ЛАБОРАТОРНА РОБОТА № 6 ==='];
+  lines.push('Клас: '+(S.g.klass||'—')+' | Учень: '+(S.g.fio||'—')+' | Дата: '+(S.g.date||'—'));
+  lines.push('');
+  lines.push('--- ДОСЛІД 1 (Бойля-Маріотта, T=const) ---');
+  for(var i=1;i<=3;i++){
+    lines.push('Рядок '+i+': l='+($('#e1l'+i)||{}).value+' нм, p='+($('#e1p'+i)||{}).value+' кПа, p·l='+($('#e1pl'+i)||{}).value);
+  }
+  lines.push('Висновок 1: '+(S.g.concl1||'—'));
+  lines.push('');
+  lines.push('--- ДОСЛІД 2 (Ґей-Люссака, p=const) ---');
+  for(var i=1;i<=3;i++){
+    lines.push('Рядок '+i+': l='+($('#e2l'+i)||{}).value+' нм, T='+($('#e2t'+i)||{}).value+' К, l/T='+($('#e2lt'+i)||{}).value);
+  }
+  lines.push('Висновок 2: '+(S.g.concl2||'—'));
+  lines.push('');
+  lines.push('--- ДОСЛІД 3 (Шарля, V=const) ---');
+  for(var i=1;i<=3;i++){
+    lines.push('Рядок '+i+': p='+($('#e3p'+i)||{}).value+' кПа, T='+($('#e3t'+i)||{}).value+' К, p/T='+($('#e3pt'+i)||{}).value);
+  }
+  lines.push('Висновок 3: '+(S.g.concl3||'—'));
+  lines.push('');
+  lines.push('Контрольні запитання:');
+  lines.push('КЗ1: '+(S.g.q1||'—'));
+  lines.push('КЗ2: '+(S.g.q2work||'—')+' | Відповідь: '+(S.g.q2ans||'—')+' кПа');
+  lines.push('КЗ3: '+(S.g.q3||'—'));
+  var txt=lines.join('\n');
+  var ta=$('#reportTxt');
+  ta.value=txt;ta.hidden=false;
+  try{navigator.clipboard.writeText(txt);$('#reportMsg').textContent='✓ Скопійовано в буфер обміну.'}
+  catch(e){$('#reportMsg').textContent='Виділіть текст нижче і скопіюйте вручну.'}
+});
+
+/* ===== PDF ===== */
+$('#bPdf').addEventListener('click',function(){window.print()});
+
+/* ===== ОЧИСТИТИ ===== */
+$('#bClear').addEventListener('click',function(){
+  if(!confirm('Видалити всі введені дані?'))return;
+  localStorage.removeItem(KEY);
+  location.reload();
+});
+
+/* ===== НАВІГАЦІЯ ===== */
+try{
+  var navLinks=$$('.nav a');
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting)navLinks.forEach(function(a){a.setAttribute('aria-current',String(a.getAttribute('href')==='#'+en.target.id))})})},{rootMargin:'-25% 0px -65% 0px'});
+  $$('main.sheet>section').forEach(function(s){io.observe(s)});
+}catch(e){}
+
+/* ===== ВІДПОВІДІ (малювання) ===== */
+function mountResponseEditors(){
+  S.g.responseEditors=S.g.responseEditors||{};
+  $$('.work').forEach(function(ta){
+    if(ta.dataset.editorMounted)return;ta.dataset.editorMounted='1';
+    var key=ta.dataset.k||ta.id,state=S.g.responseEditors[key]||{mode:'text',draw:'',image:''};
+    S.g.responseEditors[key]=state;
+    var wrap=document.createElement('div');wrap.className='response-editor';
+    var tabs=document.createElement('div');tabs.className='response-tabs';
+    tabs.setAttribute('role','group');
+    [['text','Ввести текст'],['draw','Малювати від руки'],['image','Вставити зображення']].forEach(function(item){
+      var b=document.createElement('button');b.type='button';b.className='btn';b.textContent=item[1];b.dataset.mode=item[0];b.setAttribute('aria-pressed',String((state.mode||'text')===item[0]));tabs.appendChild(b);
+    });
+    var drawPanel=document.createElement('div');drawPanel.className='response-panel';drawPanel.hidden=state.mode!=='draw';
+    var tools=document.createElement('div');tools.className='response-tools';
+    var pen=document.createElement('button');pen.type='button';pen.className='btn sm';pen.textContent='Чорна ручка';
+    var er=document.createElement('button');er.type='button';er.className='btn sm';er.textContent='Гумка';
+    var clr=document.createElement('button');clr.type='button';clr.className='btn sm';clr.textContent='Очистити';
+    tools.append(pen,er,clr);
+    var rCv=document.createElement('canvas');rCv.className='response-canvas';rCv.width=900;rCv.height=200;rCv.setAttribute('aria-label','Поле рукописної відповіді');
+    var hint=document.createElement('p');hint.className='response-hint';hint.textContent='Малюйте мишею, пальцем або стилусом.';
+    drawPanel.append(tools,rCv,hint);
+    var imgPanel=document.createElement('div');imgPanel.className='response-panel';imgPanel.tabIndex=0;imgPanel.hidden=state.mode!=='image';
+    var upLabel=document.createElement('label');upLabel.className='response-upload';upLabel.textContent='Вибрати зображення ';
+    var fileEl=document.createElement('input');fileEl.type='file';fileEl.accept='image/*';upLabel.appendChild(fileEl);
+    var pHint=document.createElement('p');pHint.className='response-hint';pHint.textContent='Або вставте через Ctrl+V.';
+    var prevImg=document.createElement('img');prevImg.className='response-image-preview';prevImg.alt='';prevImg.hidden=true;
+    var clrImg=document.createElement('button');clrImg.type='button';clrImg.className='btn sm';clrImg.textContent='Видалити';
+    imgPanel.append(upLabel,pHint,prevImg,clrImg);
+    ta.parentNode.insertBefore(wrap,ta.nextSibling);wrap.append(tabs,drawPanel,imgPanel);
+    var textPanel=document.createElement('div');textPanel.className='response-panel';textPanel.style.padding='0';
+    wrap.insertBefore(textPanel,drawPanel);textPanel.appendChild(ta);
+    function setMode(mode){state.mode=mode;S.g.responseEditors[key]=state;ta.hidden=mode!=='text';drawPanel.hidden=mode!=='draw';imgPanel.hidden=mode!=='image';Array.from(tabs.children).forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.mode===mode))});save()}
+    var rCtx=rCv.getContext('2d'),rDown=false,rLast=null,rTool='pen';rCtx.lineCap='round';rCtx.lineJoin='round';
+    if(state.draw){var rIm=new Image();rIm.onload=function(){rCtx.drawImage(rIm,0,0,rCv.width,rCv.height)};rIm.src=state.draw}
+    function showPrev(){if(state.image){prevImg.src=state.image;prevImg.hidden=false}else{prevImg.removeAttribute('src');prevImg.hidden=true}}
+    showPrev();
+    function rPos(e){var r=rCv.getBoundingClientRect();return[(e.clientX-r.left)*rCv.width/r.width,(e.clientY-r.top)*rCv.height/r.height]}
+    function rLine(a,b){rCtx.globalCompositeOperation=rTool==='erase'?'destination-out':'source-over';rCtx.strokeStyle='#111';rCtx.lineWidth=rTool==='erase'?24:3;rCtx.beginPath();rCtx.moveTo(a[0],a[1]);rCtx.lineTo(b[0],b[1]);rCtx.stroke()}
+    function persD(){try{var rO=document.createElement('canvas');rO.width=rCv.width;rO.height=rCv.height;var rOx=rO.getContext('2d');rOx.fillStyle='#fff';rOx.fillRect(0,0,rO.width,rO.height);rOx.drawImage(rCv,0,0);state.draw=rO.toDataURL('image/jpeg',.72);S.g.responseEditors[key]=state;save()}catch(e){}}
+    rCv.addEventListener('pointerdown',function(e){rDown=true;rLast=rPos(e);try{rCv.setPointerCapture(e.pointerId)}catch(z){}rLine(rLast,rLast);e.preventDefault()});
+    rCv.addEventListener('pointermove',function(e){if(!rDown)return;var p=rPos(e);rLine(rLast,p);rLast=p});
+    ['pointerup','pointercancel'].forEach(function(ev){rCv.addEventListener(ev,function(){if(rDown){rDown=false;persD()}})});
+    pen.addEventListener('click',function(){rTool='pen'});er.addEventListener('click',function(){rTool='erase'});
+    clr.addEventListener('click',function(){rCtx.clearRect(0,0,rCv.width,rCv.height);state.draw='';S.g.responseEditors[key]=state;save()});
+    function readImg(f){if(!f||f.type.indexOf('image/')!==0)return;var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas'),sc=Math.min(1,900/im.width,700/im.height);c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);try{state.image=c.toDataURL('image/jpeg',.68);S.g.responseEditors[key]=state;showPrev();save()}catch(e){}};im.src=rd.result};rd.readAsDataURL(f)}
+    fileEl.addEventListener('change',function(){readImg(fileEl.files&&fileEl.files[0])});
+    clrImg.addEventListener('click',function(){state.image='';S.g.responseEditors[key]=state;showPrev();fileEl.value='';save()});
+    imgPanel.addEventListener('paste',function(e){var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var i=0;i<items.length;i++){if(items[i].type.indexOf('image/')===0){readImg(items[i].getAsFile());e.preventDefault();return}}});
+    tabs.addEventListener('click',function(e){var b=e.target.closest('button[data-mode]');if(b)setMode(b.dataset.mode)});
+    setMode(state.mode||'text');
+  });
+}
+
+/* ===== СТАРТ ===== */
+fillAll();bindAll();refreshCalc();refreshProgress();mountResponseEditors();startSim();
+
+})();
+</script>
+</body></html>

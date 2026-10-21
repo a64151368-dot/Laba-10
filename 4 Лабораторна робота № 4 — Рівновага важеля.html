@@ -1,0 +1,896 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Лабораторна робота № 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Literata:wght@400;600;700&family=Marck+Script&display=swap">
+<style>
+:root{
+  --desk:#cdd6e2;--bar:#f1f5fb;--paper:#fcfdff;--grid:#d2e4f6;--grid-s:#a9c8e9;
+  --margin:#e2707b;--print:#1f2430;--muted:#5a6579;--ink:#1b3fb0;--ink-line:#8196d8;
+  --note:#eef4fc;--edge:#b4c0d3;--ok:#17794a;--bad:#bd2f2f;--btn-fg:#ffffff;
+  --tbl:#3c4557;--hov:#e2eafb;--cell:20px;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:60px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --hov:#252f4a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --hov:#252f4a;color-scheme:dark}
+*{box-sizing:border-box}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{background:var(--desk);color:var(--print);font:16px/1.55 'Literata',Georgia,'Times New Roman',serif;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bar)}
+b,strong{font-weight:700}
+a{color:var(--ink)}
+:focus-visible{outline:2px solid var(--margin);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);border-bottom:1px solid var(--edge)}
+.bar-in{max-width:980px;margin:0 auto;padding-block:6px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;gap:4px 16px;align-items:center;flex-wrap:wrap}
+.nav{display:flex;gap:4px;overflow-x:auto;flex:1 1 300px;min-width:0}
+.nav a{white-space:nowrap;padding:2px 10px;border-radius:3px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:600}
+.nav a:hover{background:var(--hov)}
+.nav a[aria-current="true"]{background:var(--ink);color:var(--btn-fg)}
+.status{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.meter{width:70px;height:6px;background:var(--note);border:1px solid var(--edge);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle}
+.meter i{display:block;height:100%;width:0;background:var(--ink);transition:width .25s}
+
+.page{max-width:980px;margin:0 auto;padding-block:10px 24px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{position:relative;background-color:var(--paper);
+  background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);padding:14px 20px 28px 50px;border-radius:3px;box-shadow:0 10px 28px rgba(10,20,40,.22)}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:40px;width:2px;background:var(--margin);opacity:.85}
+.sheet>section{margin-top:18px}
+h1{margin:0;text-align:center;font-size:22px;line-height:1.6;letter-spacing:.03em}
+h2{margin:0 0 12px;font-size:19px;line-height:1.6;border-bottom:2px solid var(--margin);display:inline-block;padding-right:18px}
+h3{margin:0;font-size:17px;line-height:1.45}
+p{margin:0 0 8px}
+.small{font-size:14px;line-height:1.5;color:var(--print)}
+.fio{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:10px}
+.fio label{display:inline-flex;align-items:baseline;gap:6px}
+.w-s{width:7em}.w-l{width:min(20em,100%)}
+
+input.ink{font:19px/24px 'Marck Script',cursive;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid var(--ink-line);border-radius:0;padding:1px 4px;min-width:0}
+input.ink:focus{background:var(--note);border-bottom-color:var(--ink);outline:none}
+input.ink::placeholder,textarea.work::placeholder{color:var(--muted);opacity:.5}
+input.num{width:5.8em;text-align:center}
+textarea.work{display:block;width:100%;min-height:60px;resize:vertical;border:1.5px solid var(--edge);border-radius:3px;
+  background-color:var(--paper);background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);background-attachment:local;font:18px/20px 'Marck Script',cursive;color:var(--ink);padding:0 8px}
+textarea.work:focus{outline:none;border-color:var(--ink)}
+
+.btn{font:600 14px/18px 'Literata',serif;padding:6px 12px;border:1.5px solid #344054;background:#fff;color:#000!important;border-radius:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:background .15s,box-shadow .15s}
+.btn:hover,.btn:focus-visible{background:#fff0ad!important;color:#000!important;box-shadow:0 0 0 2px rgba(0,0,0,.12)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:#f3e7a5;color:#000!important;border-color:#8b7a2b}
+.btn.primary:hover{background:#ffe680!important}
+.btn.sm{padding:1px 8px;font-size:12.5px}
+.btn[aria-pressed="true"]{background:#ffe680!important;color:#000!important;border-color:#8b7a2b}
+.row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+
+.box{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px;margin-block:8px}
+.box.simbox{background:#e8f3e8;border:1.5px solid #5f8c63;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);color:#111!important}
+.box.simbox h3,.box.simbox .small,.box.simbox .lv-info,.box.simbox .lv-info b,.box.simbox #simMsg{color:#111!important;opacity:1}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:9px;margin-block:6px;align-items:flex-start}
+.steps li>div{min-width:0}.step-dot{font-weight:700;min-width:18px;color:var(--print)}
+
+canvas.simcv{display:block;width:100%;height:auto;border:1.5px solid #5f8c63;border-radius:4px;background:#bfe3f7;margin-block:8px;touch-action:none;cursor:grab}
+.modes{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.modes .lbl{font-size:13.5px;font-weight:600;color:#111}
+.sw{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:8px}
+.lv-info{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:2px;font-size:14px}
+.lv-info b{font:500 14px/18px 'IBM Plex Mono',monospace;color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;margin-block:10px;background:var(--paper);border-radius:3px}
+.tbl{border-collapse:collapse;min-width:900px;width:100%;background:var(--paper)}
+.tbl th,.tbl td{border:1.5px solid var(--tbl);padding:5px 4px;text-align:center;vertical-align:middle;font-size:14px;line-height:1.35}
+.tbl th{background:var(--note);font-weight:600}
+.tbl td input.ink{width:100%;min-width:3.4em;text-align:center;background:#fff0ad!important;color:#202020!important;border:1.5px solid #c4a000!important;border-radius:2px;font-weight:700}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 3px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px 1px}
+.frac>span:last-child{padding:1px 4px 0}
+.step{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px 10px;margin-block:8px}
+.step header{display:flex;align-items:center;gap:9px}
+.no{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1.5px solid var(--margin);color:var(--margin);border-radius:50%;font-weight:700;font-size:13px}
+.formula{font-size:15.5px;line-height:24px;padding:4px 10px;background:var(--note);border-left:3px solid var(--margin);margin-block:8px;overflow-x:auto}
+.formula div{white-space:nowrap}
+.wl{display:block;font-size:14px;font-weight:700;color:var(--print);margin-bottom:4px}
+.af{display:inline-flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.af .u{color:var(--muted);font-size:13px}
+.fb{min-height:20px;margin:6px 0 0;font-size:13.5px;line-height:19px}
+.fb.ok{color:var(--ok)}.fb.ok::before{content:"✓ "}
+.fb.bad{color:var(--bad)}.fb.bad::before{content:"✗ "}
+
+.checks{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:8px;list-style:none;padding:0}
+.checks li{position:relative;padding-left:14px}
+.checks li:before{content:"•";position:absolute;left:0;font-weight:700}
+
+/* Графік */
+.gz{border:1.5px solid var(--edge);border-radius:4px;background:var(--paper);margin-block:8px}
+.gz-tabs{display:flex;border-bottom:1.5px solid var(--edge);overflow-x:auto}
+.gz-tab{flex:1 0 auto;padding:5px 12px;border:0;background:transparent;font:600 13px/18px 'Literata',serif;color:var(--print);cursor:pointer;border-bottom:3px solid transparent}
+.gz-tab[aria-selected="true"]{color:#000!important;background:#fff0ad;border-bottom-color:#8b7a2b}
+.gz-body{padding:10px}
+.gz-grid{display:grid;grid-template-columns:minmax(200px,240px) minmax(0,1fr);gap:12px}
+.gz-ax{display:grid;gap:2px;margin-bottom:6px}
+.gz-ax label{display:flex;align-items:baseline;gap:6px;font-size:12.5px}
+.gz-ax input{flex:1;font-size:16px}
+.pts{border-collapse:collapse;width:100%}
+.pts th{font-size:11.5px;color:var(--muted);font-weight:600}
+.pts td{padding:0 2px;text-align:center}
+.pts td input{width:100%;font-size:16px;text-align:center}
+.pts .x{border:0;background:transparent;color:var(--muted);font-size:17px;cursor:pointer;line-height:1}
+.gz-btns{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;align-items:center}
+svg.gz-svg{width:100%;height:auto;display:block;background:var(--paper);border:1.5px solid var(--edge);border-radius:3px}
+.gz-svg text{fill:var(--print);font:12px 'Literata',serif}
+.gz-svg .gm{stroke:var(--grid);stroke-width:1}
+.gz-svg .gM{stroke:var(--grid-s);stroke-width:1}
+.gz-svg .ga{stroke:var(--print);stroke-width:1.8}
+.gz-svg .gl{fill:none;stroke:var(--ink);stroke-width:2}
+.gz-svg .gp{fill:var(--ink);stroke:var(--paper);stroke-width:1.5}
+.gz-tools{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+canvas.gz-cv{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1.5px solid var(--edge);border-radius:3px;background-color:var(--paper);
+  background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);background-size:26px 26px}
+.drop{display:grid;gap:3px;place-items:center;text-align:center;padding:22px 14px;border:2px dashed var(--ink-line);border-radius:4px;cursor:pointer;color:var(--muted)}
+.drop:hover,.drop.over{background:var(--note)}
+.drop b{color:var(--ink)}
+.shot{margin-top:8px}.shot img{display:block;max-width:100%;height:auto;border:1.5px solid var(--edge);border-radius:3px;margin-bottom:6px}
+
+.response-editor{margin:5px 0 10px;border:1px solid var(--edge);border-radius:4px;background:var(--paper);overflow:hidden}
+.response-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:5px;background:var(--note);border-bottom:1px solid var(--edge)}
+.response-tabs .btn{font-size:12px;padding:3px 9px}
+.response-panel{padding:7px}
+.response-panel[hidden]{display:none!important}
+.response-canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1px solid var(--edge);border-radius:3px;background-color:#fff;
+  background-image:linear-gradient(to right,#d9e7f5 1px,transparent 1px),linear-gradient(to bottom,#d9e7f5 1px,transparent 1px);background-size:20px 20px}
+.response-image-preview{display:block;max-width:100%;max-height:420px;margin:8px auto;border:1px solid var(--edge);border-radius:3px}
+.response-upload{display:inline-block;padding:7px 11px;border:1px dashed var(--ink-line);border-radius:3px;cursor:pointer;background:var(--note);color:var(--print);font:600 12.5px 'Literata',serif}
+.response-tools{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px}
+.response-hint{font-size:14px;color:var(--print);margin:6px 0}
+
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:28px;align-items:flex-start}
+
+.creative-task{margin-top:14px;padding:14px 16px;background:#fff3c4;border:2px solid #9a6a00;border-left:7px solid #9a6a00;border-radius:8px;color:#241900;font-size:16px;line-height:1.65}
+.creative-task h3{font-size:20px;color:#241900;margin-bottom:8px}
+.creative-task .fb.ok{color:#0b5d33}.creative-task .fb.bad{color:#9b1c1c}
+.creative-task .af .u{color:#4a3500}
+.creative-task textarea.work{background-color:#fffdf4;border-color:#9a6a00;color:#5b3215!important;font-weight:600}
+.creative-task textarea.work::placeholder{color:#795536!important;opacity:1!important}
+.creative-task input.ink{color:#5b3215;border-bottom-color:#9a6a00}
+
+/* Поля введення: білий, жирний, контрастний текст на темному тлі, збільшений шрифт */
+input.ink,.tbl td input.ink,.creative-task input.ink{color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;
+  background:#1c2745!important;border:0!important;border-bottom:2px solid #8196d8!important;border-radius:2px;
+  font-size:22px;line-height:28px;font-weight:700;letter-spacing:.02em;text-shadow:0 0 1px rgba(255,255,255,.35);padding:2px 6px}
+.tbl td input.ink{border:1px solid #8196d8!important;border-radius:3px;font-size:20px;min-width:3.8em}
+input.num{width:6.5em}
+input.ink:focus,.tbl td input.ink:focus,.creative-task input.ink:focus{background:#10192e!important;border-bottom-color:#ffe680!important;outline:none}
+input.ink::placeholder{color:#c9d3ee!important;opacity:.6}
+.gz-ax input,.pts td input{font-size:20px}
+textarea.work,.creative-task textarea.work{color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;font-weight:700;
+  font-size:23px;line-height:30px;padding:0 10px;
+  background-color:#1c2745!important;background-size:30px 30px;
+  background-image:linear-gradient(to right,#33436e 1px,transparent 1px),linear-gradient(to bottom,#33436e 1px,transparent 1px)!important;
+  border-color:#8196d8!important}
+textarea.work:focus{border-color:#ffe680!important}
+textarea.work::placeholder,.creative-task textarea.work::placeholder{color:#c9d3ee!important;opacity:.6!important}
+@media(max-width:700px){.gz-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.sheet{padding:16px 10px 36px 32px}.sheet::before{left:20px}.box,.step{padding-inline:10px}}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff!important;color:#111!important;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar,.no-print,.btn,.fb,.meter,.status{display:none!important}
+  .page{max-width:none;margin:0;padding:0}
+  .sheet{box-shadow:none;border-radius:0;padding:8mm 7mm 8mm 12mm;background-color:#fff!important}
+  .sheet::before{left:9mm}
+  .sheet>section{break-inside:auto;margin-top:12px}
+  h1{font-size:17pt}h2{font-size:13pt}h3{font-size:11pt}
+  .box,.step,.creative-task,.tbl-wrap,.gz{break-inside:avoid}
+  .tbl-wrap{overflow:visible}
+  .tbl{min-width:0;width:100%;table-layout:fixed}
+  .tbl th,.tbl td{font-size:7.5pt;padding:3px 2px;color:#111!important;border-color:#333!important;overflow-wrap:anywhere}
+  input.ink,.tbl td input.ink,.creative-task input.ink,textarea.work,.creative-task textarea.work{font:10pt Arial,sans-serif!important;font-weight:700!important;line-height:1.3!important;color:#111!important;-webkit-text-fill-color:#111;text-shadow:none;background:#fff!important;background-image:none!important;border:1px solid #777!important;min-height:20px;padding:2px!important}
+  textarea.work{min-height:44px;resize:none;white-space:pre-wrap}
+  textarea.work::placeholder,input::placeholder{color:transparent!important}
+  .formula{background:#f3f3f3!important;color:#111!important}
+  .box.simbox{background:#fff!important;border-color:#777!important}
+  canvas.simcv{max-height:90mm;width:auto;max-width:100%;margin:4mm auto}
+  .gz-tabs,.gz-btns,.gz-tools,.response-tabs{display:none!important}
+  .creative-task{background:#fff!important;color:#111!important;border-color:#777!important}
+  .small{font-size:9pt;color:#222!important}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <nav class="nav" aria-label="Розділи роботи">
+      <a href="#prep">1. Підготовка</a>
+      <a href="#exp">2. Дослід</a>
+      <a href="#calc">3. Обчислення</a>
+      <a href="#concl">4. Висновок</a>
+    </nav>
+    <div class="status" aria-live="polite">
+      <span>Заповнено <b id="progTxt">0 з 0</b> <span class="meter"><i id="progBar"></i></span></span>
+      <span id="saveSt">Зберігається у цьому браузері</span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+<main class="sheet" id="top">
+
+  <div class="fio">
+    <label>Клас <input class="ink w-s" id="f-klass" data-k="klass" autocomplete="off"></label>
+    <label>Прізвище та ім'я <input class="ink w-l" id="f-fio" data-k="fio" autocomplete="off"></label>
+    <label>Дата <input class="ink w-s" id="f-date" data-k="date" autocomplete="off"></label>
+  </div>
+
+  <h1>ЛАБОРАТОРНА РОБОТА № 4</h1>
+  <p><b>Тема.</b> Дослідження рівноваги тіла під дією кількох сил.</p>
+  <p><b>Мета:</b> з'ясувати, за яких умов тіло із закріпленою віссю обертання перебуває в рівновазі.</p>
+  <p><b>Обладнання:</b> вбудована інтерактивна модель важеля, набір цеглин масою по 5 кг, лінійка.</p>
+
+  <!-- 1. ПІДГОТОВКА -->
+  <section id="prep">
+    <h2>1. Підготовка до експерименту</h2>
+    <p>Перед виконанням роботи згадайте відповіді на запитання:</p>
+    <ul class="checks">
+      <li>1) Що називають плечем сили?</li>
+      <li>2) Як визначити момент сили? Яка його одиниця в СІ?</li>
+      <li>3) За яких умов тіло перебуває в рівновазі?</li>
+    </ul>
+    <label class="wl" for="prep-t">Відповіді</label>
+    <textarea class="work" id="prep-t" data-k="prep" rows="6" spellcheck="false"></textarea>
+  </section>
+
+  <!-- 2. ЕКСПЕРИМЕНТ -->
+  <section id="exp">
+    <h2>2. Експеримент</h2>
+
+    <ul class="steps">
+      <li><span class="step-dot" aria-hidden="true">1.</span><div>Натисніть <b>«Опори»</b>, щоб вимкнути їх: важіль стане <b>рухомим</b> і нахилятиметься. Вага однієї цеглини — <b>50 Н</b> (маса 5 кг).</div></li>
+      <li><span class="step-dot" aria-hidden="true">2.</span><div>Перетягніть цеглини на важіль: <b>ліворуч — 1 і 2 цеглини</b> (на різних відстанях), <b>праворуч — 3 цеглини</b>. Пересуваючи їх, <b>зрівноважте важіль</b>.</div></li>
+      <li><span class="step-dot" aria-hidden="true">3.</span><div>Натисніть <b>«Лінійка»</b> і виміряйте <b>плечі d₁, d₂, d₃</b> (відстань від осі до цеглини). Занесіть їх до таблиці.</div></li>
+      <li><span class="step-dot" aria-hidden="true">4.</span><div>Натисніть <b>«Записати в таблицю»</b> — сили F₁, F₂, F₃ запишуться самі (зліва направо). Повторіть для дослідів 2–4:
+        <br>2) ліворуч 1 і 3 цеглини, праворуч 4; &nbsp;3) ліворуч 2, праворуч 1 і 4; &nbsp;4) ліворуч 3, праворуч 2 і 4.</div></li>
+    </ul>
+
+    <!-- Симуляція важеля -->
+    <div class="box simbox" id="sim">
+      <div class="row" style="justify-content:space-between;align-items:baseline">
+        <h3>Тренажер: важіль із цеглинами</h3>
+        <span class="small">Перетягуйте цеглини мишею або пальцем</span>
+      </div>
+      <div class="modes" id="modes">
+        <span class="lbl">Режим:</span>
+        <button class="btn sm" type="button" data-mode="lab" aria-pressed="true">Дослід</button>
+        <button class="btn sm" type="button" data-mode="1" aria-pressed="false">Невідомий вантаж 1</button>
+        <button class="btn sm" type="button" data-mode="2" aria-pressed="false">Невідомий вантаж 2</button>
+        <button class="btn sm" type="button" data-mode="3" aria-pressed="false">Невідомий вантаж 3</button>
+      </div>
+      <canvas class="simcv" id="simCv" width="1200" height="520" role="img" aria-label="Інтерактивна модель важеля з цеглинами"></canvas>
+
+      <div class="lv-info">
+        <span>Стан важеля: <b id="infoState">порожній</b></span>
+        <span>Цеглин на важелі: <b id="infoN">0</b></span>
+      </div>
+
+      <div class="sw">
+        <button class="btn" id="bSupport" type="button" aria-pressed="true">🧱 Опори: увімк.</button>
+        <button class="btn" id="bRuler" type="button" aria-pressed="false">📏 Лінійка</button>
+        <button class="btn" id="bReset" type="button">↺ Скинути</button>
+        <button class="btn primary" id="bSaveRow" type="button">Записати в таблицю</button>
+      </div>
+      <p class="small" id="simMsg" aria-live="polite" style="margin:6px 0 0"></p>
+    </div>
+
+    <!-- Таблиця -->
+    <div class="tbl-wrap">
+      <table class="tbl" id="dataTbl"><thead></thead><tbody id="dataTbody"></tbody></table>
+    </div>
+    <p class="small">Кнопка «Записати в таблицю» вносить лише сили <i>F</i><sub>1</sub>, <i>F</i><sub>2</sub>, <i>F</i><sub>3</sub>. Плечі <i>d</i> виміряйте лінійкою, моменти <i>M</i> та їхню суму обчисліть самостійно.</p>
+  </section>
+
+  <!-- 3. ОБЧИСЛЕННЯ -->
+  <section id="calc">
+    <h2>3. Опрацювання результатів</h2>
+
+    <article class="step">
+      <header><span class="no">1</span><h3>Моменти сил</h3></header>
+      <div class="formula">
+        <div><i>F</i> = <i>mg</i> &nbsp;&nbsp; <i>M</i> = ±<i>F</i>·<i>d</i> &nbsp;&nbsp; <i>M</i><sub>1</sub> + <i>M</i><sub>2</sub> + <i>M</i><sub>3</sub> = ?</div>
+      </div>
+      <p class="small">Сила обертає важіль <b>проти</b> ходу годинникової стрілки — момент <b>додатний</b> (+). <b>За</b> ходом годинникової стрілки — <b>від'ємний</b> (−).</p>
+      <label class="wl" for="w1">Хід обчислень (для дослідів 1–4)</label>
+      <textarea class="work" id="w1" data-k="w1" rows="6" spellcheck="false"></textarea>
+    </article>
+
+    <article class="step">
+      <header><span class="no">2</span><h3>Сума моментів сил</h3></header>
+      <p class="small">Знайдіть суму моментів для кожного досліду і впишіть її в останню колонку таблиці.</p>
+      <label class="wl" for="w2">Хід обчислень</label>
+      <textarea class="work" id="w2" data-k="w2" rows="4" spellcheck="false"></textarea>
+    </article>
+  </section>
+
+  <!-- 4. ВИСНОВОК -->
+  <section id="concl">
+    <h2>4. Висновок і контрольні запитання</h2>
+
+    <p>Проаналізуйте результати та зазначте:</p>
+    <ul class="checks">
+      <li>яку величину ви вимірювали</li>
+      <li>за яких умов тіло із закріпленою віссю обертання перебуває в рівновазі</li>
+      <li>вимірювання якої величини, на ваш погляд, дає найбільшу похибку</li>
+    </ul>
+    <label class="wl" for="concl-t">Висновок</label>
+    <textarea class="work" id="concl-t" data-k="concl" rows="7" spellcheck="false"></textarea>
+
+    <div style="margin-top:16px">
+      <h3>Контрольні запитання</h3>
+
+      <div style="margin-top:10px">
+        <p><b>1.</b> Для піднімання вантажу застосовують легкий важіль із віссю на лівому кінці <i>O</i>. Вантаж підвішено <b>посередині</b> між віссю та правим кінцем, а сила <i>F</i> прикладена до правого кінця вгору. Який виграш у силі отримують?</p>
+        <div class="row">
+          <span class="af">Виграш у силі у <input class="ink num" id="q1g" data-k="q1g" inputmode="decimal" autocomplete="off" aria-label="Виграш у силі, разів"> <span class="u">разів</span></span>
+          <button class="btn primary" type="button" id="bQ1">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ1" aria-live="polite"></p>
+        <label class="wl" for="q1ans">Обґрунтування</label>
+        <textarea class="work" id="q1ans" data-k="q1ans" rows="3" spellcheck="false"></textarea>
+      </div>
+
+      <div style="margin-top:10px">
+        <p><b>2.</b> Вантаж несуть на палиці, перекинутій через плече. Коли палиця сильніше тисне на плече: коли вантаж ближче чи дальше від плеча? Як положення вантажу впливає на силу, якою рука втримує палицю в рівновазі?</p>
+        <label class="wl" for="q2ans">Відповідь</label>
+        <textarea class="work" id="q2ans" data-k="q2ans" rows="4" spellcheck="false"></textarea>
+      </div>
+
+      <div style="margin-top:10px">
+        <p><b>3.</b> Дошку масою 10 кг підперли на відстані, що становить 1/3 її довжини. Яку силу, напрямлену перпендикулярно до дошки, слід прикласти до її короткого кінця, щоб утримати дошку в рівновазі? (<i>g</i> = 10 м/с²)</p>
+        <label class="wl" for="q3work">Розв'язання</label>
+        <textarea class="work" id="q3work" data-k="q3work" rows="4" spellcheck="false"></textarea>
+        <div class="row" style="margin-top:4px">
+          <span class="af"><i>F</i> = <input class="ink num" id="q3v" data-k="q3v" inputmode="decimal" autocomplete="off" aria-label="Сила, Н"> <span class="u">Н</span></span>
+          <button class="btn primary" type="button" id="bQ3">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ3" aria-live="polite"></p>
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="creative-task"><h3>Творче завдання: невідомий вантаж</h3>
+          <p>У тренажері оберіть режим <b>«Невідомий вантаж 1/2/3»</b>. На лівому плечі важеля лежить вантаж «?» невідомої маси. Зрівноважте важіль цеглинами, виміряйте плечі лінійкою й за <b>умовою рівноваги</b> (сума моментів дорівнює нулю) обчисліть масу вантажу. Для кожного вантажу запишіть розв'язання.</p>
+          <label class="wl" for="cr1">Розв'язання (формули, підстановка чисел, одиниці)</label>
+          <textarea class="work" id="cr1" data-k="cr1" rows="8" spellcheck="false"></textarea>
+          <div class="row" style="margin-top:8px">
+            <span class="af"><i>m</i><sub>1</sub> = <input class="ink num" id="cm1" data-k="cm1" inputmode="decimal" autocomplete="off" aria-label="Маса вантажу 1, кг"> <span class="u">кг</span></span>
+            <button class="btn primary" type="button" data-cm="1">Перевірити</button>
+          </div>
+          <p class="fb" id="fbC1" aria-live="polite"></p>
+          <div class="row">
+            <span class="af"><i>m</i><sub>2</sub> = <input class="ink num" id="cm2" data-k="cm2" inputmode="decimal" autocomplete="off" aria-label="Маса вантажу 2, кг"> <span class="u">кг</span></span>
+            <button class="btn primary" type="button" data-cm="2">Перевірити</button>
+          </div>
+          <p class="fb" id="fbC2" aria-live="polite"></p>
+          <div class="row">
+            <span class="af"><i>m</i><sub>3</sub> = <input class="ink num" id="cm3" data-k="cm3" inputmode="decimal" autocomplete="off" aria-label="Маса вантажу 3, кг"> <span class="u">кг</span></span>
+            <button class="btn primary" type="button" data-cm="3">Перевірити</button>
+          </div>
+          <p class="fb" id="fbC3" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot no-print">
+    <div style="flex:1 1 300px;min-width:0">
+      <button class="btn primary" id="bPdf" type="button">⬇ Завантажити роботу у PDF</button>
+      <p class="small" style="margin-top:4px">Натисніть кнопку, у вікні друку виберіть «Зберегти як PDF» і прикріпіть файл у Classroom.</p>
+    </div>
+    <button class="btn" id="bClear" type="button">Очистити сторінку</button>
+  </div>
+
+</main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var KEY='lab4-lever-v1';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var num=function(v){var t=String(v==null?'':v).replace(',','.').replace(/\s/g,'').replace('−','-');return /^-?(\d+\.?\d*|\.\d+)$/.test(t)?parseFloat(t):NaN};
+var fmt=function(x,d){if(d==null)d=2;return isFinite(x)?x.toFixed(d).replace('.',','):'—'};
+
+function fresh(){return {f:{},g:{}}}
+function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&j.f){var o=fresh();o.f=j.f;o.g=j.g||{};return o}}catch(e){}return fresh()}
+// Під час кожного відкриття сторінки всі поля порожні: старі записи не підвантажуються.
+try{localStorage.removeItem(KEY)}catch(e){}
+var S=fresh();
+var saveT;
+function setSt(t){$('#saveSt').textContent=t}
+function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem(KEY,JSON.stringify(S));setSt('Збережено у браузері')}catch(e){setSt('Не вдалося зберегти')}},350)}
+
+/* ===== ТАБЛИЦЯ ===== */
+var COLS=[['F1','<i>F</i><sub>1</sub>, Н'],['d1','<i>d</i><sub>1</sub>, м'],['M1','<i>M</i><sub>1</sub>,<br>Н·м'],
+          ['F2','<i>F</i><sub>2</sub>, Н'],['d2','<i>d</i><sub>2</sub>, м'],['M2','<i>M</i><sub>2</sub>,<br>Н·м'],
+          ['F3','<i>F</i><sub>3</sub>, Н'],['d3','<i>d</i><sub>3</sub>, м'],['M3','<i>M</i><sub>3</sub>,<br>Н·м'],
+          ['S','<i>M</i><sub>1</sub>+<i>M</i><sub>2</sub>+<i>M</i><sub>3</sub>,<br>Н·м']];
+var ROWS=4;
+function buildTable(){
+  $('#dataTbl thead').innerHTML='<tr><th>№</th>'+COLS.map(function(c){return '<th>'+c[1]+'</th>'}).join('')+'</tr>';
+  var b='';
+  for(var r=1;r<=ROWS;r++){
+    b+='<tr><td>'+r+'</td>'+COLS.map(function(c){
+      var k='c'+r+'_'+c[0];
+      return '<td><input class="ink" id="'+k+'" data-k="'+k+'" inputmode="decimal" autocomplete="off" aria-label="'+c[0]+', дослід '+r+'"></td>';
+    }).join('')+'</tr>';
+  }
+  $('#dataTbody').innerHTML=b;
+}
+buildTable();
+
+/* ===== МОДЕЛЬ ВАЖЕЛЯ ===== */
+var cv=$('#simCv'),ctx=cv.getContext('2d');
+var W=1200,H=520,PX=600,PY=280,PPM=270,BT=12,GY=425,STEP=0.05,MINSEP=0.2,BRH=16,BRW=50;
+var supports=true,ang=0,mode='lab',hb=null;
+var weights=[5,10,15,20].map(function(m,i){return {m:m,n:m/5,d:null,drag:false,x:0,y:0,ox:0,oy:0,tx:300+i*200}});
+var HIDDEN={1:{m:8,d:1.0},2:{m:12,d:1.5},3:{m:18,d:1.0}};
+var rulerOn=false,rA=null,rB=null,rDrag=false;
+
+function wH(w){return BRH*w.n}
+function pose(w){
+  if(w.drag)return {x:w.x,y:w.y,a:0};
+  if(w.d==null)return {x:w.tx,y:H-18-wH(w)/2,a:0};
+  var u=w.d*PPM,v=-(BT/2+wH(w)/2),a=ang;
+  return {x:PX+u*Math.cos(a)-v*Math.sin(a),y:PY+u*Math.sin(a)+v*Math.cos(a),a:a};
+}
+function hbPose(){
+  var u=hb.d*PPM,v=-(BT/2+22),a=ang;
+  return {x:PX+u*Math.cos(a)-v*Math.sin(a),y:PY+u*Math.sin(a)+v*Math.cos(a),a:a};
+}
+function net(){
+  var s=0;
+  weights.forEach(function(w){if(w.d!=null)s+=w.m*10*(-w.d)});
+  if(hb)s+=hb.m*10*(-hb.d);
+  return s;
+}
+function placedCount(){return weights.filter(function(w){return w.d!=null}).length}
+function targetAng(){
+  if(supports)return 0;
+  var n=net();if(Math.abs(n)<1)return 0;
+  return -(n>0?1:-1)*Math.min(0.22,0.025+0.0025*Math.abs(n));
+}
+
+function stack(x,y,a,n,label){
+  ctx.save();ctx.translate(x,y);ctx.rotate(a);
+  var h=BRH*n;
+  for(var i=0;i<n;i++){
+    var by=h/2-BRH*(i+1);
+    ctx.fillStyle='#c0392b';ctx.fillRect(-BRW/2,by,BRW,BRH);
+    ctx.strokeStyle='#7b241c';ctx.lineWidth=1.5;ctx.strokeRect(-BRW/2,by,BRW,BRH);
+    ctx.strokeStyle='rgba(255,255,255,.35)';ctx.beginPath();ctx.moveTo(-BRW/2+4,by+4);ctx.lineTo(BRW/2-4,by+4);ctx.stroke();
+  }
+  ctx.fillStyle='#111';ctx.font='bold 14px sans-serif';ctx.textAlign='center';
+  ctx.fillText(label,0,-h/2-6);
+  ctx.restore();
+}
+function drawHidden(){
+  var p=hbPose();
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);
+  ctx.fillStyle='#6f7a8f';ctx.fillRect(-28,-22,56,44);
+  ctx.strokeStyle='#2f3646';ctx.lineWidth=2;ctx.strokeRect(-28,-22,56,44);
+  ctx.fillStyle='#fff';ctx.font='bold 30px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',0,2);
+  ctx.restore();
+}
+
+function draw(){
+  var g=ctx.createLinearGradient(0,0,0,GY);g.addColorStop(0,'#7fc6ee');g.addColorStop(1,'#dff3ff');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#6aa84f';ctx.fillRect(0,GY,W,H-GY);
+  ctx.fillStyle='#548c3c';ctx.fillRect(0,GY,W,6);
+  ctx.fillStyle='rgba(0,0,0,.55)';ctx.font='13px sans-serif';ctx.textAlign='left';
+  ctx.fillText('Цеглини по 5 кг (1 цеглина = 50 Н)',16,GY+24);
+
+  // опора-призма
+  ctx.fillStyle='#f2d21b';ctx.strokeStyle='#a38b00';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(PX,PY);ctx.lineTo(PX-70,GY);ctx.lineTo(PX+70,GY);ctx.closePath();ctx.fill();ctx.stroke();
+  // бокові опори
+  if(supports){
+    ctx.fillStyle='#8a93a3';ctx.strokeStyle='#4d5566';
+    [-1,1].forEach(function(s){var x=PX+s*2*PPM;ctx.fillRect(x-14,PY+BT/2,28,GY-PY-BT/2);ctx.strokeRect(x-14,PY+BT/2,28,GY-PY-BT/2)});
+  }
+  // балка
+  ctx.save();ctx.translate(PX,PY);ctx.rotate(ang);
+  ctx.fillStyle='#e0b060';ctx.fillRect(-2*PPM-10,-BT/2,4*PPM+20,BT);
+  ctx.strokeStyle='#6b4b1a';ctx.lineWidth=1.5;ctx.strokeRect(-2*PPM-10,-BT/2,4*PPM+20,BT);
+  for(var k=-8;k<=8;k++){var x=k*0.25*PPM,len=(k%4===0)?11:6;ctx.beginPath();ctx.moveTo(x,BT/2);ctx.lineTo(x,BT/2+len);ctx.stroke()}
+  ctx.beginPath();ctx.arc(0,0,7,0,2*Math.PI);ctx.fillStyle='#fff';ctx.fill();ctx.stroke();
+  ctx.restore();
+
+  if(hb)drawHidden();
+  weights.forEach(function(w){if(!w.drag){var p=pose(w);stack(p.x,p.y,p.a,w.n,w.m+' кг')}});
+  weights.forEach(function(w){if(w.drag){var p=pose(w);stack(p.x,p.y,0,w.n,w.m+' кг')}});
+
+  // лінійка
+  if(rulerOn&&rA&&rB){
+    ctx.save();
+    ctx.strokeStyle='#ffcf33';ctx.lineWidth=3;ctx.setLineDash([8,5]);
+    ctx.beginPath();ctx.moveTo(rA.x,rA.y);ctx.lineTo(rB.x,rB.y);ctx.stroke();ctx.setLineDash([]);
+    [rA,rB].forEach(function(p){ctx.beginPath();ctx.arc(p.x,p.y,6,0,2*Math.PI);ctx.fillStyle='#ffcf33';ctx.fill();ctx.strokeStyle='#5c4600';ctx.lineWidth=1.5;ctx.stroke()});
+    var dm=Math.abs(rB.x-rA.x)/PPM,txt='d = '+fmt(dm,2)+' м';
+    var mx=(rA.x+rB.x)/2,my=Math.min(rA.y,rB.y)-16;
+    ctx.font='bold 22px sans-serif';
+    var tw=ctx.measureText(txt).width+18;
+    ctx.fillStyle='rgba(0,0,0,.85)';ctx.fillRect(mx-tw/2,my-26,tw,34);
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(txt,mx,my-2);
+    ctx.restore();
+  }
+}
+
+function info(){
+  var cnt=placedCount()+(hb?1:0),n=net(),st;
+  if(!cnt)st='порожній';
+  else if(Math.abs(n)<1)st='у рівновазі ✓';
+  else st=(n>0?'переважує ліва частина':'переважує права частина');
+  if(supports&&cnt&&Math.abs(n)>=1)st+=' (утримують опори)';
+  var el=$('#infoState');if(el.textContent!==st)el.textContent=st;
+  var c=String(placedCount());if($('#infoN').textContent!==c)$('#infoN').textContent=c;
+}
+
+function frame(){
+  var t=targetAng();
+  ang+=(t-ang)*0.15;
+  if(Math.abs(t-ang)<1e-4)ang=t;
+  draw();info();
+  requestAnimationFrame(frame);
+}
+
+/* ===== ВЗАЄМОДІЯ ===== */
+function cvPos(e){
+  var r=cv.getBoundingClientRect();
+  return {x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height};
+}
+function hit(w,p){
+  var q=pose(w),c=Math.cos(q.a),s=Math.sin(q.a),dx=p.x-q.x,dy=p.y-q.y;
+  var lx=dx*c+dy*s,ly=-dx*s+dy*c;
+  return Math.abs(lx)<=BRW/2+4&&Math.abs(ly)<=wH(w)/2+4;
+}
+function findHit(p){
+  for(var i=weights.length-1;i>=0;i--)if(hit(weights[i],p))return weights[i];
+  return null;
+}
+function snapX(p){
+  var xs=[PX];
+  weights.forEach(function(w){if(w.d!=null)xs.push(pose(w).x)});
+  if(hb)xs.push(hbPose().x);
+  var out={x:p.x,y:p.y};
+  xs.forEach(function(x){if(Math.abs(p.x-x)<14)out.x=x});
+  return out;
+}
+function isFree(d,self){
+  if(Math.abs(d)<0.1-1e-9||Math.abs(d)>1.9+1e-9)return false;
+  for(var i=0;i<weights.length;i++){var w=weights[i];if(w!==self&&w.d!=null&&Math.abs(w.d-d)<MINSEP-1e-9)return false}
+  if(hb&&Math.abs(hb.d-d)<MINSEP-1e-9)return false;
+  return true;
+}
+function resolve(d,self){
+  var sign=d<0?-1:1;
+  for(var k=0;k<=40;k++){
+    for(var j=0;j<2;j++){
+      var c=Math.round((d+(j?-1:1)*k*STEP)*100)/100;
+      if((c<0?-1:1)!==sign)continue;
+      if(isFree(c,self))return c;
+    }
+  }
+  return null;
+}
+function drop(w,center,u0){
+  w.drag=false;
+  var a=ang,dx=center.x-PX,dy=center.y-PY;
+  var u=dx*Math.cos(a)+dy*Math.sin(a),v=-dx*Math.sin(a)+dy*Math.cos(a);
+  if(v>-280&&v<70&&Math.abs(u)<=2*PPM+30){
+    var d=Math.round(u/PPM/STEP)*STEP;d=Math.round(d*100)/100;
+    var sign=u<0?-1:1;
+    if(Math.abs(d)<0.1)d=sign*0.1;
+    if(Math.abs(d)>1.9)d=sign*1.9;
+    var f=resolve(d,w);
+    w.d=f;
+  }else w.d=null;
+}
+
+var dragW=null;
+cv.addEventListener('pointerdown',function(e){
+  var p=cvPos(e);
+  if(rulerOn){
+    rA=snapX(p);rB={x:rA.x,y:rA.y};rDrag=true;
+    try{cv.setPointerCapture(e.pointerId)}catch(z){}
+    e.preventDefault();return;
+  }
+  var w=findHit(p);
+  if(!w)return;
+  var q=pose(w);
+  w.ox=p.x-q.x;w.oy=p.y-q.y;
+  w.d=null;w.drag=true;w.x=q.x;w.y=q.y;
+  dragW=w;cv.style.cursor='grabbing';
+  try{cv.setPointerCapture(e.pointerId)}catch(z){}
+  $('#simMsg').textContent='';
+  e.preventDefault();
+});
+cv.addEventListener('pointermove',function(e){
+  var p=cvPos(e);
+  if(rulerOn){if(rDrag)rB=snapX(p);return}
+  if(dragW){dragW.x=p.x-dragW.ox;dragW.y=p.y-dragW.oy;return}
+  cv.style.cursor=findHit(p)?'grab':'default';
+});
+['pointerup','pointercancel'].forEach(function(t){
+  cv.addEventListener(t,function(e){
+    if(rulerOn){rDrag=false;return}
+    if(dragW){var w=dragW;dragW=null;drop(w,{x:w.x,y:w.y});cv.style.cursor='grab'}
+  });
+});
+
+$('#bSupport').addEventListener('click',function(){
+  supports=!supports;
+  this.setAttribute('aria-pressed',String(supports));
+  this.textContent='🧱 Опори: '+(supports?'увімк.':'вимк.');
+});
+$('#bRuler').addEventListener('click',function(){
+  rulerOn=!rulerOn;rA=null;rB=null;rDrag=false;
+  this.setAttribute('aria-pressed',String(rulerOn));
+  cv.style.cursor=rulerOn?'crosshair':'grab';
+  $('#simMsg').textContent=rulerOn?'Проведіть лінію від осі (білий кружок) до цеглини — лінійка покаже плече. Біля цеглини лінія «прилипає» до її центру.':'';
+});
+function resetWeights(){weights.forEach(function(w){w.d=null;w.drag=false});dragW=null}
+$('#bReset').addEventListener('click',function(){resetWeights();rA=null;rB=null;$('#simMsg').textContent=''});
+
+$$('#modes [data-mode]').forEach(function(b){
+  b.addEventListener('click',function(){
+    mode=b.dataset.mode;
+    $$('#modes [data-mode]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+    resetWeights();rA=null;rB=null;
+    if(mode==='lab'){hb=null;$('#simMsg').textContent='Режим «Дослід».'}
+    else{var h=HIDDEN[mode];hb={m:h.m,d:-h.d};$('#simMsg').textContent='Невідомий вантаж «?» лежить ліворуч. Зрівноважте його цеглинами та виміряйте плечі лінійкою.'}
+  });
+});
+
+function nextEmptyRow(){
+  for(var r=1;r<=ROWS;r++){
+    if(!(S.f['c'+r+'_F1']&&S.f['c'+r+'_F2']&&S.f['c'+r+'_F3']))return r;
+  }
+  return null;
+}
+$('#bSaveRow').addEventListener('click',function(){
+  var msg=$('#simMsg');
+  if(mode!=='lab'){msg.textContent='Запис у таблицю працює в режимі «Дослід».';return}
+  var placed=weights.filter(function(w){return w.d!=null}).sort(function(a,b){return a.d-b.d});
+  if(placed.length!==3){msg.textContent='Покладіть на важіль рівно три вантажі (за інструкцією досліду).';return}
+  if(Math.abs(net())>=1){msg.textContent='Спочатку зрівноважте важіль.';return}
+  var r=nextEmptyRow();
+  if(!r){msg.textContent='Усі чотири рядки вже заповнені.';return}
+  for(var i=0;i<3;i++){
+    var k='c'+r+'_F'+(i+1),val=String(placed[i].m*10);
+    S.f[k]=val;$('#'+k).value=val;
+  }
+  save();refresh();
+  msg.textContent='У рядок '+r+' записано сили F₁, F₂, F₃ (зліва направо). Плечі виміряйте лінійкою, а моменти обчисліть самостійно.';
+});
+
+/* ===== ПОЛЯ ФОРМИ ===== */
+var TRACK=['prep','w1','w2','concl','q1g','q1ans','q2ans','q3work','q3v','cr1','cm1','cm2','cm3'];
+for(var rr=1;rr<=ROWS;rr++)COLS.forEach(function(c){TRACK.push('c'+rr+'_'+c[0])});
+function fillAll(){$$('[data-k]').forEach(function(el){el.value=S.f[el.dataset.k]||''})}
+function bindAll(){$$('[data-k]').forEach(function(el){el.addEventListener('input',function(){S.f[el.dataset.k]=el.value;save();refresh()})})}
+function refresh(){
+  var n=TRACK.filter(function(k){return String(S.f[k]||'').trim()!==''}).length;
+  $('#progTxt').textContent=n+' з '+TRACK.length;
+  $('#progBar').style.width=(100*n/TRACK.length)+'%';
+}
+
+/* ===== ПЕРЕВІРКА ВІДПОВІДЕЙ ===== */
+function setFb(el,cls,t){el.className='fb '+cls;el.textContent=t}
+$('#bQ1').addEventListener('click',function(){
+  var v=num(S.f.q1g),fb=$('#fbQ1');
+  if(isNaN(v)){setFb(fb,'','Впишіть число.');return}
+  var ok=Math.abs(v-2)<0.01;
+  setFb(fb,ok?'ok':'bad',ok?'Правильно! Плече сили F удвічі більше за плече вантажу: F·L = P·L/2, тому F = P/2 — виграш у 2 рази.':'Підказка: запишіть правило моментів відносно осі O: F·L = P·d, де d — плече вантажу.');
+});
+$('#bQ3').addEventListener('click',function(){
+  var v=num(S.f.q3v),fb=$('#fbQ3');
+  if(isNaN(v)){setFb(fb,'','Впишіть число.');return}
+  var ok=v>=45&&v<=52;
+  setFb(fb,ok?'ok':'bad',ok?'Правильно! mg = 100 Н діє в центрі дошки на відстані L/6 від опори; F·L/3 = mg·L/6, тож F = mg/2 = 50 Н.':'Підказка: опора на L/3 від короткого кінця, центр ваги дошки — посередині. Знайдіть плечі й скористайтеся правилом моментів.');
+});
+var CM={1:8,2:12,3:18};
+$$('[data-cm]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var i=b.dataset.cm,v=num(S.f['cm'+i]),fb=$('#fbC'+i);
+    if(isNaN(v)){setFb(fb,'','Впишіть масу в кілограмах.');return}
+    var ok=Math.abs(v-CM[i])<=0.5;
+    setFb(fb,ok?'ok':'bad',ok?'Правильно! Умова рівноваги: m·g·d₁ = ΣF·d, звідси маса вантажу знайдена.':'Перевірте плечі й напрямки: момент невідомого вантажу має дорівнювати сумі моментів цеглин на протилежному плечі.');
+  });
+});
+
+/* ===== PDF ===== */
+$('#bPdf').addEventListener('click',function(){
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  window.print();
+});
+$('#bClear').addEventListener('click',function(){
+  if(!confirm('Очистити всі введені дані?'))return;
+  try{localStorage.removeItem(KEY)}catch(e){}
+  location.reload();
+});
+function initDate(){if(!S.f.date){try{S.f.date=new Date().toLocaleDateString('uk-UA')}catch(e){}}}
+
+/* ===== ГРАФІК ===== */
+function niceStep(r){var p=Math.pow(10,Math.floor(Math.log10(r/5))),m=r/5/p;return (m<=1?1:m<=2?2:m<=5?5:10)*p}
+function mountGraph(root,id,cfg){
+  var G=S.g[id]=S.g[id]||{mode:'pts',pts:[['',''],['',''],['',''],['',''],['','']],xl:cfg.xl,yl:cfg.yl,line:true,draw:'',photo:''};
+  root.innerHTML=
+    '<div class="gz-tabs" role="tablist">'+
+    '<button class="gz-tab" type="button" role="tab" data-m="pts">За точками</button>'+
+    '<button class="gz-tab" type="button" role="tab" data-m="draw">Малювати від руки</button>'+
+    '<button class="gz-tab" type="button" role="tab" data-m="img">Вставити фото</button></div>'+
+    '<div class="gz-body">'+
+    '<div data-pane="pts"><div class="gz-grid"><div>'+
+    '<div class="gz-ax"><label>Вісь x<input class="ink" data-ax="xl" value="'+esc(G.xl)+'"></label><label>Вісь y<input class="ink" data-ax="yl" value="'+esc(G.yl)+'"></label></div>'+
+    '<table class="pts"><thead><tr><th>№</th><th>x</th><th>y</th><th></th></tr></thead><tbody></tbody></table>'+
+    '<div class="gz-btns"><button class="btn sm" type="button" data-add>+ точка</button>'+(cfg.preset?'<button class="btn sm" type="button" data-preset>'+cfg.preset.label+'</button>':'')+'<button class="btn sm" type="button" data-clr>Очистити</button></div>'+
+    '<div class="gz-btns"><button class="btn sm" type="button" data-line aria-pressed="'+String(!!G.line)+'">З\'єднати лінією</button></div>'+
+    '<p class="small gz-note" aria-live="polite" style="margin:4px 0 0"></p></div>'+
+    '<svg class="gz-svg" viewBox="0 0 520 360"></svg></div></div>'+
+    '<div data-pane="draw" hidden><div class="gz-tools"><button class="btn sm" type="button" data-tool="blue" aria-pressed="true">Синя ручка</button><button class="btn sm" type="button" data-tool="red" aria-pressed="false">Червона ручка</button><button class="btn sm" type="button" data-tool="erase" aria-pressed="false">Гумка</button><button class="btn sm" type="button" data-cleardraw>Стерти</button></div>'+
+    '<canvas class="gz-cv" width="1040" height="560"></canvas><p class="small">Малюйте пальцем, стилусом або мишею.</p></div>'+
+    '<div data-pane="img" hidden><label class="drop"><input type="file" accept="image/*" hidden><b>Перетягніть фото графіка</b><span>або натисніть для вибору файлу</span></label>'+
+    '<div class="shot" hidden><img alt="Графік"><button class="btn sm" type="button" data-rm>Прибрати</button></div></div></div>';
+
+  var tb=$('tbody',root),svgEl=$('svg.gz-svg',root),note=$('.gz-note',root);
+  function rows(){tb.innerHTML=G.pts.map(function(p,i){return '<tr><td>'+(i+1)+'</td><td><input class="ink" inputmode="decimal" data-i="'+i+'" data-c="0" value="'+esc(p[0])+'"></td><td><input class="ink" inputmode="decimal" data-i="'+i+'" data-c="1" value="'+esc(p[1])+'"></td><td><button class="x" type="button" data-del="'+i+'" aria-label="Видалити точку">×</button></td></tr>'}).join('')}
+  function ext(a){var lo=0,hi=10;if(a.length){lo=Math.min.apply(null,[0].concat(a));hi=Math.max.apply(null,[0].concat(a))}if(hi<=lo)hi=lo+1;var st=niceStep(hi-lo);return {lo:Math.floor(lo/st+1e-9)*st,hi:Math.ceil(hi/st-1e-9)*st,st:st}}
+  var decs=function(s){return Math.max(0,-Math.floor(Math.log10(s)+1e-9))};
+  function chart(){
+    var pts=G.pts.map(function(p){return [num(p[0]),num(p[1])]}).filter(function(p){return isFinite(p[0])&&isFinite(p[1])});
+    var W2=520,H2=360,ML=60,MR=22,MT=18,MB=54,X=ext(pts.map(function(p){return p[0]})),Y=ext(pts.map(function(p){return p[1]}));
+    var px=function(v){return ML+(v-X.lo)/(X.hi-X.lo)*(W2-ML-MR)},py=function(v){return H2-MB-(v-Y.lo)/(Y.hi-Y.lo)*(H2-MT-MB)};
+    var o='<rect width="'+W2+'" height="'+H2+'" fill="var(--paper)"/>';
+    var nx=Math.round((X.hi-X.lo)/X.st*5),ny=Math.round((Y.hi-Y.lo)/Y.st*5),i,v2;
+    for(i=0;i<=nx;i++){v2=X.lo+i*X.st/5;o+='<line class="'+(i%5?'gm':'gM')+'" x1="'+px(v2)+'" y1="'+MT+'" x2="'+px(v2)+'" y2="'+(H2-MB)+'"/>';if(i%5===0)o+='<text x="'+px(v2)+'" y="'+(H2-MB+17)+'" text-anchor="middle">'+fmt(v2,decs(X.st))+'</text>'}
+    for(i=0;i<=ny;i++){v2=Y.lo+i*Y.st/5;o+='<line class="'+(i%5?'gm':'gM')+'" x1="'+ML+'" y1="'+py(v2)+'" x2="'+(W2-MR)+'" y2="'+py(v2)+'"/>';if(i%5===0)o+='<text x="'+(ML-8)+'" y="'+(py(v2)+4)+'" text-anchor="end">'+fmt(v2,decs(Y.st))+'</text>'}
+    o+='<line class="ga" x1="'+ML+'" y1="'+(H2-MB)+'" x2="'+(W2-MR)+'" y2="'+(H2-MB)+'"/><line class="ga" x1="'+ML+'" y1="'+MT+'" x2="'+ML+'" y2="'+(H2-MB)+'"/>';
+    o+='<text x="'+(ML+(W2-ML-MR)/2)+'" y="'+(H2-12)+'" text-anchor="middle" font-style="italic">'+esc(G.xl)+'</text>';
+    o+='<text transform="translate(16 '+(MT+(H2-MT-MB)/2)+') rotate(-90)" text-anchor="middle" font-style="italic">'+esc(G.yl)+'</text>';
+    if(G.line&&pts.length>1)o+='<polyline class="gl" points="'+pts.map(function(p){return px(p[0])+','+py(p[1])}).join(' ')+'"/>';
+    pts.forEach(function(p){o+='<circle class="gp" cx="'+px(p[0])+'" cy="'+py(p[1])+'" r="4.5"/>'});
+    if(!pts.length)o+='<text x="'+(ML+(W2-ML-MR)/2)+'" y="'+(MT+(H2-MT-MB)/2)+'" text-anchor="middle" style="fill:var(--muted)">Додайте точки в таблицю</text>';
+    svgEl.innerHTML=o;
+  }
+  rows();chart();
+  tb.addEventListener('input',function(e){var t=e.target;if(t.dataset.i==null)return;G.pts[+t.dataset.i][+t.dataset.c]=t.value;chart();save()});
+  tb.addEventListener('click',function(e){var b=e.target.closest('[data-del]');if(!b)return;G.pts.splice(+b.dataset.del,1);rows();chart();save()});
+  $$('[data-ax]',root).forEach(function(el){el.addEventListener('input',function(){G[el.dataset.ax]=el.value;chart();save()})});
+  $('[data-line]',root).addEventListener('click',function(e){G.line=!G.line;e.currentTarget.setAttribute('aria-pressed',String(G.line));chart();save()});
+  $('[data-add]',root).addEventListener('click',function(){G.pts.push(['','']);rows();chart();save()});
+  $('[data-clr]',root).addEventListener('click',function(){G.pts=[['',''],['',''],['',''],['',''],['','']];rows();chart();save();note.textContent=''});
+  var pb=$('[data-preset]',root);
+  if(pb)pb.addEventListener('click',function(){var r=cfg.preset.run();if(!r){note.textContent=cfg.preset.fail;return}G.pts=r;note.textContent='Точки взято з таблиці.';rows();chart();save()});
+
+  var gCv=$('.gz-cv',root),gCx=gCv.getContext('2d'),tool='blue',down=false,last2=null;
+  gCx.lineCap='round';gCx.lineJoin='round';
+  if(G.draw){var im2=new Image();im2.onload=function(){gCx.drawImage(im2,0,0)};im2.src=G.draw}
+  var pos2=function(e){var r=gCv.getBoundingClientRect();return[(e.clientX-r.left)*gCv.width/r.width,(e.clientY-r.top)*gCv.height/r.height]};
+  function stroke2(a,b){gCx.globalCompositeOperation=tool==='erase'?'destination-out':'source-over';gCx.strokeStyle=tool==='red'?'#d64545':'#3b6fe0';gCx.lineWidth=tool==='erase'?26:3.4;gCx.beginPath();gCx.moveTo(a[0],a[1]);gCx.lineTo(b[0],b[1]);gCx.stroke()}
+  gCv.addEventListener('pointerdown',function(e){down=true;last2=pos2(e);try{gCv.setPointerCapture(e.pointerId)}catch(x){}stroke2(last2,last2);e.preventDefault()});
+  gCv.addEventListener('pointermove',function(e){if(!down)return;var p=pos2(e);stroke2(last2,p);last2=p});
+  ['pointerup','pointercancel'].forEach(function(t){gCv.addEventListener(t,function(){if(!down)return;down=false;try{G.draw=gCv.toDataURL('image/png')}catch(x){}save()})});
+  $$('[data-tool]',root).forEach(function(b){b.addEventListener('click',function(){tool=b.dataset.tool;$$('[data-tool]',root).forEach(function(x){x.setAttribute('aria-pressed',String(x===b))})})});
+  $('[data-cleardraw]',root).addEventListener('click',function(){gCx.clearRect(0,0,gCv.width,gCv.height);G.draw='';save()});
+
+  var dropEl=$('.drop',root),fileIn=$('input[type=file]',root),shotEl=$('.shot',root),imgEl=$('img',shotEl);
+  function showPhoto(src){if(src){imgEl.src=src;shotEl.hidden=false;dropEl.hidden=true}else{shotEl.hidden=true;dropEl.hidden=false;imgEl.removeAttribute('src')}}
+  showPhoto(G.photo||'');
+  function loadPhoto(file){if(!file||file.type.indexOf('image/')!==0)return;var rd=new FileReader();rd.onload=function(){var im3=new Image();im3.onload=function(){var c3=document.createElement('canvas'),sc=Math.min(1,900/im3.width,700/im3.height);c3.width=Math.max(1,Math.round(im3.width*sc));c3.height=Math.max(1,Math.round(im3.height*sc));var x3=c3.getContext('2d');x3.fillStyle='#fff';x3.fillRect(0,0,c3.width,c3.height);x3.drawImage(im3,0,0,c3.width,c3.height);try{G.photo=c3.toDataURL('image/jpeg',.68);showPhoto(G.photo);save()}catch(e){}};im3.src=rd.result};rd.readAsDataURL(file)}
+  fileIn.addEventListener('change',function(){loadPhoto(fileIn.files&&fileIn.files[0])});
+  dropEl.addEventListener('dragover',function(e){e.preventDefault();dropEl.classList.add('over')});
+  dropEl.addEventListener('dragleave',function(){dropEl.classList.remove('over')});
+  dropEl.addEventListener('drop',function(e){e.preventDefault();dropEl.classList.remove('over');loadPhoto(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0])});
+  $('[data-rm]',root).addEventListener('click',function(){G.photo='';showPhoto('');save()});
+
+  function setPane(m){G.mode=m;$$('[data-pane]',root).forEach(function(p){p.hidden=p.getAttribute('data-pane')!==m});$$('.gz-tab',root).forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.m===m))})}
+  $$('.gz-tab',root).forEach(function(b){b.addEventListener('click',function(){setPane(b.dataset.m)})});
+  setPane(G.mode||'pts');
+}
+function mountGraphs(){
+  if(!$('#gz1'))return;
+  mountGraph($('#gz1'),'g1',{xl:'M(+), Н·м',yl:'|M(−)|, Н·м',preset:{label:'З таблиці',fail:'Заповніть колонки M у таблиці.',run:function(){
+    var pts=[];
+    for(var r=1;r<=ROWS;r++){
+      var pos=0,neg=0,any=false;
+      ['M1','M2','M3'].forEach(function(k){var v=num(S.f['c'+r+'_'+k]);if(isFinite(v)){any=true;if(v>0)pos+=v;else neg+=-v}});
+      if(any)pts.push([String(Math.round(pos*1000)/1000),String(Math.round(neg*1000)/1000)]);
+    }
+    return pts.length?pts:null;
+  }}});
+}
+
+/* ===== РЕДАКТОРИ ВІДПОВІДЕЙ (текст / від руки / зображення) ===== */
+function mountResponseEditors(){
+  S.g.responseEditors=S.g.responseEditors||{};
+  $$('.work').forEach(function(ta){
+    if(ta.dataset.editorMounted)return;ta.dataset.editorMounted='1';
+    var key=ta.dataset.k||ta.id,state=S.g.responseEditors[key]||{mode:'text',draw:'',image:''};
+    S.g.responseEditors[key]=state;
+    var wrap=document.createElement('div');wrap.className='response-editor';
+    var tabs=document.createElement('div');tabs.className='response-tabs';tabs.setAttribute('role','group');
+    [['text','Ввести текст'],['draw','Малювати від руки'],['image','Вставити зображення']].forEach(function(item){
+      var b=document.createElement('button');b.type='button';b.className='btn';b.textContent=item[1];b.dataset.mode=item[0];b.setAttribute('aria-pressed',String((state.mode||'text')===item[0]));tabs.appendChild(b);
+    });
+    var drawPanel=document.createElement('div');drawPanel.className='response-panel';drawPanel.hidden=state.mode!=='draw';
+    var tools=document.createElement('div');tools.className='response-tools';
+    var pen=document.createElement('button');pen.type='button';pen.className='btn sm';pen.textContent='Ручка';
+    var er=document.createElement('button');er.type='button';er.className='btn sm';er.textContent='Гумка';
+    var clr=document.createElement('button');clr.type='button';clr.className='btn sm';clr.textContent='Очистити';
+    tools.append(pen,er,clr);
+    var rCv=document.createElement('canvas');rCv.className='response-canvas';rCv.width=900;rCv.height=260;rCv.setAttribute('aria-label','Поле рукописної відповіді');
+    var hint=document.createElement('p');hint.className='response-hint';hint.textContent='Малюйте мишею, пальцем або стилусом.';
+    drawPanel.append(tools,rCv,hint);
+    var imgPanel=document.createElement('div');imgPanel.className='response-panel';imgPanel.tabIndex=0;imgPanel.hidden=state.mode!=='image';
+    var upLabel=document.createElement('label');upLabel.className='response-upload';upLabel.textContent='Вибрати зображення ';
+    var fileEl=document.createElement('input');fileEl.type='file';fileEl.accept='image/*';upLabel.appendChild(fileEl);
+    var pHint=document.createElement('p');pHint.className='response-hint';pHint.textContent='Або вставте через Ctrl+V.';
+    var prevImg=document.createElement('img');prevImg.className='response-image-preview';prevImg.alt='';prevImg.hidden=true;
+    var clrImg=document.createElement('button');clrImg.type='button';clrImg.className='btn sm';clrImg.textContent='Видалити';
+    imgPanel.append(upLabel,pHint,prevImg,clrImg);
+    ta.parentNode.insertBefore(wrap,ta.nextSibling);wrap.append(tabs,drawPanel,imgPanel);
+    var textPanel=document.createElement('div');textPanel.className='response-panel';textPanel.style.padding='0';
+    wrap.insertBefore(textPanel,drawPanel);textPanel.appendChild(ta);
+    function setMode(m){state.mode=m;S.g.responseEditors[key]=state;ta.hidden=m!=='text';drawPanel.hidden=m!=='draw';imgPanel.hidden=m!=='image';Array.from(tabs.children).forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.mode===m))});save()}
+    var rCtx=rCv.getContext('2d'),rDown=false,rLast=null,rTool='pen';rCtx.lineCap='round';rCtx.lineJoin='round';
+    if(state.draw){var rIm=new Image();rIm.onload=function(){rCtx.drawImage(rIm,0,0,rCv.width,rCv.height)};rIm.src=state.draw}
+    function showPrev(){if(state.image){prevImg.src=state.image;prevImg.hidden=false}else{prevImg.removeAttribute('src');prevImg.hidden=true}}
+    showPrev();
+    function rPos(e){var r=rCv.getBoundingClientRect();return [(e.clientX-r.left)*rCv.width/r.width,(e.clientY-r.top)*rCv.height/r.height]}
+    function rLine(a,b){rCtx.globalCompositeOperation=rTool==='erase'?'destination-out':'source-over';rCtx.strokeStyle='#111';rCtx.lineWidth=rTool==='erase'?25:3;rCtx.beginPath();rCtx.moveTo(a[0],a[1]);rCtx.lineTo(b[0],b[1]);rCtx.stroke()}
+    function persD(){try{var o=document.createElement('canvas');o.width=rCv.width;o.height=rCv.height;var ox=o.getContext('2d');ox.fillStyle='#fff';ox.fillRect(0,0,o.width,o.height);ox.drawImage(rCv,0,0);state.draw=o.toDataURL('image/jpeg',.72);S.g.responseEditors[key]=state;save()}catch(e){}}
+    rCv.addEventListener('pointerdown',function(e){rDown=true;rLast=rPos(e);try{rCv.setPointerCapture(e.pointerId)}catch(z){}rLine(rLast,rLast);e.preventDefault()});
+    rCv.addEventListener('pointermove',function(e){if(!rDown)return;var p=rPos(e);rLine(rLast,p);rLast=p});
+    ['pointerup','pointercancel'].forEach(function(ev){rCv.addEventListener(ev,function(){if(rDown){rDown=false;persD()}})});
+    pen.addEventListener('click',function(){rTool='pen'});er.addEventListener('click',function(){rTool='erase'});
+    clr.addEventListener('click',function(){rCtx.clearRect(0,0,rCv.width,rCv.height);state.draw='';S.g.responseEditors[key]=state;save()});
+    function readImg(f){if(!f||f.type.indexOf('image/')!==0)return;var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas'),sc=Math.min(1,900/im.width,700/im.height);c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);try{state.image=c.toDataURL('image/jpeg',.68);S.g.responseEditors[key]=state;showPrev();save()}catch(e){}};im.src=rd.result};rd.readAsDataURL(f)}
+    fileEl.addEventListener('change',function(){readImg(fileEl.files&&fileEl.files[0])});
+    clrImg.addEventListener('click',function(){state.image='';S.g.responseEditors[key]=state;showPrev();fileEl.value='';save()});
+    imgPanel.addEventListener('paste',function(e){var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var i=0;i<items.length;i++){if(items[i].type.indexOf('image/')===0){readImg(items[i].getAsFile());e.preventDefault();return}}});
+    tabs.addEventListener('click',function(e){var b=e.target.closest('button[data-mode]');if(b)setMode(b.dataset.mode)});
+    setMode(state.mode||'text');
+  });
+}
+
+/* ===== НАВІГАЦІЯ ===== */
+try{
+  var navLinks=$$('.nav a');
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting)navLinks.forEach(function(a){a.setAttribute('aria-current',String(a.getAttribute('href')==='#'+en.target.id))})})},{rootMargin:'-25% 0px -65% 0px'});
+  $$('main.sheet>section').forEach(function(s){io.observe(s)});
+}catch(e){}
+
+/* ===== СТАРТ ===== */
+fillAll();bindAll();refresh();mountGraphs();mountResponseEditors();
+requestAnimationFrame(frame);
+
+})();
+</script>
+</body></html>

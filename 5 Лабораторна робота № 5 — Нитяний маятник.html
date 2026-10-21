@@ -1,0 +1,900 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Лабораторна робота № 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Literata:wght@400;600;700&family=Marck+Script&display=swap">
+<style>
+:root{
+  --desk:#cdd6e2;--bar:#f1f5fb;--paper:#fcfdff;--grid:#d2e4f6;--grid-s:#a9c8e9;
+  --margin:#e2707b;--print:#1f2430;--muted:#5a6579;--ink:#1b3fb0;--ink-line:#8196d8;
+  --note:#eef4fc;--edge:#b4c0d3;--ok:#17794a;--bad:#bd2f2f;--btn-fg:#ffffff;
+  --tbl:#3c4557;--hov:#e2eafb;--cell:20px;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:60px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --hov:#252f4a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --hov:#252f4a;color-scheme:dark}
+*{box-sizing:border-box}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{background:var(--desk);color:var(--print);font:16px/1.55 'Literata',Georgia,'Times New Roman',serif;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bar)}
+b,strong{font-weight:700}
+a{color:var(--ink)}
+:focus-visible{outline:2px solid var(--margin);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);border-bottom:1px solid var(--edge)}
+.bar-in{max-width:980px;margin:0 auto;padding-block:6px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;gap:4px 16px;align-items:center;flex-wrap:wrap}
+.nav{display:flex;gap:4px;overflow-x:auto;flex:1 1 300px;min-width:0}
+.nav a{white-space:nowrap;padding:2px 10px;border-radius:3px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:600}
+.nav a:hover{background:var(--hov)}
+.nav a[aria-current="true"]{background:var(--ink);color:var(--btn-fg)}
+.status{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.meter{width:70px;height:6px;background:var(--note);border:1px solid var(--edge);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle}
+.meter i{display:block;height:100%;width:0;background:var(--ink);transition:width .25s}
+
+.page{max-width:980px;margin:0 auto;padding-block:10px 24px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{position:relative;background-color:var(--paper);
+  background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);padding:14px 20px 28px 50px;border-radius:3px;box-shadow:0 10px 28px rgba(10,20,40,.22)}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:40px;width:2px;background:var(--margin);opacity:.85}
+.sheet>section{margin-top:18px}
+h1{margin:0;text-align:center;font-size:22px;line-height:1.6;letter-spacing:.03em}
+h2{margin:0 0 12px;font-size:19px;line-height:1.6;border-bottom:2px solid var(--margin);display:inline-block;padding-right:18px}
+h3{margin:0;font-size:17px;line-height:1.45}
+p{margin:0 0 8px}
+.small{font-size:14px;line-height:1.5;color:var(--print)}
+.fio{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:10px}
+.fio label{display:inline-flex;align-items:baseline;gap:6px}
+.w-s{width:7em}.w-l{width:min(20em,100%)}
+
+input.ink{font:19px/24px 'Marck Script',cursive;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid var(--ink-line);border-radius:0;padding:1px 4px;min-width:0}
+input.ink:focus{background:var(--note);border-bottom-color:var(--ink);outline:none}
+input.ink::placeholder,textarea.work::placeholder{color:var(--muted);opacity:.5}
+input.num{width:5.8em;text-align:center}
+textarea.work{display:block;width:100%;min-height:60px;resize:vertical;border:1.5px solid var(--edge);border-radius:3px;
+  background-color:var(--paper);background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);background-attachment:local;font:18px/20px 'Marck Script',cursive;color:var(--ink);padding:0 8px}
+textarea.work:focus{outline:none;border-color:var(--ink)}
+
+.btn{font:600 14px/18px 'Literata',serif;padding:6px 12px;border:1.5px solid #344054;background:#fff;color:#000!important;border-radius:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:background .15s,box-shadow .15s}
+.btn:hover,.btn:focus-visible{background:#fff0ad!important;color:#000!important;box-shadow:0 0 0 2px rgba(0,0,0,.12)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:#f3e7a5;color:#000!important;border-color:#8b7a2b}
+.btn.primary:hover{background:#ffe680!important}
+.btn.sm{padding:3px 9px;font-size:13px}
+.btn[aria-pressed="true"]{background:#ffe680!important;color:#000!important;border-color:#8b7a2b}
+.row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+
+.box{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px;margin-block:8px}
+.box.simbox{background:#e8f3e8;border:1.5px solid #5f8c63;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);color:#111!important}
+.box.simbox h3,.box.simbox label,.box.simbox .small,.box.simbox .lv-info,.box.simbox .lv-info b,.box.simbox #simMsg,.box.simbox .sl output{color:#111!important;opacity:1}
+.box.simbox input.ink{color:#111!important;background:#fff!important;border:1.5px solid #5f8c63!important;border-radius:3px;text-align:center}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:9px;margin-block:6px;align-items:flex-start}
+.steps li>div{min-width:0}.step-dot{font-weight:700;min-width:18px}
+
+canvas.simcv{display:block;width:100%;height:auto;border:1.5px solid #5f8c63;border-radius:4px;background:#e9f3fb;margin-block:8px;touch-action:none;cursor:grab}
+.modes{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.modes .lbl{font-size:13.5px;font-weight:600;color:#111}
+.sw{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:8px}
+.sw-disp{font:500 28px/34px 'IBM Plex Mono',ui-monospace,Menlo,monospace;background:#fff;color:#111;border:1.5px solid #5f8c63;border-radius:4px;padding:0 12px;font-variant-numeric:tabular-nums;min-width:8.5em;text-align:center}
+.sw-disp.run{color:#b3263a}
+.ctl{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;margin-top:4px}
+.sl{display:grid;grid-template-columns:8.5em 1fr 5.5em;gap:8px;align-items:center;min-height:30px}
+.sl label{font-size:14.5px}
+.sl input[type=range]{accent-color:var(--ink);width:100%;min-width:0}
+.sl output{font-weight:700;font-size:14px}
+.lv-info{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:2px;font-size:14px}
+.lv-info b{font:500 15px/18px 'IBM Plex Mono',monospace;color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;margin-block:10px;background:var(--paper);border-radius:3px}
+.tbl{border-collapse:collapse;min-width:720px;width:100%;background:var(--paper)}
+.tbl th,.tbl td{border:1.5px solid var(--tbl);padding:5px 4px;text-align:center;vertical-align:middle;font-size:14px;line-height:1.35}
+.tbl th{background:var(--note);font-weight:600}
+.tbl td input.ink{width:100%;min-width:3.6em;text-align:center;background:#fff0ad!important;color:#202020!important;border:1.5px solid #c4a000!important;border-radius:2px;font-weight:700}
+.cap{font-size:14px;font-style:italic;text-align:right;margin:6px 0 0}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 3px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px 1px}
+.frac>span:last-child{padding:1px 4px 0}
+.rt{border-top:1.5px solid currentColor;padding:0 2px}
+.step{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px 10px;margin-block:8px}
+.step header{display:flex;align-items:center;gap:9px}
+.no{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1.5px solid var(--margin);color:var(--margin);border-radius:50%;font-weight:700;font-size:13px}
+.formula{font-size:15.5px;line-height:28px;padding:4px 10px;background:var(--note);border-left:3px solid var(--margin);margin-block:8px;overflow-x:auto}
+.formula div{white-space:nowrap}
+.wl{display:block;font-size:14px;font-weight:700;color:var(--print);margin-bottom:4px}
+.af{display:inline-flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.af .u{color:var(--muted);font-size:13px}
+.fb{min-height:20px;margin:6px 0 0;font-size:13.5px;line-height:19px}
+.fb.ok{color:var(--ok)}.fb.ok::before{content:"✓ "}
+.fb.bad{color:var(--bad)}.fb.bad::before{content:"✗ "}
+.checks{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:8px;list-style:none;padding:0}
+.checks li{position:relative;padding-left:14px}
+.checks li:before{content:"•";position:absolute;left:0;font-weight:700}
+.opt{text-align:center;padding:4px 8px}
+.opt svg{display:block;width:110px;height:88px;margin:0 auto 2px}
+
+/* Графік */
+.gz{border:1.5px solid var(--edge);border-radius:4px;background:var(--paper);margin-block:8px}
+.gz-tabs{display:flex;border-bottom:1.5px solid var(--edge);overflow-x:auto}
+.gz-tab{flex:1 0 auto;padding:5px 12px;border:0;background:transparent;font:600 13px/18px 'Literata',serif;color:var(--print);cursor:pointer;border-bottom:3px solid transparent}
+.gz-tab[aria-selected="true"]{color:#000!important;background:#fff0ad;border-bottom-color:#8b7a2b}
+.gz-body{padding:10px}
+.gz-grid{display:grid;grid-template-columns:minmax(200px,240px) minmax(0,1fr);gap:12px}
+.gz-ax{display:grid;gap:2px;margin-bottom:6px}
+.gz-ax label{display:flex;align-items:baseline;gap:6px;font-size:12.5px}
+.gz-ax input{flex:1;font-size:16px}
+.pts{border-collapse:collapse;width:100%}
+.pts th{font-size:11.5px;color:var(--muted);font-weight:600}
+.pts td{padding:0 2px;text-align:center}
+.pts td input{width:100%;font-size:16px;text-align:center}
+.pts .x{border:0;background:transparent;color:var(--muted);font-size:17px;cursor:pointer;line-height:1}
+.gz-btns{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;align-items:center}
+svg.gz-svg{width:100%;height:auto;display:block;background:var(--paper);border:1.5px solid var(--edge);border-radius:3px}
+.gz-svg text{fill:var(--print);font:12px 'Literata',serif}
+.gz-svg .gm{stroke:var(--grid);stroke-width:1}
+.gz-svg .gM{stroke:var(--grid-s);stroke-width:1}
+.gz-svg .ga{stroke:var(--print);stroke-width:1.8}
+.gz-svg .gl{fill:none;stroke:var(--ink);stroke-width:2}
+.gz-svg .gp{fill:var(--ink);stroke:var(--paper);stroke-width:1.5}
+.gz-tools{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+canvas.gz-cv{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1.5px solid var(--edge);border-radius:3px;background-color:var(--paper);
+  background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);background-size:26px 26px}
+.drop{display:grid;gap:3px;place-items:center;text-align:center;padding:22px 14px;border:2px dashed var(--ink-line);border-radius:4px;cursor:pointer;color:var(--muted)}
+.drop:hover,.drop.over{background:var(--note)}
+.drop b{color:var(--ink)}
+.shot{margin-top:8px}.shot img{display:block;max-width:100%;height:auto;border:1.5px solid var(--edge);border-radius:3px;margin-bottom:6px}
+
+.response-editor{margin:5px 0 10px;border:1px solid var(--edge);border-radius:4px;background:var(--paper);overflow:hidden}
+.response-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:5px;background:var(--note);border-bottom:1px solid var(--edge)}
+.response-tabs .btn{font-size:12px;padding:3px 9px}
+.response-panel{padding:7px}
+.response-panel[hidden]{display:none!important}
+.response-canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1px solid var(--edge);border-radius:3px;background-color:#fff;
+  background-image:linear-gradient(to right,#d9e7f5 1px,transparent 1px),linear-gradient(to bottom,#d9e7f5 1px,transparent 1px);background-size:20px 20px}
+.response-image-preview{display:block;max-width:100%;max-height:420px;margin:8px auto;border:1px solid var(--edge);border-radius:3px}
+.response-upload{display:inline-block;padding:7px 11px;border:1px dashed var(--ink-line);border-radius:3px;cursor:pointer;background:var(--note);color:var(--print);font:600 12.5px 'Literata',serif}
+.response-tools{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px}
+.response-hint{font-size:14px;color:var(--print);margin:6px 0}
+
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:28px;align-items:flex-start}
+
+.creative-task{margin-top:14px;padding:14px 16px;background:#fff3c4;border:2px solid #9a6a00;border-left:7px solid #9a6a00;border-radius:8px;color:#241900;font-size:16px;line-height:1.65}
+.creative-task h3{font-size:20px;color:#241900;margin-bottom:8px}
+.creative-task .fb.ok{color:#0b5d33}.creative-task .fb.bad{color:#9b1c1c}
+.creative-task .af .u{color:#4a3500}
+.creative-task textarea.work{background-color:#fffdf4;border-color:#9a6a00;color:#5b3215!important;font-weight:600}
+.creative-task textarea.work::placeholder{color:#795536!important;opacity:1!important}
+.creative-task .tbl-wrap{background:#fffdf4}
+
+/* Поля введення: білий, жирний, контрастний текст на темному тлі, збільшений шрифт */
+input.ink,.tbl td input.ink{color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;
+  background:#1c2745!important;border:0!important;border-bottom:2px solid #8196d8!important;border-radius:2px;
+  font-size:22px;line-height:28px;font-weight:700;letter-spacing:.02em;text-shadow:0 0 1px rgba(255,255,255,.35);padding:2px 6px}
+.tbl td input.ink{border:1px solid #8196d8!important;border-radius:3px;font-size:20px;min-width:3.8em}
+input.num{width:6.5em}
+input.ink:focus,.tbl td input.ink:focus{background:#10192e!important;border-bottom-color:#ffe680!important;outline:none}
+input.ink::placeholder{color:#c9d3ee!important;opacity:.6}
+.box.simbox input.ink{font-size:22px;font-weight:700}
+.gz-ax input,.pts td input{font-size:20px}
+textarea.work,.creative-task textarea.work{color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;font-weight:700;
+  font-size:23px;line-height:30px;padding:0 10px;
+  background-color:#1c2745!important;background-size:30px 30px;
+  background-image:linear-gradient(to right,#33436e 1px,transparent 1px),linear-gradient(to bottom,#33436e 1px,transparent 1px)!important;
+  border-color:#8196d8!important}
+textarea.work:focus{border-color:#ffe680!important}
+textarea.work::placeholder,.creative-task textarea.work::placeholder{color:#c9d3ee!important;opacity:.6!important}
+.creative-task .tbl-wrap,.creative-task .tbl{background:#1c2745!important}
+.creative-task .tbl th{background:#2a3a66!important;color:#ffffff!important;font-size:15px;font-weight:700}
+.creative-task .tbl td{color:#ffffff!important;font-weight:700;font-size:16px}
+.creative-task .tbl th,.creative-task .tbl td{border-color:#8196d8!important}
+@media(max-width:700px){.gz-grid,.ctl{grid-template-columns:1fr}}
+@media(max-width:560px){.sheet{padding:16px 10px 36px 32px}.sheet::before{left:20px}.box,.step{padding-inline:10px}.sl{grid-template-columns:7em 1fr 4.6em}}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff!important;color:#111!important;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar,.no-print,.btn,.fb,.meter,.status{display:none!important}
+  .page{max-width:none;margin:0;padding:0}
+  .sheet{box-shadow:none;border-radius:0;padding:8mm 7mm 8mm 12mm;background-color:#fff!important}
+  .sheet::before{left:9mm}
+  .sheet>section{break-inside:auto;margin-top:12px}
+  h1{font-size:17pt}h2{font-size:13pt}h3{font-size:11pt}
+  .box,.step,.creative-task,.tbl-wrap,.gz{break-inside:avoid}
+  .tbl-wrap{overflow:visible}
+  .tbl{min-width:0;width:100%;table-layout:fixed}
+  .tbl th,.tbl td{font-size:7.5pt;padding:3px 2px;color:#111!important;border-color:#333!important;overflow-wrap:anywhere}
+  input.ink,.tbl td input.ink,.box.simbox input.ink,textarea.work,.creative-task textarea.work{font:10pt Arial,sans-serif!important;font-weight:700!important;line-height:1.3!important;color:#111!important;-webkit-text-fill-color:#111;text-shadow:none;background:#fff!important;background-image:none!important;border:1px solid #777!important;min-height:20px;padding:2px!important}
+  textarea.work{min-height:44px;resize:none;white-space:pre-wrap}
+  .creative-task .tbl-wrap,.creative-task .tbl{background:#fff!important}
+  .creative-task .tbl th,.creative-task .tbl td{background:#fff!important;color:#111!important;border-color:#333!important}
+  textarea.work::placeholder,input::placeholder{color:transparent!important}
+  .formula{background:#f3f3f3!important;color:#111!important}
+  .box.simbox{background:#fff!important;border-color:#777!important}
+  .ctl,.sw,.modes{display:none!important}
+  canvas.simcv{max-height:80mm;width:auto;max-width:100%;margin:3mm auto}
+  .gz-tabs,.gz-btns,.gz-tools,.response-tabs{display:none!important}
+  .creative-task{background:#fff!important;color:#111!important;border-color:#777!important}
+  .small{font-size:9pt;color:#222!important}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <nav class="nav" aria-label="Розділи роботи">
+      <a href="#prep">1. Тренажер</a>
+      <a href="#e1">2. Експеримент 1</a>
+      <a href="#e2">3. Експеримент 2</a>
+      <a href="#concl">4. Висновок</a>
+    </nav>
+    <div class="status" aria-live="polite">
+      <span>Заповнено <b id="progTxt">0 з 0</b> <span class="meter"><i id="progBar"></i></span></span>
+      <span id="saveSt">Зберігається у цьому браузері</span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+<main class="sheet" id="top">
+
+  <div class="fio">
+    <label>Клас <input class="ink w-s" id="f-klass" data-k="klass" autocomplete="off"></label>
+    <label>Прізвище та ім'я <input class="ink w-l" id="f-fio" data-k="fio" autocomplete="off"></label>
+    <label>Дата <input class="ink w-s" id="f-date" data-k="date" autocomplete="off"></label>
+  </div>
+
+  <h1>ЛАБОРАТОРНА РОБОТА № 5</h1>
+  <p><b>Тема.</b> Дослідження коливань нитяного маятника, вимірювання прискорення вільного падіння.</p>
+  <p><b>Мета:</b> визначити за допомогою нитяного маятника прискорення вільного падіння; переконатися в справедливості формули Гюйґенса.</p>
+  <p><b>Обладнання:</b> вбудована інтерактивна модель маятника (важок, нитка змінної довжини, лінійка, транспортир, секундомір).</p>
+
+  <!-- 1. ТРЕНАЖЕР -->
+  <section id="prep">
+    <h2>1. Підготовка до експерименту</h2>
+
+    <ul class="steps">
+      <li><span class="step-dot" aria-hidden="true">1.</span><div>Оберіть у тренажері <b>«Експ. 1»</b> або <b>«Експ. 2»</b>. Повзунком встановіть <b>довжину нитки</b> і <b>кут відхилення</b> (10°–15°; важок можна й перетягнути мишею).</div></li>
+      <li><span class="step-dot" aria-hidden="true">2.</span><div>Натисніть <b>«▶ Старт»</b> — маятник відпускається й запускається секундомір. Лічильник <b>N</b> показує, скільки <b>повних коливань</b> уже зроблено (одне повне коливання — рух від крайнього положення й назад).</div></li>
+      <li><span class="step-dot" aria-hidden="true">3.</span><div>Коли лічильник покаже <b>20</b>, натисніть <b>«⏹ Стоп»</b>, потім <b>«Записати в таблицю»</b>. Кнопка вносить лише <i>l</i>, <i>N</i> та <i>t</i>. Решту величин обчисліть самостійно.</div></li>
+    </ul>
+
+    <!-- Тренажер -->
+    <div class="box simbox" id="sim">
+      <div class="row" style="justify-content:space-between;align-items:baseline">
+        <h3>Тренажер: маятники</h3>
+        <span class="small">Режим визначає, у яку таблицю потрапить запис</span>
+      </div>
+      <div class="modes" id="modes">
+        <span class="lbl">Режим:</span>
+        <button class="btn sm" type="button" data-t="e1" aria-pressed="true">Експ. 1 (g)</button>
+        <button class="btn sm" type="button" data-t="e2" aria-pressed="false">Експ. 2 (формула Гюйґенса)</button>
+        <button class="btn sm" type="button" data-t="sp" aria-pressed="false">Творче: пружина</button>
+      </div>
+      <canvas class="simcv" id="simCv" width="1200" height="520" role="img" aria-label="Інтерактивна модель нитяного і пружинного маятників"></canvas>
+
+      <div class="ctl">
+        <div class="sl" data-for="pend"><label for="slL">Довжина нитки</label><input type="range" id="slL" min="0.1" max="1" step="0.05" value="0.5"><output id="oL">0,50 м</output></div>
+        <div class="sl" data-for="pend"><label for="slA">Кут відхилення</label><input type="range" id="slA" min="5" max="30" step="1" value="12"><output id="oA">12°</output></div>
+        <div class="sl" data-for="spring" hidden><label for="slM">Маса тягарця</label><input type="range" id="slM" min="50" max="400" step="50" value="100"><output id="oM">100 г</output></div>
+        <div class="sl" data-for="spring" hidden><label for="slAm">Відхилення</label><input type="range" id="slAm" min="2" max="8" step="0.5" value="4"><output id="oAm">4 см</output></div>
+        <div class="sl"><label for="slSp">Швидкість</label><input type="range" id="slSp" min="0.5" max="4" step="0.5" value="2"><output id="oSp">2×</output></div>
+      </div>
+
+      <div class="lv-info">
+        <span>Коливань <b>N</b>: <b id="infoN">0</b></span>
+      </div>
+
+      <div class="sw">
+        <div class="sw-disp" id="swDisp" role="timer" aria-label="Секундомір">00:00,00</div>
+        <input class="ink num" id="simN" inputmode="numeric" value="20" style="width:5em" aria-label="Кількість коливань N для запису" title="Кількість коливань N">
+        <button class="btn primary" id="bStart" type="button">▶ Старт</button>
+        <button class="btn" id="bStop" type="button" disabled>⏹ Стоп</button>
+        <button class="btn" id="bReset" type="button">↺ Скинути</button>
+        <button class="btn primary" id="bSaveRow" type="button" disabled>Записати в таблицю</button>
+      </div>
+      <p class="small" id="simMsg" aria-live="polite" style="margin:6px 0 0"></p>
+    </div>
+  </section>
+
+  <!-- 2. ЕКСПЕРИМЕНТ 1 -->
+  <section id="e1">
+    <h2>2. Експеримент 1. Вимірювання прискорення вільного падіння</h2>
+    <p class="small">Встановіть довільну довжину нитки, відхиліть маятник на 10°–15° й виміряйте час 20 повних коливань. <b>Не змінюючи довжини</b>, повторіть дослід ще двічі.</p>
+
+    <p class="cap">Таблиця 1</p>
+    <div class="tbl-wrap"><table class="tbl" id="tbl1"></table></div>
+
+    <article class="step">
+      <header><span class="no">1</span><h3>Обчислення</h3></header>
+      <div class="formula">
+        <div><i>t</i><sub>сер</sub> = <span class="frac"><span><i>t</i><sub>1</sub> + <i>t</i><sub>2</sub> + <i>t</i><sub>3</sub></span><span>3</span></span> &nbsp;&nbsp;
+          <i>T</i> = <span class="frac"><span><i>t</i><sub>сер</sub></span><span><i>N</i></span></span> &nbsp;&nbsp;
+          <i>g</i><sub>вим</sub> = <span class="frac"><span>4π²<i>l</i></span><span><i>T</i>²</span></span></div>
+        <div><i>ε<sub>g</sub></i> = |1 − <span class="frac"><span><i>g</i><sub>вим</sub></span><span><i>g</i><sub>таб</sub></span></span>| · 100 %, &nbsp; <i>g</i><sub>таб</sub> = 9,8 м/с²</div>
+      </div>
+      <label class="wl" for="w1">Хід обчислень</label>
+      <textarea class="work" id="w1" data-k="w1" rows="6" spellcheck="false"></textarea>
+      <p class="small" style="margin-top:4px">Результати впишіть у таблицю 1.</p>
+    </article>
+  </section>
+
+  <!-- 3. ЕКСПЕРИМЕНТ 2 -->
+  <section id="e2">
+    <h2>3. Експеримент 2. Перевірка формули Гюйґенса</h2>
+    <p class="small">Встановіть довжину <b>1 м</b>, виміряйте час 20 повних коливань. Повторіть дослід ще двічі, <b>щоразу зменшуючи</b> довжину нитки.</p>
+
+    <p class="cap">Таблиця 2</p>
+    <div class="tbl-wrap"><table class="tbl" id="tbl2"></table></div>
+
+    <article class="step">
+      <header><span class="no">1</span><h3>Обчислення</h3></header>
+      <div class="formula">
+        <div><i>T</i> = <span class="frac"><span><i>t</i></span><span><i>N</i></span></span> &nbsp;&nbsp;
+          <i>T′</i> = 2π<span class="rt">√(<span class="frac" style="vertical-align:middle"><span><i>l</i></span><span><i>g</i></span></span>)</span>, &nbsp; <i>g</i> = 9,8 м/с² &nbsp;&nbsp;
+          <i>ε<sub>T</sub></i> = |1 − <span class="frac"><span><i>T</i></span><span><i>T′</i></span></span>| · 100 %</div>
+      </div>
+      <label class="wl" for="w2">Хід обчислень</label>
+      <textarea class="work" id="w2" data-k="w2" rows="6" spellcheck="false"></textarea>
+    </article>
+  </section>
+
+  <!-- 4. ВИСНОВОК -->
+  <section id="concl">
+    <h2>4. Висновок і контрольні запитання</h2>
+
+    <p>Проаналізуйте експеримент і його результати. У висновку зазначте:</p>
+    <ul class="checks">
+      <li>величини, які ви вимірювали</li>
+      <li>якими є результати вимірювання</li>
+      <li>чи залежать значення цих величин від довжини нитки (як саме)</li>
+      <li>причини похибки</li>
+    </ul>
+    <label class="wl" for="concl-t">Висновок</label>
+    <textarea class="work" id="concl-t" data-k="concl" rows="7" spellcheck="false"></textarea>
+
+    <div style="margin-top:16px">
+      <h3>Контрольні запитання</h3>
+
+      <div style="margin-top:10px">
+        <p><b>1.</b> Укажіть графік залежності періоду математичного маятника від довжини його підвісу (по осі <i>x</i> — <i>l</i>, по осі <i>y</i> — <i>T</i>).</p>
+        <div class="row" id="q1opts">
+          <button class="btn opt" type="button" data-opt="а" aria-pressed="false"><svg viewBox="0 0 100 80" aria-hidden="true"><path d="M10 70H94M10 70V6" fill="none" stroke="#333" stroke-width="1.5"/><path d="M10 70L88 14" fill="none" stroke="#1b3fb0" stroke-width="2.6"/><text x="90" y="78" font-size="10" fill="#333">l</text><text x="2" y="10" font-size="10" fill="#333">T</text></svg>а)</button>
+          <button class="btn opt" type="button" data-opt="б" aria-pressed="false"><svg viewBox="0 0 100 80" aria-hidden="true"><path d="M10 70H94M10 70V6" fill="none" stroke="#333" stroke-width="1.5"/><path d="M10 70Q50 66 88 12" fill="none" stroke="#1b3fb0" stroke-width="2.6"/><text x="90" y="78" font-size="10" fill="#333">l</text><text x="2" y="10" font-size="10" fill="#333">T</text></svg>б)</button>
+          <button class="btn opt" type="button" data-opt="в" aria-pressed="false"><svg viewBox="0 0 100 80" aria-hidden="true"><path d="M10 70H94M10 70V6" fill="none" stroke="#333" stroke-width="1.5"/><path d="M10 70Q22 18 88 14" fill="none" stroke="#1b3fb0" stroke-width="2.6"/><text x="90" y="78" font-size="10" fill="#333">l</text><text x="2" y="10" font-size="10" fill="#333">T</text></svg>в)</button>
+          <button class="btn opt" type="button" data-opt="г" aria-pressed="false"><svg viewBox="0 0 100 80" aria-hidden="true"><path d="M10 70H94M10 70V6" fill="none" stroke="#333" stroke-width="1.5"/><path d="M14 12Q20 62 88 66" fill="none" stroke="#1b3fb0" stroke-width="2.6"/><text x="90" y="78" font-size="10" fill="#333">l</text><text x="2" y="10" font-size="10" fill="#333">T</text></svg>г)</button>
+          <button class="btn primary" type="button" id="bQ1">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ1" aria-live="polite"></p>
+      </div>
+
+      <div style="margin-top:10px">
+        <p><b>2.</b> Визначте шлях і модуль переміщення матеріальної точки, що здійснює гармонічні коливання за період. Амплітуда коливань дорівнює 1,5 см.</p>
+        <div class="row">
+          <span class="af">шлях <i>s</i> = <input class="ink num" id="q2s" data-k="q2s" inputmode="decimal" autocomplete="off" aria-label="Шлях, см"> <span class="u">см</span></span>
+          <span class="af">переміщення |Δ<i>r</i>| = <input class="ink num" id="q2d" data-k="q2d" inputmode="decimal" autocomplete="off" aria-label="Модуль переміщення, см"> <span class="u">см</span></span>
+          <button class="btn primary" type="button" id="bQ2">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ2" aria-live="polite"></p>
+      </div>
+
+      <div style="margin-top:10px">
+        <p><b>3.</b> Довжину підвісу математичного маятника зменшили на 19 %. На скільки відсотків змінився період коливань?</p>
+        <label class="wl" for="q3work">Розв'язання</label>
+        <textarea class="work" id="q3work" data-k="q3work" rows="4" spellcheck="false"></textarea>
+        <div class="row" style="margin-top:4px">
+          <span class="af">Період зменшився на <input class="ink num" id="q3v" data-k="q3v" inputmode="decimal" autocomplete="off" aria-label="Зміна періоду, %"> <span class="u">%</span></span>
+          <button class="btn primary" type="button" id="bQ3">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ3" aria-live="polite"></p>
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="creative-task"><h3>Творче завдання: пружинний маятник</h3>
+          <p>У тренажері оберіть режим <b>«Творче: пружина»</b>. До пружини підвішено тягарець. Визначте <b>період коливань</b> тягарця на пружині й дослідіть, <b>чи залежить період від маси</b> тягарця: виміряйте час 10 коливань для різних мас (повзунок «Маса тягарця», кут відхилення не змінюйте) і заповніть таблицю.</p>
+          <div class="tbl-wrap"><table class="tbl" id="tblS"></table></div>
+          <div class="row">
+            <span class="af">Відношення <i>T</i>(400 г) / <i>T</i>(100 г) = <input class="ink num" id="crr" data-k="crr" inputmode="decimal" autocomplete="off" aria-label="Відношення періодів"></span>
+            <button class="btn primary" type="button" id="bCr">Перевірити</button>
+          </div>
+          <p class="fb" id="fbCr" aria-live="polite"></p>
+          <label class="wl" for="crc">Висновок: чи залежить період від маси? Як саме?</label>
+          <textarea class="work" id="crc" data-k="crc" rows="5" spellcheck="false"></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot no-print">
+    <div style="flex:1 1 300px;min-width:0">
+      <button class="btn primary" id="bPdf" type="button">⬇ Завантажити роботу у PDF</button>
+      <p class="small" style="margin-top:4px">Натисніть кнопку, у вікні друку виберіть «Зберегти як PDF» і прикріпіть файл у Classroom.</p>
+    </div>
+    <button class="btn" id="bClear" type="button">Очистити сторінку</button>
+  </div>
+
+</main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var KEY='lab5-pendulum-v1';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var num=function(v){var t=String(v==null?'':v).replace(',','.').replace(/\s/g,'').replace('−','-');return /^-?(\d+\.?\d*|\.\d+)$/.test(t)?parseFloat(t):NaN};
+var fmt=function(x,d){if(d==null)d=2;return isFinite(x)?x.toFixed(d).replace('.',','):'—'};
+
+function fresh(){return {f:{},g:{}}}
+function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&j.f){var o=fresh();o.f=j.f;o.g=j.g||{};return o}}catch(e){}return fresh()}
+// Під час кожного відкриття сторінки всі поля порожні: старі записи не підвантажуються.
+try{localStorage.removeItem(KEY)}catch(e){}
+var S=fresh();
+var saveT;
+function setSt(t){$('#saveSt').textContent=t}
+function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem(KEY,JSON.stringify(S));setSt('Збережено у браузері')}catch(e){setSt('Не вдалося зберегти')}},350)}
+
+/* ===== ТАБЛИЦІ ===== */
+var TRACK=['w1','w2','concl','q1','q2s','q2d','q3work','q3v','crr','crc'];
+function inp(k,label){TRACK.push(k);return '<input class="ink" id="'+k+'" data-k="'+k+'" inputmode="decimal" autocomplete="off" aria-label="'+label+'">'}
+function buildTables(){
+  // Таблиця 1
+  var t1='<thead><tr><th>№</th><th><i>l</i>, м</th><th><i>N</i></th><th><i>t</i>, с</th><th><i>t</i><sub>сер</sub>, с</th><th><i>T</i>, с</th><th><i>g</i><sub>вим</sub>, м/с²</th><th><i>ε<sub>g</sub></i>, %</th></tr></thead><tbody>';
+  var ks=['t1a','t1b','t1c'];
+  for(var r=0;r<3;r++){
+    t1+='<tr><td>'+(r+1)+'</td>';
+    if(r===0)t1+='<td rowspan="3">'+inp('t1l','Довжина l')+'</td><td rowspan="3">'+inp('t1N','Кількість коливань N')+'</td>';
+    t1+='<td>'+inp(ks[r],'Час t, дослід '+(r+1))+'</td>';
+    if(r===0)t1+='<td rowspan="3">'+inp('t1avg','t сер')+'</td><td rowspan="3">'+inp('t1T','Період T')+'</td><td rowspan="3">'+inp('t1g','g вим')+'</td><td rowspan="3">'+inp('t1e','Похибка ε g')+'</td>';
+    t1+='</tr>';
+  }
+  $('#tbl1').innerHTML=t1+'</tbody>';
+  // Таблиця 2
+  var t2='<thead><tr><th>№</th><th><i>l</i>, м</th><th><i>N</i></th><th><i>t</i>, с</th><th><i>T</i> = <i>t</i>/<i>N</i>, с</th><th><i>T′</i> = 2π√(<i>l</i>/<i>g</i>), с</th><th><i>ε<sub>T</sub></i>, %</th></tr></thead><tbody>';
+  for(r=1;r<=3;r++){
+    t2+='<tr><td>'+r+'</td>'+['l','N','t','T','Tp','e'].map(function(c){return '<td>'+inp('t2_'+r+'_'+c,c+', дослід '+r)+'</td>'}).join('')+'</tr>';
+  }
+  $('#tbl2').innerHTML=t2+'</tbody>';
+  // Творче: пружина
+  var ts='<thead><tr><th>№ досліду</th><th>Маса тягарця<br><i>m</i>, г</th><th>Кількість коливань<br><i>N</i></th><th>Час коливань<br><i>t</i>, с</th><th>Період коливань<br><i>T</i> = <i>t</i>/<i>N</i>, с</th></tr></thead><tbody>';
+  for(r=1;r<=4;r++){
+    ts+='<tr><td>'+r+'</td>'+['m','N','t','T'].map(function(c){return '<td>'+inp('sp_'+r+'_'+c,c+', ряд '+r)+'</td>'}).join('')+'</tr>';
+  }
+  $('#tblS').innerHTML=ts+'</tbody>';
+}
+buildTables();
+function setField(k,v){S.f[k]=v;var el=document.getElementById(k);if(el)el.value=v}
+
+/* ===== ТРЕНАЖЕР ===== */
+var cv=$('#simCv'),ctx=cv.getContext('2d');
+var W=1200,H=520,PXc=600,PYc=44,SC=420,SCS=700,L0=120,BH=44;
+var G=9.8,K=15;
+var target='e1';
+var P={l:0.5,a0:12,m:100,A:4,speed:2};
+var st={run:false,th:0,om:0,x:0,v:0,N:0,el:0,last:null,stopT:null,prevV:0};
+var isSpring=function(){return target==='sp'};
+
+function initState(){
+  st.run=false;st.N=0;st.el=0;st.last=null;st.stopT=null;st.prevV=0;st.om=0;st.v=0;
+  st.th=P.a0*Math.PI/180;st.x=P.A/100;
+  $('#bStart').disabled=false;$('#bStop').disabled=true;$('#bSaveRow').disabled=true;
+  $('#infoN').textContent='0';updSw();
+}
+function updSw(){
+  var s=st.el,min=Math.floor(s/60),sec=s%60;
+  var el=$('#swDisp');
+  el.textContent=pad2(min)+':'+pad2(Math.floor(sec))+','+pad2(Math.floor((sec%1)*100));
+  el.className='sw-disp'+(st.run?' run':'');
+}
+function pad2(n){return String(Math.floor(n)).padStart(2,'0')}
+
+function step(dt){
+  var vel;
+  if(isSpring()){
+    st.v+=-(K/(P.m/1000))*st.x*dt;st.x+=st.v*dt;vel=st.v;
+  }else{
+    st.om+=-(G/P.l)*Math.sin(st.th)*dt;st.th+=st.om*dt;vel=st.om;
+  }
+  st.el+=dt;
+  if(st.prevV>0&&vel<=0){st.N++;$('#infoN').textContent=String(st.N)}
+  st.prevV=vel;
+}
+
+function frame(ts){
+  if(st.run){
+    if(st.last==null)st.last=ts;
+    var dr=Math.min(0.05,(ts-st.last)/1000);st.last=ts;
+    var sd=dr*P.speed,n=Math.max(1,Math.round(sd/0.001)),h=sd/n;
+    for(var i=0;i<n;i++)step(h);
+    updSw();
+  }
+  draw();
+  requestAnimationFrame(frame);
+}
+
+function drawBg(){
+  var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#eef6fc');g.addColorStop(1,'#d3e6f5');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(120,160,200,.22)';ctx.lineWidth=1;
+  for(var x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(var y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+  // кронштейн
+  ctx.fillStyle='#5b6578';ctx.fillRect(PXc-70,PYc-16,140,14);
+  ctx.fillStyle='#3f4859';ctx.fillRect(PXc-70,PYc-16,140,4);
+}
+function drawPend(){
+  var L=P.l*SC,bx=PXc+L*Math.sin(st.th),by=PYc+L*Math.cos(st.th);
+  // лінійка (вертикальна, 0–1 м від осі підвісу)
+  var rx=150;
+  ctx.fillStyle='#f6e7b4';ctx.fillRect(rx,PYc,28,SC);
+  ctx.strokeStyle='#8b7a2b';ctx.lineWidth=1.5;ctx.strokeRect(rx,PYc,28,SC);
+  ctx.fillStyle='#222';ctx.font='12px sans-serif';ctx.textAlign='right';
+  for(var i=0;i<=20;i++){
+    var y=PYc+i*0.05*SC,len=(i%2===0)?15:8;
+    ctx.beginPath();ctx.moveTo(rx+28,y);ctx.lineTo(rx+28-len,y);ctx.stroke();
+    if(i%2===0)ctx.fillText(fmt(i/20,1),rx-6,y+4);
+  }
+  ctx.textAlign='left';ctx.fillText('м',rx+4,PYc-6);
+  // транспортир
+  var R=84;
+  ctx.strokeStyle='rgba(60,70,90,.55)';ctx.lineWidth=1.2;ctx.beginPath();
+  ctx.arc(PXc,PYc,R,Math.PI/2-Math.PI/4,Math.PI/2+Math.PI/4);ctx.stroke();
+  ctx.fillStyle='rgba(40,50,70,.8)';ctx.font='11px sans-serif';ctx.textAlign='center';
+  for(var a=-45;a<=45;a+=5){
+    var f=a*Math.PI/180,len2=(a%10===0)?12:6;
+    ctx.beginPath();ctx.moveTo(PXc+R*Math.sin(f),PYc+R*Math.cos(f));ctx.lineTo(PXc+(R+len2)*Math.sin(f),PYc+(R+len2)*Math.cos(f));ctx.stroke();
+    if(a%10===0&&a!==0)ctx.fillText(Math.abs(a)+'°',PXc+(R+26)*Math.sin(f),PYc+(R+26)*Math.cos(f)+4);
+  }
+  ctx.fillText('0°',PXc,PYc+R+30);
+  // положення рівноваги
+  ctx.save();ctx.setLineDash([6,6]);ctx.strokeStyle='rgba(60,70,90,.5)';
+  ctx.beginPath();ctx.moveTo(PXc,PYc);ctx.lineTo(PXc,PYc+SC+40);ctx.stroke();ctx.restore();
+  // нитка і важок
+  ctx.strokeStyle='#2c3444';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(PXc,PYc);ctx.lineTo(bx,by);ctx.stroke();
+  var rg=ctx.createRadialGradient(bx-6,by-6,2,bx,by,20);rg.addColorStop(0,'#c9d3e3');rg.addColorStop(1,'#4b5568');
+  ctx.beginPath();ctx.arc(bx,by,20,0,2*Math.PI);ctx.fillStyle=rg;ctx.fill();ctx.strokeStyle='#2c3444';ctx.stroke();
+  ctx.beginPath();ctx.arc(PXc,PYc,4,0,2*Math.PI);ctx.fillStyle='#222';ctx.fill();
+  ctx.fillStyle='#111';ctx.font='bold 15px sans-serif';ctx.textAlign='left';
+  ctx.fillText('l = '+fmt(P.l,2)+' м   φ₀ = '+P.a0+'°',PXc+130,PYc+30);
+}
+function drawSpring(){
+  var eq=PYc+L0+(P.m/1000)*G/K*SCS;       // верх тягарця в рівновазі
+  var top=eq+st.x*SCS;
+  // лінійка в сантиметрах від положення рівноваги
+  var rx=150;
+  ctx.fillStyle='#f6e7b4';ctx.fillRect(rx,eq-110,28,220);
+  ctx.strokeStyle='#8b7a2b';ctx.lineWidth=1.5;ctx.strokeRect(rx,eq-110,28,220);
+  ctx.fillStyle='#222';ctx.font='12px sans-serif';ctx.textAlign='right';
+  for(var c=-15;c<=15;c++){
+    var y=eq+c*SCS/100,len=(c%5===0)?15:8;
+    ctx.beginPath();ctx.moveTo(rx+28,y);ctx.lineTo(rx+28-len,y);ctx.stroke();
+    if(c%5===0)ctx.fillText(String(Math.abs(c)),rx-6,y+4);
+  }
+  ctx.textAlign='left';ctx.fillText('см',rx+2,eq-118);
+  // положення рівноваги
+  ctx.save();ctx.setLineDash([6,6]);ctx.strokeStyle='rgba(60,70,90,.55)';
+  ctx.beginPath();ctx.moveTo(rx,eq);ctx.lineTo(PXc+120,eq);ctx.stroke();ctx.restore();
+  // пружина
+  ctx.strokeStyle='#445066';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(PXc,PYc);
+  var n=16,y0=PYc+14,y1=top;
+  ctx.lineTo(PXc,y0);
+  for(var i=1;i<=n;i++){var yy=y0+(y1-y0)*i/n;ctx.lineTo(PXc+((i%2)?16:-16),yy-((y1-y0)/n)/2)}
+  ctx.lineTo(PXc,y1);ctx.stroke();
+  // тягарець
+  var w=60+P.m/10;
+  var g=ctx.createLinearGradient(0,top,0,top+BH);g.addColorStop(0,'#d9a441');g.addColorStop(1,'#a8741a');
+  ctx.fillStyle=g;ctx.fillRect(PXc-w/2,top,w,BH);ctx.strokeStyle='#6b4a0f';ctx.lineWidth=2;ctx.strokeRect(PXc-w/2,top,w,BH);
+  ctx.fillStyle='#111';ctx.font='bold 16px sans-serif';ctx.textAlign='center';ctx.fillText(P.m+' г',PXc,top+BH/2+6);
+  ctx.textAlign='left';ctx.font='bold 15px sans-serif';
+  ctx.fillText('m = '+P.m+' г   відхилення '+fmt(P.A,1)+' см',PXc+130,PYc+30);
+}
+function draw(){
+  drawBg();
+  if(isSpring())drawSpring();else drawPend();
+}
+
+/* перетягування важка/тягарця */
+var drag=false;
+function cvPos(e){var r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}}
+function dragTo(p){
+  if(isSpring()){
+    var eq=PYc+L0+(P.m/1000)*G/K*SCS,v=(p.y-BH/2-eq)/SCS*100;
+    v=Math.max(2,Math.min(8,Math.round(v*2)/2));P.A=v;$('#slAm').value=v;$('#oAm').textContent=fmt(v,1)+' см';
+  }else{
+    var a=Math.atan2(p.x-PXc,p.y-PYc)*180/Math.PI;
+    a=Math.max(5,Math.min(30,Math.round(Math.abs(a))));P.a0=a;$('#slA').value=a;$('#oA').textContent=a+'°';
+  }
+  initState();
+}
+cv.addEventListener('pointerdown',function(e){
+  if(st.run||st.el>0)return;
+  drag=true;try{cv.setPointerCapture(e.pointerId)}catch(z){}
+  dragTo(cvPos(e));e.preventDefault();
+});
+cv.addEventListener('pointermove',function(e){if(drag)dragTo(cvPos(e))});
+['pointerup','pointercancel'].forEach(function(t){cv.addEventListener(t,function(){drag=false})});
+
+/* кнопки */
+$('#bStart').addEventListener('click',function(){
+  if(st.run)return;
+  st.run=true;st.last=null;
+  this.disabled=true;$('#bStop').disabled=false;$('#bSaveRow').disabled=true;
+  $('#simMsg').textContent='';
+});
+$('#bStop').addEventListener('click',function(){
+  if(!st.run)return;
+  st.run=false;st.last=null;st.stopT=st.el;
+  $('#bStart').disabled=false;this.disabled=true;$('#bSaveRow').disabled=false;
+  updSw();
+  $('#simMsg').textContent='Зупинено. Перевірте кількість коливань N і натисніть «Записати в таблицю».';
+});
+$('#bReset').addEventListener('click',function(){initState();$('#simMsg').textContent=''});
+
+function bindSl(id,out,fn){
+  $(id).addEventListener('input',function(){fn(parseFloat(this.value));initState()});
+}
+bindSl('#slL','#oL',function(v){P.l=v;$('#oL').textContent=fmt(v,2)+' м'});
+bindSl('#slA','#oA',function(v){P.a0=v;$('#oA').textContent=v+'°'});
+bindSl('#slM','#oM',function(v){P.m=v;$('#oM').textContent=v+' г'});
+bindSl('#slAm','#oAm',function(v){P.A=v;$('#oAm').textContent=fmt(v,1)+' см'});
+$('#slSp').addEventListener('input',function(){P.speed=parseFloat(this.value);$('#oSp').textContent=fmt(P.speed,1).replace(',0','')+'×'});
+
+function setTarget(t){
+  target=t;
+  $$('#modes [data-t]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.t===t))});
+  $$('.ctl [data-for]').forEach(function(d){d.hidden=(d.dataset.for==='spring')!==isSpring()&&d.dataset.for!==undefined});
+  $('#simN').value=(t==='sp')?'10':'20';
+  initState();
+  $('#simMsg').textContent=t==='e1'?'Експ. 1: тримайте довжину нитки незмінною в усіх трьох дослідах.':
+    t==='e2'?'Експ. 2: починайте з довжини 1 м, далі зменшуйте її.':'Пружинний маятник: змінюйте масу тягарця й вимірюйте час коливань.';
+}
+$$('#modes [data-t]').forEach(function(b){b.addEventListener('click',function(){setTarget(b.dataset.t)})});
+
+$('#bSaveRow').addEventListener('click',function(){
+  var msg=$('#simMsg');
+  if(st.stopT==null){msg.textContent='Спочатку зупиніть секундомір.';return}
+  var N=($('#simN').value||'').trim()||String(st.N),ts=fmt(st.stopT,2),k;
+  if(target==='e1'){
+    var keys=['t1a','t1b','t1c'];k=null;
+    for(var i=0;i<3;i++){if(!S.f[keys[i]]){k=keys[i];break}}
+    if(!k){msg.textContent='Усі три досліди таблиці 1 уже заповнені.';return}
+    var ls=fmt(P.l,2);
+    if(S.f.t1l&&Math.abs(num(S.f.t1l)-P.l)>1e-6){msg.textContent='У досліді 1 довжина нитки має бути незмінною: поверніть l = '+S.f.t1l+' м.';return}
+    setField('t1l',ls);setField('t1N',N);setField(k,ts);
+    msg.textContent='Записано в таблицю 1: l = '+ls+' м, N = '+N+', t = '+ts+' с. Решту величин обчисліть самостійно.';
+  }else if(target==='e2'){
+    var r=null;for(var j=1;j<=3;j++){if(!S.f['t2_'+j+'_t']){r=j;break}}
+    if(!r){msg.textContent='Усі три рядки таблиці 2 уже заповнені.';return}
+    setField('t2_'+r+'_l',fmt(P.l,2));setField('t2_'+r+'_N',N);setField('t2_'+r+'_t',ts);
+    msg.textContent='Записано в рядок '+r+' таблиці 2: l, N та t. Періоди й похибку обчисліть самостійно.';
+  }else{
+    var q=null;for(var m=1;m<=4;m++){if(!S.f['sp_'+m+'_t']){q=m;break}}
+    if(!q){msg.textContent='Усі чотири рядки таблиці вже заповнені.';return}
+    setField('sp_'+q+'_m',String(P.m));setField('sp_'+q+'_N',N);setField('sp_'+q+'_t',ts);
+    msg.textContent='Записано в рядок '+q+': m, N та t. Період T обчисліть самостійно.';
+  }
+  save();refresh();
+});
+
+/* ===== ПОЛЯ ФОРМИ ===== */
+function fillAll(){$$('[data-k]').forEach(function(el){el.value=S.f[el.dataset.k]||''})}
+function bindAll(){$$('[data-k]').forEach(function(el){el.addEventListener('input',function(){S.f[el.dataset.k]=el.value;save();refresh()})})}
+function refresh(){
+  var n=TRACK.filter(function(k){return String(S.f[k]||'').trim()!==''}).length;
+  $('#progTxt').textContent=n+' з '+TRACK.length;
+  $('#progBar').style.width=(100*n/TRACK.length)+'%';
+}
+
+/* ===== КОНТРОЛЬНІ ЗАПИТАННЯ ===== */
+function setFb(el,cls,t){el.className='fb '+cls;el.textContent=t}
+function markOpt(){$$('#q1opts [data-opt]').forEach(function(b){b.setAttribute('aria-pressed',String(S.f.q1===b.dataset.opt))})}
+$$('#q1opts [data-opt]').forEach(function(b){b.addEventListener('click',function(){S.f.q1=b.dataset.opt;markOpt();save();refresh()})});
+$('#bQ1').addEventListener('click',function(){
+  var fb=$('#fbQ1');
+  if(!S.f.q1){setFb(fb,'','Оберіть графік.');return}
+  var ok=S.f.q1==='в';
+  setFb(fb,ok?'ok':'bad',ok?'Правильно! T = 2π√(l/g): період зростає з довжиною, але повільніше, ніж l (крива виходить з початку координат і поступово «вирівнюється»).':'Підказка: T пропорційний √l — при l = 0 період дорівнює нулю, а зростання з довжиною сповільнюється.');
+});
+$('#bQ2').addEventListener('click',function(){
+  var s=num(S.f.q2s),d=num(S.f.q2d),fb=$('#fbQ2');
+  if(isNaN(s)||isNaN(d)){setFb(fb,'','Впишіть обидва числа.');return}
+  var ok=Math.abs(s-6)<0.01&&Math.abs(d)<0.01;
+  setFb(fb,ok?'ok':'bad',ok?'Правильно! За період точка проходить 4 амплітуди: s = 4·1,5 = 6 см, а повертається в початкове положення, тож переміщення дорівнює 0.':'Підказка: за один період точка проходить 4 амплітуди; де вона опиняється в кінці періоду?');
+});
+$('#bQ3').addEventListener('click',function(){
+  var v=num(S.f.q3v),fb=$('#fbQ3');
+  if(isNaN(v)){setFb(fb,'','Впишіть число.');return}
+  var ok=Math.abs(Math.abs(v)-10)<0.5;
+  setFb(fb,ok?'ok':'bad',ok?'Правильно! T ∝ √l, нова довжина 0,81·l, тож T₂/T₁ = √0,81 = 0,9 — період зменшився на 10 %.':'Підказка: T пропорційний √l. Нова довжина становить 81 % від початкової — знайдіть √0,81.');
+});
+$('#bCr').addEventListener('click',function(){
+  var v=num(S.f.crr),fb=$('#fbCr');
+  if(isNaN(v)){setFb(fb,'','Впишіть число.');return}
+  var ok=Math.abs(v-2)<0.15;
+  setFb(fb,ok?'ok':'bad',ok?'Так! T = 2π√(m/k): маса збільшилася в 4 рази, період — у 2 рази. Період пружинного маятника залежить від маси.':'Перевірте свої виміри: порівняйте періоди для 400 г і 100 г.');
+});
+
+/* ===== PDF ===== */
+$('#bPdf').addEventListener('click',function(){
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  window.print();
+});
+$('#bClear').addEventListener('click',function(){
+  if(!confirm('Очистити всі введені дані?'))return;
+  try{localStorage.removeItem(KEY)}catch(e){}
+  location.reload();
+});
+function initDate(){if(!S.f.date){try{S.f.date=new Date().toLocaleDateString('uk-UA')}catch(e){}}}
+
+/* ===== ГРАФІК ===== */
+function niceStep(r){var p=Math.pow(10,Math.floor(Math.log10(r/5))),m=r/5/p;return (m<=1?1:m<=2?2:m<=5?5:10)*p}
+function mountGraph(root,id,cfg){
+  var Gd=S.g[id]=S.g[id]||{mode:'pts',pts:[['',''],['',''],['',''],['',''],['','']],xl:cfg.xl,yl:cfg.yl,line:true,draw:'',photo:''};
+  root.innerHTML=
+    '<div class="gz-tabs" role="tablist">'+
+    '<button class="gz-tab" type="button" role="tab" data-m="pts">За точками</button>'+
+    '<button class="gz-tab" type="button" role="tab" data-m="draw">Малювати від руки</button>'+
+    '<button class="gz-tab" type="button" role="tab" data-m="img">Вставити фото</button></div>'+
+    '<div class="gz-body">'+
+    '<div data-pane="pts"><div class="gz-grid"><div>'+
+    '<div class="gz-ax"><label>Вісь x<input class="ink" data-ax="xl" value="'+esc(Gd.xl)+'"></label><label>Вісь y<input class="ink" data-ax="yl" value="'+esc(Gd.yl)+'"></label></div>'+
+    '<table class="pts"><thead><tr><th>№</th><th>x</th><th>y</th><th></th></tr></thead><tbody></tbody></table>'+
+    '<div class="gz-btns"><button class="btn sm" type="button" data-add>+ точка</button>'+(cfg.preset?'<button class="btn sm" type="button" data-preset>'+cfg.preset.label+'</button>':'')+'<button class="btn sm" type="button" data-clr>Очистити</button></div>'+
+    '<div class="gz-btns"><button class="btn sm" type="button" data-line aria-pressed="'+String(!!Gd.line)+'">З\'єднати лінією</button></div>'+
+    '<p class="small gz-note" aria-live="polite" style="margin:4px 0 0"></p></div>'+
+    '<svg class="gz-svg" viewBox="0 0 520 360"></svg></div></div>'+
+    '<div data-pane="draw" hidden><div class="gz-tools"><button class="btn sm" type="button" data-tool="blue" aria-pressed="true">Синя ручка</button><button class="btn sm" type="button" data-tool="red" aria-pressed="false">Червона ручка</button><button class="btn sm" type="button" data-tool="erase" aria-pressed="false">Гумка</button><button class="btn sm" type="button" data-cleardraw>Стерти</button></div>'+
+    '<canvas class="gz-cv" width="1040" height="560"></canvas><p class="small">Малюйте пальцем, стилусом або мишею.</p></div>'+
+    '<div data-pane="img" hidden><label class="drop"><input type="file" accept="image/*" hidden><b>Перетягніть фото графіка</b><span>або натисніть для вибору файлу</span></label>'+
+    '<div class="shot" hidden><img alt="Графік"><button class="btn sm" type="button" data-rm>Прибрати</button></div></div></div>';
+
+  var tb=$('tbody',root),svgEl=$('svg.gz-svg',root),note=$('.gz-note',root);
+  function rows(){tb.innerHTML=Gd.pts.map(function(p,i){return '<tr><td>'+(i+1)+'</td><td><input class="ink" inputmode="decimal" data-i="'+i+'" data-c="0" value="'+esc(p[0])+'"></td><td><input class="ink" inputmode="decimal" data-i="'+i+'" data-c="1" value="'+esc(p[1])+'"></td><td><button class="x" type="button" data-del="'+i+'" aria-label="Видалити точку">×</button></td></tr>'}).join('')}
+  function ext(a){var lo=0,hi=10;if(a.length){lo=Math.min.apply(null,[0].concat(a));hi=Math.max.apply(null,[0].concat(a))}if(hi<=lo)hi=lo+1;var s=niceStep(hi-lo);return {lo:Math.floor(lo/s+1e-9)*s,hi:Math.ceil(hi/s-1e-9)*s,st:s}}
+  var decs=function(s){return Math.max(0,-Math.floor(Math.log10(s)+1e-9))};
+  function chart(){
+    var pts=Gd.pts.map(function(p){return [num(p[0]),num(p[1])]}).filter(function(p){return isFinite(p[0])&&isFinite(p[1])});
+    var W2=520,H2=360,ML=60,MR=22,MT=18,MB=54,X=ext(pts.map(function(p){return p[0]})),Y=ext(pts.map(function(p){return p[1]}));
+    var px=function(v){return ML+(v-X.lo)/(X.hi-X.lo)*(W2-ML-MR)},py=function(v){return H2-MB-(v-Y.lo)/(Y.hi-Y.lo)*(H2-MT-MB)};
+    var o='<rect width="'+W2+'" height="'+H2+'" fill="var(--paper)"/>';
+    var nx=Math.round((X.hi-X.lo)/X.st*5),ny=Math.round((Y.hi-Y.lo)/Y.st*5),i,v2;
+    for(i=0;i<=nx;i++){v2=X.lo+i*X.st/5;o+='<line class="'+(i%5?'gm':'gM')+'" x1="'+px(v2)+'" y1="'+MT+'" x2="'+px(v2)+'" y2="'+(H2-MB)+'"/>';if(i%5===0)o+='<text x="'+px(v2)+'" y="'+(H2-MB+17)+'" text-anchor="middle">'+fmt(v2,decs(X.st))+'</text>'}
+    for(i=0;i<=ny;i++){v2=Y.lo+i*Y.st/5;o+='<line class="'+(i%5?'gm':'gM')+'" x1="'+ML+'" y1="'+py(v2)+'" x2="'+(W2-MR)+'" y2="'+py(v2)+'"/>';if(i%5===0)o+='<text x="'+(ML-8)+'" y="'+(py(v2)+4)+'" text-anchor="end">'+fmt(v2,decs(Y.st))+'</text>'}
+    o+='<line class="ga" x1="'+ML+'" y1="'+(H2-MB)+'" x2="'+(W2-MR)+'" y2="'+(H2-MB)+'"/><line class="ga" x1="'+ML+'" y1="'+MT+'" x2="'+ML+'" y2="'+(H2-MB)+'"/>';
+    o+='<text x="'+(ML+(W2-ML-MR)/2)+'" y="'+(H2-12)+'" text-anchor="middle" font-style="italic">'+esc(Gd.xl)+'</text>';
+    o+='<text transform="translate(16 '+(MT+(H2-MT-MB)/2)+') rotate(-90)" text-anchor="middle" font-style="italic">'+esc(Gd.yl)+'</text>';
+    if(Gd.line&&pts.length>1){var sp=pts.slice().sort(function(a,b){return a[0]-b[0]});o+='<polyline class="gl" points="'+sp.map(function(p){return px(p[0])+','+py(p[1])}).join(' ')+'"/>'}
+    pts.forEach(function(p){o+='<circle class="gp" cx="'+px(p[0])+'" cy="'+py(p[1])+'" r="4.5"/>'});
+    if(!pts.length)o+='<text x="'+(ML+(W2-ML-MR)/2)+'" y="'+(MT+(H2-MT-MB)/2)+'" text-anchor="middle" style="fill:var(--muted)">Додайте точки в таблицю</text>';
+    svgEl.innerHTML=o;
+  }
+  rows();chart();
+  tb.addEventListener('input',function(e){var t=e.target;if(t.dataset.i==null)return;Gd.pts[+t.dataset.i][+t.dataset.c]=t.value;chart();save()});
+  tb.addEventListener('click',function(e){var b=e.target.closest('[data-del]');if(!b)return;Gd.pts.splice(+b.dataset.del,1);rows();chart();save()});
+  $$('[data-ax]',root).forEach(function(el){el.addEventListener('input',function(){Gd[el.dataset.ax]=el.value;chart();save()})});
+  $('[data-line]',root).addEventListener('click',function(e){Gd.line=!Gd.line;e.currentTarget.setAttribute('aria-pressed',String(Gd.line));chart();save()});
+  $('[data-add]',root).addEventListener('click',function(){Gd.pts.push(['','']);rows();chart();save()});
+  $('[data-clr]',root).addEventListener('click',function(){Gd.pts=[['',''],['',''],['',''],['',''],['','']];rows();chart();save();note.textContent=''});
+  var pb=$('[data-preset]',root);
+  if(pb)pb.addEventListener('click',function(){var r=cfg.preset.run();if(!r){note.textContent=cfg.preset.fail;return}Gd.pts=r;note.textContent='Точки взято з таблиці.';rows();chart();save()});
+
+  var gCv=$('.gz-cv',root),gCx=gCv.getContext('2d'),tool='blue',down=false,last2=null;
+  gCx.lineCap='round';gCx.lineJoin='round';
+  if(Gd.draw){var im2=new Image();im2.onload=function(){gCx.drawImage(im2,0,0)};im2.src=Gd.draw}
+  var pos2=function(e){var r=gCv.getBoundingClientRect();return[(e.clientX-r.left)*gCv.width/r.width,(e.clientY-r.top)*gCv.height/r.height]};
+  function stroke2(a,b){gCx.globalCompositeOperation=tool==='erase'?'destination-out':'source-over';gCx.strokeStyle=tool==='red'?'#d64545':'#3b6fe0';gCx.lineWidth=tool==='erase'?26:3.4;gCx.beginPath();gCx.moveTo(a[0],a[1]);gCx.lineTo(b[0],b[1]);gCx.stroke()}
+  gCv.addEventListener('pointerdown',function(e){down=true;last2=pos2(e);try{gCv.setPointerCapture(e.pointerId)}catch(x){}stroke2(last2,last2);e.preventDefault()});
+  gCv.addEventListener('pointermove',function(e){if(!down)return;var p=pos2(e);stroke2(last2,p);last2=p});
+  ['pointerup','pointercancel'].forEach(function(t){gCv.addEventListener(t,function(){if(!down)return;down=false;try{Gd.draw=gCv.toDataURL('image/png')}catch(x){}save()})});
+  $$('[data-tool]',root).forEach(function(b){b.addEventListener('click',function(){tool=b.dataset.tool;$$('[data-tool]',root).forEach(function(x){x.setAttribute('aria-pressed',String(x===b))})})});
+  $('[data-cleardraw]',root).addEventListener('click',function(){gCx.clearRect(0,0,gCv.width,gCv.height);Gd.draw='';save()});
+
+  var dropEl=$('.drop',root),fileIn=$('input[type=file]',root),shotEl=$('.shot',root),imgEl=$('img',shotEl);
+  function showPhoto(src){if(src){imgEl.src=src;shotEl.hidden=false;dropEl.hidden=true}else{shotEl.hidden=true;dropEl.hidden=false;imgEl.removeAttribute('src')}}
+  showPhoto(Gd.photo||'');
+  function loadPhoto(file){if(!file||file.type.indexOf('image/')!==0)return;var rd=new FileReader();rd.onload=function(){var im3=new Image();im3.onload=function(){var c3=document.createElement('canvas'),sc=Math.min(1,900/im3.width,700/im3.height);c3.width=Math.max(1,Math.round(im3.width*sc));c3.height=Math.max(1,Math.round(im3.height*sc));var x3=c3.getContext('2d');x3.fillStyle='#fff';x3.fillRect(0,0,c3.width,c3.height);x3.drawImage(im3,0,0,c3.width,c3.height);try{Gd.photo=c3.toDataURL('image/jpeg',.68);showPhoto(Gd.photo);save()}catch(e){}};im3.src=rd.result};rd.readAsDataURL(file)}
+  fileIn.addEventListener('change',function(){loadPhoto(fileIn.files&&fileIn.files[0])});
+  dropEl.addEventListener('dragover',function(e){e.preventDefault();dropEl.classList.add('over')});
+  dropEl.addEventListener('dragleave',function(){dropEl.classList.remove('over')});
+  dropEl.addEventListener('drop',function(e){e.preventDefault();dropEl.classList.remove('over');loadPhoto(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0])});
+  $('[data-rm]',root).addEventListener('click',function(){Gd.photo='';showPhoto('');save()});
+
+  function setPane(m){Gd.mode=m;$$('[data-pane]',root).forEach(function(p){p.hidden=p.getAttribute('data-pane')!==m});$$('.gz-tab',root).forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.m===m))})}
+  $$('.gz-tab',root).forEach(function(b){b.addEventListener('click',function(){setPane(b.dataset.m)})});
+  setPane(Gd.mode||'pts');
+}
+function mountGraphs(){
+  if(!$('#gz1'))return;
+  mountGraph($('#gz1'),'g1',{xl:'l, м',yl:'T, с',preset:{label:'З таблиці 2',fail:'Заповніть у таблиці 2 довжини та періоди (або час і кількість коливань).',run:function(){
+    var pts=[];
+    for(var r=1;r<=3;r++){
+      var l=num(S.f['t2_'+r+'_l']),T=num(S.f['t2_'+r+'_T']);
+      if(!isFinite(T)){var t=num(S.f['t2_'+r+'_t']),N=num(S.f['t2_'+r+'_N']);if(t>0&&N>0)T=t/N}
+      if(isFinite(l)&&isFinite(T))pts.push([String(l),String(Math.round(T*1000)/1000)]);
+    }
+    return pts.length?pts:null;
+  }}});
+}
+
+/* ===== РЕДАКТОРИ ВІДПОВІДЕЙ (текст / від руки / зображення) ===== */
+function mountResponseEditors(){
+  S.g.responseEditors=S.g.responseEditors||{};
+  $$('.work').forEach(function(ta){
+    if(ta.dataset.editorMounted)return;ta.dataset.editorMounted='1';
+    var key=ta.dataset.k||ta.id,state=S.g.responseEditors[key]||{mode:'text',draw:'',image:''};
+    S.g.responseEditors[key]=state;
+    var wrap=document.createElement('div');wrap.className='response-editor';
+    var tabs=document.createElement('div');tabs.className='response-tabs';tabs.setAttribute('role','group');
+    [['text','Ввести текст'],['draw','Малювати від руки'],['image','Вставити зображення']].forEach(function(item){
+      var b=document.createElement('button');b.type='button';b.className='btn';b.textContent=item[1];b.dataset.mode=item[0];b.setAttribute('aria-pressed',String((state.mode||'text')===item[0]));tabs.appendChild(b);
+    });
+    var drawPanel=document.createElement('div');drawPanel.className='response-panel';drawPanel.hidden=state.mode!=='draw';
+    var tools=document.createElement('div');tools.className='response-tools';
+    var pen=document.createElement('button');pen.type='button';pen.className='btn sm';pen.textContent='Ручка';
+    var er=document.createElement('button');er.type='button';er.className='btn sm';er.textContent='Гумка';
+    var clr=document.createElement('button');clr.type='button';clr.className='btn sm';clr.textContent='Очистити';
+    tools.append(pen,er,clr);
+    var rCv=document.createElement('canvas');rCv.className='response-canvas';rCv.width=900;rCv.height=260;rCv.setAttribute('aria-label','Поле рукописної відповіді');
+    var hint=document.createElement('p');hint.className='response-hint';hint.textContent='Малюйте мишею, пальцем або стилусом.';
+    drawPanel.append(tools,rCv,hint);
+    var imgPanel=document.createElement('div');imgPanel.className='response-panel';imgPanel.tabIndex=0;imgPanel.hidden=state.mode!=='image';
+    var upLabel=document.createElement('label');upLabel.className='response-upload';upLabel.textContent='Вибрати зображення ';
+    var fileEl=document.createElement('input');fileEl.type='file';fileEl.accept='image/*';upLabel.appendChild(fileEl);
+    var pHint=document.createElement('p');pHint.className='response-hint';pHint.textContent='Або вставте через Ctrl+V.';
+    var prevImg=document.createElement('img');prevImg.className='response-image-preview';prevImg.alt='';prevImg.hidden=true;
+    var clrImg=document.createElement('button');clrImg.type='button';clrImg.className='btn sm';clrImg.textContent='Видалити';
+    imgPanel.append(upLabel,pHint,prevImg,clrImg);
+    ta.parentNode.insertBefore(wrap,ta.nextSibling);wrap.append(tabs,drawPanel,imgPanel);
+    var textPanel=document.createElement('div');textPanel.className='response-panel';textPanel.style.padding='0';
+    wrap.insertBefore(textPanel,drawPanel);textPanel.appendChild(ta);
+    function setMode(m){state.mode=m;S.g.responseEditors[key]=state;ta.hidden=m!=='text';drawPanel.hidden=m!=='draw';imgPanel.hidden=m!=='image';Array.from(tabs.children).forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.mode===m))});save()}
+    var rCtx=rCv.getContext('2d'),rDown=false,rLast=null,rTool='pen';rCtx.lineCap='round';rCtx.lineJoin='round';
+    if(state.draw){var rIm=new Image();rIm.onload=function(){rCtx.drawImage(rIm,0,0,rCv.width,rCv.height)};rIm.src=state.draw}
+    function showPrev(){if(state.image){prevImg.src=state.image;prevImg.hidden=false}else{prevImg.removeAttribute('src');prevImg.hidden=true}}
+    showPrev();
+    function rPos(e){var r=rCv.getBoundingClientRect();return [(e.clientX-r.left)*rCv.width/r.width,(e.clientY-r.top)*rCv.height/r.height]}
+    function rLine(a,b){rCtx.globalCompositeOperation=rTool==='erase'?'destination-out':'source-over';rCtx.strokeStyle='#111';rCtx.lineWidth=rTool==='erase'?25:3;rCtx.beginPath();rCtx.moveTo(a[0],a[1]);rCtx.lineTo(b[0],b[1]);rCtx.stroke()}
+    function persD(){try{var o=document.createElement('canvas');o.width=rCv.width;o.height=rCv.height;var ox=o.getContext('2d');ox.fillStyle='#fff';ox.fillRect(0,0,o.width,o.height);ox.drawImage(rCv,0,0);state.draw=o.toDataURL('image/jpeg',.72);S.g.responseEditors[key]=state;save()}catch(e){}}
+    rCv.addEventListener('pointerdown',function(e){rDown=true;rLast=rPos(e);try{rCv.setPointerCapture(e.pointerId)}catch(z){}rLine(rLast,rLast);e.preventDefault()});
+    rCv.addEventListener('pointermove',function(e){if(!rDown)return;var p=rPos(e);rLine(rLast,p);rLast=p});
+    ['pointerup','pointercancel'].forEach(function(ev){rCv.addEventListener(ev,function(){if(rDown){rDown=false;persD()}})});
+    pen.addEventListener('click',function(){rTool='pen'});er.addEventListener('click',function(){rTool='erase'});
+    clr.addEventListener('click',function(){rCtx.clearRect(0,0,rCv.width,rCv.height);state.draw='';S.g.responseEditors[key]=state;save()});
+    function readImg(f){if(!f||f.type.indexOf('image/')!==0)return;var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas'),sc=Math.min(1,900/im.width,700/im.height);c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);try{state.image=c.toDataURL('image/jpeg',.68);S.g.responseEditors[key]=state;showPrev();save()}catch(e){}};im.src=rd.result};rd.readAsDataURL(f)}
+    fileEl.addEventListener('change',function(){readImg(fileEl.files&&fileEl.files[0])});
+    clrImg.addEventListener('click',function(){state.image='';S.g.responseEditors[key]=state;showPrev();fileEl.value='';save()});
+    imgPanel.addEventListener('paste',function(e){var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var i=0;i<items.length;i++){if(items[i].type.indexOf('image/')===0){readImg(items[i].getAsFile());e.preventDefault();return}}});
+    tabs.addEventListener('click',function(e){var b=e.target.closest('button[data-mode]');if(b)setMode(b.dataset.mode)});
+    setMode(state.mode||'text');
+  });
+}
+
+/* ===== НАВІГАЦІЯ ===== */
+try{
+  var navLinks=$$('.nav a');
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting)navLinks.forEach(function(a){a.setAttribute('aria-current',String(a.getAttribute('href')==='#'+en.target.id))})})},{rootMargin:'-25% 0px -65% 0px'});
+  $$('main.sheet>section').forEach(function(s){io.observe(s)});
+}catch(e){}
+
+/* ===== СТАРТ ===== */
+fillAll();bindAll();markOpt();refresh();mountGraphs();mountResponseEditors();
+initState();setTarget('e1');$('#simMsg').textContent='';
+requestAnimationFrame(frame);
+
+})();
+</script>
+</body></html>

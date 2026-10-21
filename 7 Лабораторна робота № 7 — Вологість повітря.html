@@ -1,0 +1,822 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Лабораторна робота № 7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Literata:wght@400;600;700&family=Marck+Script&display=swap">
+<style>
+:root{
+  --desk:#cdd6e2;--bar:#f1f5fb;--paper:#fcfdff;--grid:#d2e4f6;--grid-s:#a9c8e9;
+  --margin:#1f7acc;--print:#1b2430;--muted:#5a6579;--ink:#1b3fb0;--ink-line:#8196d8;
+  --note:#eef4fc;--edge:#b4c0d3;--ok:#17794a;--bad:#bd2f2f;--btn-fg:#ffffff;
+  --tbl:#3c4557;--sky:#e6f2fc;--hov:#e2eafb;--sim:#e4f3ff;--sim-edge:#6bacd9;--cell:20px;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:60px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#4da3ff;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;--sim:#1a2840;--sim-edge:#3a6090;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#4da3ff;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;--sim:#1a2840;--sim-edge:#3a6090;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{background:var(--desk);color:var(--print);font:16px/1.55 'Literata',Georgia,serif;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bar)}
+b,strong{font-weight:700}a{color:var(--ink)}
+:focus-visible{outline:2px solid var(--margin);outline-offset:2px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);border-bottom:1px solid var(--edge)}
+.bar-in{max-width:900px;margin:0 auto;padding-block:6px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;gap:4px 16px;align-items:center;flex-wrap:wrap}
+.nav{display:flex;gap:4px;overflow-x:auto;flex:1 1 300px;min-width:0}
+.nav a{white-space:nowrap;padding:2px 10px;border-radius:3px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:600}
+.nav a:hover{background:var(--hov)}.nav a[aria-current="true"]{background:var(--ink);color:var(--btn-fg)}
+.status{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.meter{width:70px;height:6px;background:var(--note);border:1px solid var(--edge);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle}
+.meter i{display:block;height:100%;width:0;background:var(--ink);transition:width .25s}
+.page{max-width:980px;margin:0 auto;padding-block:10px 24px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{position:relative;background-color:var(--paper);
+  background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);padding:14px 20px 28px 50px;border-radius:3px;box-shadow:0 10px 28px rgba(10,20,40,.22)}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:40px;width:2px;background:var(--margin);opacity:.85}
+.sheet>section{margin-top:18px}
+h1{margin:0;text-align:center;font-size:22px;line-height:1.6;letter-spacing:.03em}
+h2{margin:0 0 12px;font-size:19px;line-height:1.6;border-bottom:2px solid var(--margin);display:inline-block;padding-right:18px}
+h3{margin:0;font-size:17px;line-height:1.45}
+p{margin:0 0 8px}.small{font-size:14px;line-height:1.5;color:var(--print)}
+.fio{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:10px}
+.fio label{display:inline-flex;align-items:baseline;gap:6px}
+.w-s{width:7em}.w-l{width:min(20em,100%)}
+input.ink,select.ink{font:19px/24px 'Marck Script',cursive;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid var(--ink-line);border-radius:0;padding:1px 4px;min-width:0}
+select.ink{background:var(--paper);border:1.5px solid var(--ink-line);border-radius:3px;font-size:17px}
+input.ink:focus,select.ink:focus{background:var(--note);border-bottom-color:var(--ink);outline:none}
+input.ink::placeholder,textarea.work::placeholder{color:var(--muted);opacity:.5}
+input.num{width:5.8em;text-align:center}
+textarea.work{display:block;width:100%;min-height:60px;resize:vertical;border:1.5px solid var(--edge);border-radius:3px;
+  background-color:var(--paper);background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);background-attachment:local;font:18px/20px 'Marck Script',cursive;color:var(--ink);padding:0 8px}
+textarea.work:focus{outline:none;border-color:var(--ink)}
+.btn{font:600 14px/18px 'Literata',serif;padding:6px 12px;border:1.5px solid #344054;background:#fff;color:#000!important;border-radius:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:background .15s,box-shadow .15s}
+.btn:hover,.btn:focus-visible{background:#fff0ad!important;color:#000!important;box-shadow:0 0 0 2px rgba(0,0,0,.12)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:#f3e7a5;color:#000!important;border-color:#8b7a2b}
+.btn.primary:hover{background:#ffe680!important}
+.btn.sm{padding:2px 9px;font-size:13px}
+.btn[aria-pressed="true"]{background:#ffe680!important;color:#000!important;border-color:#8b7a2b;box-shadow:inset 0 0 0 1.5px #8b7a2b}
+.row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.box{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px;margin-block:8px}
+.box.simbox{background:var(--sim);border:1.5px solid var(--sim-edge);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5);color:#111!important;font-size:16px}
+.box.simbox h3,.box.simbox label,.box.simbox .small{color:#111!important;opacity:1}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:9px;margin-block:7px;align-items:flex-start}
+.steps li>div{min-width:0}.step-dot{font-weight:700;min-width:18px;color:var(--print)}
+.tbl-wrap{overflow-x:auto;margin-block:10px;background:var(--paper);border-radius:3px}
+.tbl{border-collapse:collapse;min-width:520px;width:100%;background:var(--paper)}
+.tbl th,.tbl td{border:1.5px solid var(--tbl);padding:6px 7px;text-align:center;vertical-align:middle;font-size:14px;line-height:1.4}
+.tbl th{background:var(--note);font-weight:600}
+.tbl td.lbl{text-align:left;font-weight:600}
+.tbl td input.ink{width:100%;text-align:center;background:#fff0ad!important;color:#202020!important;border:1.5px solid #c4a000!important;border-radius:2px;font-weight:700}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 3px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px 1px}
+.frac>span:last-child{padding:1px 4px 0}
+.step{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px 10px;margin-block:8px}
+.step header{display:flex;align-items:center;gap:9px}
+.no{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1.5px solid var(--margin);color:var(--margin);border-radius:50%;font-weight:700;font-size:13px}
+.formula{font-size:15.5px;line-height:24px;padding:4px 10px;background:var(--note);border-left:3px solid var(--margin);margin-block:8px;overflow-x:auto}
+.formula div{white-space:nowrap}
+.wl{display:block;font-size:14px;font-weight:700;color:var(--print);margin-bottom:4px}
+.ans-row{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:flex-end;margin-top:8px}
+.af{display:inline-flex;align-items:baseline;gap:5px}
+.af .u{color:var(--muted);font-size:13px}
+.fb{min-height:20px;margin:6px 0 0;font-size:13.5px;line-height:19px;border-radius:4px;padding:0}
+.fb.ok{background:#1a5c35;color:#e8fdf0;padding:7px 11px;font-weight:600}.fb.ok::before{content:"✓ "}
+.fb.bad{background:#6b1a1a;color:#ffe8e8;padding:7px 11px;font-weight:600}.fb.bad::before{content:"✗ "}
+.checks{display:flex;flex-direction:column;flex-wrap:wrap;gap:2px 18px;margin-bottom:8px;list-style:none;padding:0}
+.checks li{position:relative;padding-left:14px}
+.checks li:before{content:"•";position:absolute;left:0;color:var(--print);font-weight:700}
+.info{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:8px;font-size:14px;align-items:center}
+.info span{display:flex;gap:5px;align-items:center}
+.info b{font:500 16px/20px 'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;padding:1px 10px;border-radius:999px;font-weight:700;font-size:13.5px;background:#fff;border:1.5px solid var(--sim-edge);color:#111}
+
+/* Sim weather widget */
+.weather-widget{background:linear-gradient(135deg,#1e6fb5,#3496d3);border-radius:10px;padding:14px 18px;color:#fff;margin-block:10px;font-size:15px;max-width:440px}
+.weather-widget .city-name{font-size:21px;font-weight:700;margin-bottom:2px}
+.weather-widget .temp-big{font-size:52px;font-weight:700;line-height:1;margin-block:4px}
+.weather-widget .wrow{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin-top:8px}
+.weather-widget .wrow span{display:flex;gap:4px;align-items:center}
+.weather-widget .wrow b{font-size:15px;font-weight:700}
+.weather-widget .status-bar{font-size:13px;opacity:.85;margin-top:6px}
+.weather-live-badge{display:inline-block;background:#23a65a;color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;vertical-align:middle;margin-left:6px}
+
+/* Drawing canvas field */
+.gz{border:1.5px solid var(--edge);border-radius:4px;background:var(--paper);margin-block:8px;padding:8px}
+.gz-tools{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;align-items:center}
+.gz-tools .sep{width:1px;align-self:stretch;background:var(--edge);margin-inline:3px}
+canvas#gCv{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1.5px solid var(--edge);border-radius:3px;background:#fffefa}
+
+.creative-task{margin-top:14px;padding:14px 16px;background:#fff3c4;border:2px solid #9a6a00;border-left:7px solid #9a6a00;border-radius:8px;color:#241900;font-size:16px;line-height:1.65}
+.creative-task h3{font-size:20px;color:#241900;margin-bottom:8px}
+.creative-task .wl{color:#241900}
+.creative-task textarea.work{background-color:#fffdf4;border-color:#9a6a00;color:#5b3215!important}
+.report{width:100%;min-height:130px;font:12.5px/17px 'IBM Plex Mono',ui-monospace,monospace;background:var(--note);color:var(--print);border:1.5px solid var(--edge);border-radius:3px;padding:8px;margin-top:8px}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:28px;align-items:flex-start}
+
+/* Response editor */
+.response-editor{margin:5px 0 10px;border:1px solid var(--edge);border-radius:4px;background:var(--paper);overflow:hidden}
+.response-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:5px;background:var(--note);border-bottom:1px solid var(--edge)}
+.response-tabs .btn{font-size:12px;padding:3px 9px}
+.response-panel{padding:7px}
+.response-canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1px solid var(--edge);border-radius:3px;background-color:#fff;
+  background-image:linear-gradient(to right,#d9e7f5 1px,transparent 1px),linear-gradient(to bottom,#d9e7f5 1px,transparent 1px);background-size:20px 20px}
+.response-image-preview{display:block;max-width:100%;max-height:420px;margin:8px auto;border:1px solid var(--edge);border-radius:3px}
+.response-upload{display:inline-block;padding:7px 11px;border:1px dashed var(--ink-line);border-radius:3px;cursor:pointer;background:var(--note);color:var(--print);font:600 12.5px 'Literata',serif}
+.response-tools{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px}
+.response-hint{font-size:14px;color:var(--print);margin:6px 0}
+
+/* Psychrometer sim */
+.psy-sim{background:var(--sim);border:1.5px solid var(--sim-edge);border-radius:8px;padding:12px 14px;margin-block:10px}
+.psy-therm{display:flex;gap:24px;align-items:flex-end;justify-content:center;margin:10px 0}
+.therm-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:60px}
+.therm-label{font-size:12px;font-weight:700;color:#333;text-align:center}
+.therm-svg{display:block}
+.psy-sl{display:grid;grid-template-columns:11em 1fr 4em;gap:8px;align-items:center;margin-top:8px}
+.psy-sl input[type=range]{accent-color:#1b3fb0;width:100%}
+.psy-sl output{font:500 16px/20px 'IBM Plex Mono',monospace;text-align:right}
+.psy-info{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:14px;align-items:center}
+.psy-info span{display:flex;gap:5px;align-items:center}
+.psy-info b{font:500 16px/20px 'IBM Plex Mono',monospace}
+.psy-btn-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+
+/* Поля введення: білий, жирний, контрастний текст на темному тлі, збільшений шрифт */
+input.ink,.tbl td input.ink,select.ink:not(#selCity){color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;
+  background:#1c2745!important;border:0!important;border-bottom:2px solid #8196d8!important;border-radius:2px;
+  font-size:22px;line-height:28px;font-weight:700;letter-spacing:.02em;text-shadow:0 0 1px rgba(255,255,255,.35);padding:2px 6px}
+.tbl td input.ink,select.ink:not(#selCity){border:1px solid #8196d8!important;border-radius:3px}
+.tbl td input.ink{font-size:20px}
+select.ink:not(#selCity) option{background:#1c2745;color:#ffffff}
+input.num{width:6.5em}
+input.ink:focus,.tbl td input.ink:focus,select.ink:not(#selCity):focus{background:#10192e!important;border-bottom-color:#ffe680!important;outline:none}
+input.ink::placeholder{color:#c9d3ee!important;opacity:.6}
+textarea.work,.creative-task textarea.work{color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;font-weight:700;
+  font-size:23px;line-height:30px;padding:0 10px;
+  background-color:#1c2745!important;background-size:30px 30px;
+  background-image:linear-gradient(to right,#33436e 1px,transparent 1px),linear-gradient(to bottom,#33436e 1px,transparent 1px)!important;
+  border-color:#8196d8!important}
+textarea.work:focus{border-color:#ffe680!important}
+textarea.work::placeholder{color:#c9d3ee!important;opacity:.6!important}
+/* Блоки тренажерів завжди світлі, а текст у них темний: читається і в темній темі пристрою */
+.box.simbox,.psy-sim{background:#eef4f8!important;border:1.5px solid #c3d6e4!important;box-shadow:none!important;color:#1b2430!important}
+.box.simbox *:not(.weather-widget):not(.weather-widget *):not(.btn):not(.fb):not(.weather-live-badge),
+.psy-sim *:not(.btn):not(.fb){color:#111}
+.box.simbox .weather-live-badge{color:#fff}
+#psyMsg{color:#0f5a2e!important}
+#weatherError{color:#a31f1f!important}
+#weatherLoading{color:#333!important}
+.therm-label,.therm-label small{color:#111!important}
+.psy-sl output,.psy-info b,.psy-info span{color:#111!important}
+#selCity{background:#fff!important;color:#111!important;-webkit-text-fill-color:#111;font-weight:600;border:1.5px solid #6bacd9!important}
+.weather-widget,.weather-widget *{color:#fff!important}
+@media(max-width:700px){.psy-sl{grid-template-columns:1fr 4em}.psy-sl label{grid-column:1/-1}}
+@media(max-width:560px){.sheet{padding:16px 10px 36px 32px}.sheet::before{left:20px}.box,.step{padding-inline:10px}}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff!important;color:#111!important;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar,.no-print,.btn,.fb,.meter,.status,.psy-sim,.gz-tools,.response-tabs,.response-tools,.response-hint,.weather-live-badge{display:none!important}
+  .page{max-width:none;margin:0;padding:0}
+  .sheet{box-shadow:none;border-radius:0;padding:8mm 7mm 8mm 12mm;background-color:#fff!important}
+  .sheet::before{left:9mm}
+  h1{font-size:17pt}h2{font-size:13pt}h3{font-size:11pt}
+  .box,.step,.creative-task,.tbl-wrap{break-inside:avoid}
+  .tbl-wrap{overflow:visible}.tbl{min-width:0;width:100%;table-layout:fixed}
+  .tbl th,.tbl td{font-size:8pt;padding:3px 2px;color:#111!important;border-color:#333!important}
+  input.ink,.tbl td input.ink,select.ink,select.ink:not(#selCity),textarea.work,.creative-task textarea.work{font:10pt Arial,sans-serif!important;font-weight:700!important;line-height:1.3!important;color:#111!important;-webkit-text-fill-color:#111;text-shadow:none;background:#fff!important;background-image:none!important;border:1px solid #777!important;min-height:20px;padding:2px!important}
+  textarea.work{min-height:44px;resize:none;white-space:pre-wrap}
+  textarea.work::placeholder,input::placeholder{color:transparent!important}
+  .formula{background:#f3f3f3!important;color:#111!important}
+  canvas#gCv{max-height:90mm;width:auto;max-width:100%;margin:0 auto}
+  .weather-widget{background:#d5e8f5!important;color:#000!important}
+  .creative-task{background:#fff!important;border-color:#777!important;color:#111!important}
+  .report{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <nav class="nav" aria-label="Розділи роботи">
+      <a href="#prep">1. Підготовка</a>
+      <a href="#exp">2. Дослід</a>
+      <a href="#calc">3. Опрацювання</a>
+      <a href="#concl">4. Висновок</a>
+    </nav>
+    <div class="status" aria-live="polite">
+      <span>Заповнено <b id="progTxt">0 з 0</b> <span class="meter"><i id="progBar"></i></span></span>
+      <span id="saveSt">Зберігається у цьому браузері</span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+<main class="sheet" id="top">
+
+  <div class="fio">
+    <label>Клас <input class="ink w-s" id="f-klass" data-k="klass" autocomplete="off"></label>
+    <label>Прізвище та ім'я <input class="ink w-l" id="f-fio" data-k="fio" autocomplete="off"></label>
+    <label>Дата <input class="ink w-s" id="f-date" data-k="date" autocomplete="off"></label>
+  </div>
+
+  <h1>ЛАБОРАТОРНА РОБОТА № 7</h1>
+  <p style="text-align:center"><b>Тема.</b> Вимірювання відносної вологості повітря.</p>
+  <p><b>Мета:</b> визначити відносну та абсолютну вологість повітря в різних містах України в даний момент часу.</p>
+  <p><b>Обладнання:</b> сайт meteoprog.ua; вбудований психрометричний тренажер.</p>
+
+  <!-- 1. ПІДГОТОВКА -->
+  <section id="prep">
+    <h2>1. Підготовка до експерименту</h2>
+    <p>Перед виконанням роботи пригадайте:</p>
+    <ul class="checks">
+      <li>Що таке абсолютна і відносна вологість повітря?</li>
+      <li>Що таке насичена пара і яка її особливість?</li>
+      <li>Як пов'язані відносна та абсолютна вологість?</li>
+    </ul>
+    <label class="wl" for="p1">Ваші відповіді</label>
+    <textarea class="work" id="p1" data-k="p1" rows="5" spellcheck="false"></textarea>
+
+    <!-- Психрометричний тренажер -->
+    <div class="psy-sim" id="psySim">
+      <div class="row" style="justify-content:space-between;align-items:baseline;margin-bottom:8px">
+        <h3>🌡 Тренажер: психрометр</h3>
+        <span class="small">Навчальний інструмент</span>
+      </div>
+      <p class="small" style="margin-bottom:6px">Психрометр складається з двох термометрів: <b>сухого</b> і <b>вологого</b>. Вологий термометр охолоджується внаслідок випаровування і показує нижчу температуру. Різниця температур допомагає визначити відносну вологість.</p>
+
+      <div class="psy-therm" id="psyTherms" aria-label="Психрометр"></div>
+
+      <div class="psy-sl">
+        <label for="psyTemp">Температура повітря</label>
+        <input type="range" id="psyTemp" min="1" max="35" step="1" value="20">
+        <output id="psyTempOut">20 °C</output>
+      </div>
+      <div class="psy-sl">
+        <label for="psyHum">Відносна вологість</label>
+        <input type="range" id="psyHum" min="10" max="100" step="5" value="60">
+        <output id="psyHumOut">60 %</output>
+      </div>
+
+      <div class="psy-info" aria-live="off">
+        <span>Сухий: <b id="pyDry">20,0 °C</b></span>
+        <span>Вологий: <b id="pyWet">—</b></span>
+        <span>Різниця: <b id="pyDiff">—</b></span>
+        <span>φ = <b id="pyPhi">60 %</b></span>
+        <span>ρ<sub>н</sub> = <b id="pyRhoN">—</b></span>
+        <span>ρ<sub>а</sub> = <b id="pyRhoA">—</b></span>
+      </div>
+      <div class="psy-btn-row">
+        <button class="btn primary" type="button" id="bPsyRecord">Записати в рядок 1 таблиці</button>
+        <span class="small" id="psyMsg" aria-live="polite" style="color:#1a5c35;font-weight:700"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. ДОСЛІД -->
+  <section id="exp">
+    <h2>2. Експеримент</h2>
+
+    <ul class="steps">
+      <li><span class="step-dot">1.</span><div>Перейдіть на сайт <a href="https://www.meteoprog.ua/ua/" target="_blank" rel="noopener">meteoprog.ua</a> і знайдіть погоду в <b>місті Київ</b>.</div></li>
+      <li><span class="step-dot">2.</span><div>Запишіть у таблицю <b>температуру повітря <i>t</i></b> та <b>відносну вологість φ</b>.</div></li>
+      <li><span class="step-dot">3.</span><div>Повторіть для ще <b>чотирьох міст</b> України за власним вибором.</div></li>
+    </ul>
+
+    <!-- Live weather widget -->
+    <div class="box simbox" id="weatherBox">
+      <div class="row" style="justify-content:space-between;align-items:baseline;margin-bottom:6px">
+        <h3>Погода зараз <span class="weather-live-badge">LIVE</span></h3>
+        <span class="small">Оберіть місто → дані завантажаться</span>
+      </div>
+      <div class="row" style="gap:8px;margin-bottom:10px">
+        <select class="ink" id="selCity" aria-label="Оберіть місто" style="font-size:15px">
+          <option value="">— оберіть місто —</option>
+          <option value="Kyiv">Київ</option>
+          <option value="Kharkiv">Харків</option>
+          <option value="Dnipro">Дніпро</option>
+          <option value="Odesa">Одеса</option>
+          <option value="Lviv">Львів</option>
+          <option value="Zaporizhzhia">Запоріжжя</option>
+          <option value="Kryvyi Rih">Кривий Ріг</option>
+          <option value="Mykolaiv">Миколаїв</option>
+          <option value="Vinnytsia">Вінниця</option>
+          <option value="Poltava">Полтава</option>
+          <option value="Chernihiv">Чернігів</option>
+          <option value="Sumy">Суми</option>
+          <option value="Zhytomyr">Житомир</option>
+          <option value="Kherson">Херсон</option>
+          <option value="Ivano-Frankivsk">Івано-Франківськ</option>
+          <option value="Ternopil">Тернопіль</option>
+          <option value="Uzhhorod">Ужгород</option>
+          <option value="Cherkasy">Черкаси</option>
+          <option value="Rivne">Рівне</option>
+          <option value="Khmelnytskyi">Хмельницький</option>
+        </select>
+        <button class="btn primary" type="button" id="bFetchWeather">🔍 Завантажити погоду</button>
+        <button class="btn sm" type="button" id="bAddCity" disabled>+ Записати в рядок 2</button>
+      </div>
+
+      <div id="weatherDisplay" hidden>
+        <div class="weather-widget" id="wCard">
+          <div class="city-name" id="wCityName">—</div>
+          <div class="temp-big" id="wTemp">—</div>
+          <div id="wDesc" style="font-size:14px;opacity:.9"></div>
+          <div class="wrow">
+            <span>💧 Вологість: <b id="wHum">—</b></span>
+            <span>🌬 Вітер: <b id="wWind">—</b></span>
+            <span>🌡 Відчувається: <b id="wFeels">—</b></span>
+          </div>
+          <div class="status-bar" id="wUpdated"></div>
+        </div>
+      </div>
+      <div id="weatherLoading" hidden class="small" style="padding:8px;color:var(--muted)">⏳ Завантаження даних...</div>
+      <div id="weatherError" hidden class="small" style="padding:8px;color:var(--bad)"></div>
+    </div>
+
+    <!-- Таблиця 1 -->
+    <div class="tbl-wrap">
+    <table class="tbl" id="dataTbl">
+      <thead>
+        <tr>
+          <th>Місто</th>
+          <th>Температура<br><i>t</i>, °C</th>
+          <th>Відносна вологість<br>φ, %</th>
+          <th>Густина насиченої пари<br>ρ<sub>н</sub>(при <i>t</i>), г/м³</th>
+          <th>Абсолютна вологість<br>ρ<sub>а</sub>, г/м³</th>
+        </tr>
+      </thead>
+      <tbody id="dataTbody">
+        <!-- rows generated by JS -->
+      </tbody>
+    </table>
+    </div>
+    <p class="small" style="margin-top:4px">⬆ Рядок 1 — психрометр (кнопка вище). Рядок 2 — погода з сайту (кнопка «Записати в таблицю»). Рядки 3–5 та стовпці <b>ρ<sub>н</sub></b> і <b>ρ<sub>а</sub></b> у всіх рядках — заповнюйте вручну після опрацювання (розділ 3).</p>
+  </section>
+
+  <!-- 3. ОПРАЦЮВАННЯ -->
+  <section id="calc">
+    <h2>3. Опрацювання результатів</h2>
+
+    <article class="step">
+      <header><span class="no">1</span><h3>Таблиця залежності густини насиченої пари від температури</h3></header>
+      <p class="small">За таблицею 2 знайдіть ρ<sub>н</sub> для кожного міста і впишіть у відповідний стовпець таблиці 1.</p>
+      <div class="tbl-wrap">
+      <table class="tbl" style="min-width:0">
+        <thead>
+          <tr>
+            <th><i>t</i>, °C</th><th>ρ<sub>н</sub>, г/м³</th>
+            <th><i>t</i>, °C</th><th>ρ<sub>н</sub>, г/м³</th>
+            <th><i>t</i>, °C</th><th>ρ<sub>н</sub>, г/м³</th>
+            <th><i>t</i>, °C</th><th>ρ<sub>н</sub>, г/м³</th>
+          </tr>
+        </thead>
+        <tbody id="rhoTbl"></tbody>
+      </table>
+      </div>
+    </article>
+
+    <article class="step">
+      <header><span class="no">2</span><h3>Обчислення абсолютної вологості ρ<sub>а</sub></h3></header>
+      <div class="formula">
+        <div>φ = <span class="frac"><span>ρ<sub>а</sub></span><span>ρ<sub>н</sub></span></span> · 100 % &nbsp;⟹&nbsp; ρ<sub>а</sub> = <span class="frac"><span>φ · ρ<sub>н</sub></span><span>100 %</span></span></div>
+      </div>
+      <label class="wl" for="w2">Обчислення для кожного міста</label>
+      <textarea class="work" id="w2" data-k="w2" rows="9" spellcheck="false"></textarea>
+    </article>
+
+    <article class="step">
+      <header><span class="no">3</span><h3>Перевірка обчислень</h3></header>
+      <p class="small">Введіть значення з таблиці 1 для будь-якого міста і перевірте правильність обчислення ρ<sub>а</sub>.</p>
+      <div class="ans-row" style="align-items:flex-end">
+        <span class="af"><i>t</i> = <input class="ink num" id="chkT" data-k="chkT" inputmode="decimal" autocomplete="off" aria-label="Температура"> <span class="u">°C</span></span>
+        <span class="af">φ = <input class="ink num" id="chkPhi" data-k="chkPhi" inputmode="decimal" autocomplete="off" aria-label="Відносна вологість"> <span class="u">%</span></span>
+        <span class="af">ρ<sub>а</sub> = <input class="ink num" id="chkRhoA" data-k="chkRhoA" inputmode="decimal" autocomplete="off" aria-label="Абсолютна вологість"> <span class="u">г/м³</span></span>
+        <button class="btn primary" type="button" id="bCheck">Перевірити</button>
+      </div>
+      <p class="fb" id="fbCheck" aria-live="polite"></p>
+    </article>
+  </section>
+
+  <!-- 4. ВИСНОВОК -->
+  <section id="concl">
+    <h2>4. Аналіз та висновок</h2>
+
+    <p>У висновку зазначте:</p>
+    <ul class="checks">
+      <li>Які фізичні величини визначали та які результати отримали</li>
+      <li>Які чинники впливали на точність результатів</li>
+    </ul>
+    <label class="wl" for="concl-t">Висновок</label>
+    <textarea class="work" id="concl-t" data-k="concl" rows="7" spellcheck="false"></textarea>
+
+    <div style="margin-top:16px">
+      <h3>Контрольні запитання</h3>
+
+      <div style="margin-top:10px">
+        <p><b>1.</b> Як змінюються покази різниці сухого і вологого термометрів психрометра при зменшенні відносної вологості?</p>
+        <label class="wl" for="q1">Відповідь</label>
+        <textarea class="work" id="q1" data-k="q1" rows="3" spellcheck="false"></textarea>
+      </div>
+
+      <div style="margin-top:10px">
+        <p><b>2.</b> У кімнаті при 25 °C висока вологість. Як зміниться відносна вологість, якщо відкрити кватирку, а за вікном холодно й дощ?</p>
+        <div class="row" style="margin-top:4px">
+          <select class="ink" id="q2" data-k="q2" aria-label="Відповідь на запитання 2">
+            <option value="">— оберіть —</option>
+            <option value="inc">Збільшиться</option>
+            <option value="dec">Зменшиться</option>
+            <option value="same">Не зміниться</option>
+          </select>
+          <button class="btn primary" type="button" id="bQ2">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ2" aria-live="polite"></p>
+      </div>
+
+      <div style="margin-top:10px">
+        <p><b>3.</b> Вдень температура у закритому приміщенні становила 30 °C. Визначте відносну вологість, якщо ввечері при 14 °C стіни почали покриватися вологою.</p>
+        <label class="wl" for="q3w">Розв'язання</label>
+        <textarea class="work" id="q3w" data-k="q3w" rows="5" spellcheck="false"></textarea>
+        <div class="row" style="margin-top:4px">
+          <span class="af">φ = <input class="ink num" id="q3phi" data-k="q3phi" inputmode="decimal" autocomplete="off" aria-label="Відносна вологість, %"> <span class="u">%</span></span>
+          <button class="btn primary" type="button" id="bQ3">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ3" aria-live="polite"></p>
+      </div>
+
+      <div class="creative-task" style="margin-top:14px">
+        <h3>Творче завдання</h3>
+        <p>Столітрова посудина заповнена повітрям при 15 °C і відносній вологості 30 %. Якою стане відносна вологість, якщо у посудину ввести 1 г води?</p>
+        <label class="wl" for="cr1">Розв'язання</label>
+        <textarea class="work" id="cr1" data-k="cr1" rows="6" spellcheck="false"></textarea>
+        <div class="row" style="margin-top:6px">
+          <span class="af">φ<sub>нова</sub> = <input class="ink num" id="crPhi" data-k="crPhi" inputmode="decimal" autocomplete="off" aria-label="Нова відносна вологість, %"> <span class="u">%</span></span>
+          <button class="btn primary" type="button" id="bCr">Перевірити</button>
+        </div>
+        <p class="fb" id="fbCr" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div class="foot no-print">
+      <div class="row" style="gap:8px">
+        <button class="btn primary" type="button" id="bDownload">⬇ Завантажити роботу (.html)</button>
+        <button class="btn" type="button" id="bPrint">🖨 Роздрукувати / PDF</button>
+        <button class="btn" type="button" id="bReport">📋 Скопіювати звіт</button>
+        <button class="btn sm" type="button" id="bClear" style="margin-left:auto;color:#bd2f2f!important;border-color:#bd2f2f">Очистити дані</button>
+      </div>
+      <p class="fb" id="reportMsg" aria-live="polite" style="margin-top:4px"></p>
+      <textarea id="reportTxt" class="report" hidden readonly aria-label="Текст звіту для копіювання"></textarea>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var KEY='lab7_state_v3';
+var RHO_TABLE={1:5.2,2:5.6,3:6.0,4:6.4,5:6.8,6:7.3,7:7.8,8:8.3,9:8.8,10:9.4,11:10.0,12:10.7,13:11.4,14:12.1,15:12.8,16:13.6,17:14.5,18:15.4,19:16.3,20:17.3,21:18.4,22:19.4,23:20.6,24:21.8,25:23.1,26:24.4,27:25.8,28:27.2,29:28.7,30:30.3,35:39.6,40:51.2,45:65.3,50:83.0};
+
+function rhoN(t){var ti=Math.round(t);if(RHO_TABLE[ti])return RHO_TABLE[ti];var keys=Object.keys(RHO_TABLE).map(Number).sort(function(a,b){return a-b});for(var i=0;i<keys.length-1;i++){if(t>=keys[i]&&t<=keys[i+1]){var f=(t-keys[i])/(keys[i+1]-keys[i]);return RHO_TABLE[keys[i]]+(RHO_TABLE[keys[i+1]]-RHO_TABLE[keys[i]])*f}}return null;}
+
+function fresh(){return{f:{},g:{cityRows:[{},{},{},{},{}],responseEditors:{}}}}
+var S;
+// Під час кожного відкриття сторінки всі поля порожні: старі записи не підвантажуються.
+try{localStorage.removeItem(KEY);}catch(e){}
+S=fresh();
+if(!S.g)S.g={};
+if(!S.g.cityRows||S.g.cityRows.length<5){S.g.cityRows=[{},{},{},{},{}];}
+// Завжди зачищаємо rhoN і rhoA — ці стовпці учні заповнюють самостійно
+S.g.cityRows.forEach(function(r){if(r){r.rhoN='';r.rhoA='';}});
+if(!S.g.responseEditors)S.g.responseEditors={};
+if(!S.f)S.f={};
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));$('#saveSt').textContent='Збережено ✓'}catch(e){$('#saveSt').textContent='Помилка збереження'}}
+function $(sel){return document.querySelector(sel)}function $$(sel){return document.querySelectorAll(sel)}
+
+/* ===== ρ-TABLE render ===== */
+(function(){
+  var data=[[1,5.2,11,10.0,21,18.4,35,39.6],[2,5.6,12,10.7,22,19.4,40,51.2],[3,6.0,13,11.4,23,20.6,45,65.3],[4,6.4,14,12.1,24,21.8,50,83.0],[5,6.8,15,12.8,25,23.1,60,130],[6,7.3,16,13.6,26,24.4,70,198],[7,7.8,17,14.5,27,25.8,80,293],[8,8.3,18,15.4,28,27.2,90,424],[9,8.8,19,16.3,29,28.7,100,598],[10,9.4,20,17.3,30,30.3,120,1102]];
+  var tb=$('#rhoTbl');var html='';
+  data.forEach(function(r){html+='<tr>';for(var i=0;i<8;i+=2){html+='<td>'+r[i]+'</td><td>'+r[i+1]+'</td>'}html+='</tr>';});
+  tb.innerHTML=html;
+})();
+
+/* ===== TABLE 1 rows ===== */
+function buildTableRows(){
+  var tb=$('#dataTbody');var html='';
+  for(var i=0;i<5;i++){
+    var r=S.g.cityRows[i]||{};
+    html+='<tr>';
+    html+='<td><input class="ink" style="width:100%;min-width:80px" type="text" data-row="'+i+'" data-col="city" value="'+(r.city||'')+'" autocomplete="off"></td>';
+    html+='<td><input class="ink num" data-row="'+i+'" data-col="t" value="'+(r.t||'')+'" inputmode="decimal" autocomplete="off"></td>';
+    html+='<td><input class="ink num" data-row="'+i+'" data-col="phi" value="'+(r.phi||'')+'" inputmode="decimal" autocomplete="off"></td>';
+    html+='<td><input class="ink num" data-row="'+i+'" data-col="rhoN" value="'+(r.rhoN||'')+'" inputmode="decimal" autocomplete="off"></td>';
+    html+='<td><input class="ink num" data-row="'+i+'" data-col="rhoA" value="'+(r.rhoA||'')+'" inputmode="decimal" autocomplete="off"></td>';
+    html+='</tr>';
+  }
+  tb.innerHTML=html;
+  $$('#dataTbody input').forEach(function(inp){
+    inp.addEventListener('input',function(){
+      var ri=parseInt(inp.dataset.row);var col=inp.dataset.col;
+      if(!S.g.cityRows[ri])S.g.cityRows[ri]={};
+      S.g.cityRows[ri][col]=inp.value.trim();
+      save();updateProgress();
+    });
+  });
+}
+buildTableRows();
+
+/* ===== FIO fields ===== */
+function fillAll(){
+  $$('[data-k]').forEach(function(el){
+    var k=el.dataset.k;
+    if(el.tagName==='TEXTAREA'&&S.f[k]!==undefined)el.value=S.f[k];
+    else if(el.tagName==='INPUT'&&el.type!=='range'&&S.f[k]!==undefined)el.value=S.f[k];
+    else if(el.tagName==='SELECT'&&S.f[k]!==undefined)el.value=S.f[k];
+  });
+}
+function bindAll(){
+  $$('[data-k]').forEach(function(el){
+    if(el.dataset.bound)return;el.dataset.bound='1';
+    el.addEventListener('input',function(){S.f[el.dataset.k]=el.value;save();updateProgress();});
+    el.addEventListener('change',function(){S.f[el.dataset.k]=el.value;save();updateProgress();});
+  });
+}
+
+/* ===== PROGRESS ===== */
+function updateProgress(){
+  var fields=['klass','fio','p1','concl'];var done=0;var total=fields.length;
+  fields.forEach(function(k){if((S.f[k]||'').trim())done++;});
+  var rows=S.g.cityRows||[];var cityDone=0;
+  rows.forEach(function(r){if((r.city||'').trim()&&(r.t||'').trim()&&(r.phi||'').trim())cityDone++;});
+  done+=cityDone;total+=5;
+  $('#progTxt').textContent=done+' з '+total;
+  $('#progBar').style.width=Math.round(100*done/total)+'%';
+}
+
+/* ===== AUTO DATE ===== */
+function initDate(){if(!S.f.date){var d=new Date();S.f.date=d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();}}
+
+/* ===== PSYCHROMETER SIM ===== */
+var psyT=20,psyH=60;
+function wetBulb(t,phi){var A=0.000799;var e_sat=6.112*Math.exp(17.67*t/(t+243.5));var e=phi/100*e_sat;var tw=t,iter=50;for(var i=0;i<iter;i++){var es_tw=6.112*Math.exp(17.67*tw/(tw+243.5));var f=es_tw-e-A*1013.25*(t-tw);var df=es_tw*17.67*243.5/((tw+243.5)*(tw+243.5))+A*1013.25;tw=tw-f/df;}return Math.round(tw*10)/10;}
+function drawThermometer(canvas,temp,maxT,label,color){
+  var ctx=canvas.getContext('2d');var W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  var bulbR=12,tubeW=12,tubeH=H-bulbR*2-30,tubeX=(W-tubeW)/2,tubeY=20;
+  var pct=Math.max(0,Math.min(1,(temp)/(maxT)));
+  var fillH=tubeH*pct;
+  // tube bg
+  ctx.fillStyle='#e8e8e8';ctx.beginPath();ctx.roundRect(tubeX,tubeY,tubeW,tubeH,6);ctx.fill();
+  // fill
+  ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(tubeX,tubeY+tubeH-fillH,tubeW,fillH,6);ctx.fill();
+  // bulb
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(W/2,tubeY+tubeH+bulbR,bulbR,0,2*Math.PI);ctx.fill();
+  // outline
+  ctx.strokeStyle='#888';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(tubeX,tubeY,tubeW,tubeH,6);ctx.stroke();
+  ctx.beginPath();ctx.arc(W/2,tubeY+tubeH+bulbR,bulbR,0,2*Math.PI);ctx.stroke();
+  // scale
+  ctx.fillStyle='#444';ctx.font='10px IBM Plex Mono,monospace';ctx.textAlign='right';
+  for(var tick=0;tick<=maxT;tick+=5){var ty=tubeY+tubeH-tubeH*(tick/maxT);ctx.fillText(tick,tubeX-3,ty+4);}
+  // value
+  ctx.fillStyle='#000';ctx.font='bold 13px IBM Plex Mono,monospace';ctx.textAlign='center';
+  ctx.fillText(temp.toFixed(1)+'°',W/2,tubeY-6);
+}
+function renderPsy(){
+  var tw=wetBulb(psyT,psyH);var rn=rhoN(psyT);var ra=rn?Math.round(psyH*rn)/100:null;
+  $('#pyDry').textContent=psyT+',0 °C';
+  $('#pyWet').textContent=tw+'°C';
+  $('#pyDiff').textContent=Math.round((psyT-tw)*10)/10+'°C';
+  $('#pyPhi').textContent=psyH+' %';
+  $('#pyRhoN').textContent=rn?rn+' г/м³':'—';
+  $('#pyRhoA').textContent=ra?ra.toFixed(1)+' г/м³':'—';
+  var div=$('#psyTherms');
+  if(!div._init){
+    div.innerHTML='';
+    var cv1=document.createElement('canvas');cv1.id='cvDry';cv1.width=70;cv1.height=180;
+    var cv2=document.createElement('canvas');cv2.id='cvWet';cv2.width=70;cv2.height=180;
+    var w1=document.createElement('div');w1.className='therm-wrap';
+    var l1=document.createElement('div');l1.className='therm-label';l1.textContent='СУХИЙ';
+    var w2=document.createElement('div');w2.className='therm-wrap';
+    var l2=document.createElement('div');l2.className='therm-label';l2.innerHTML='ВОЛОГИЙ<br><small style="font-weight:400;font-size:10px">(з ватою)</small>';
+    w1.append(l1,cv1);w2.append(l2,cv2);div.append(w1,w2);div._init=true;
+  }
+  drawThermometer($('#cvDry'),psyT,40,'Сухий','#e53935');
+  drawThermometer($('#cvWet'),tw,40,'Вологий','#1e88e5');
+}
+$('#psyTemp').addEventListener('input',function(){psyT=+this.value;$('#psyTempOut').textContent=psyT+' °C';renderPsy();});
+$('#psyHum').addEventListener('input',function(){psyH=+this.value;$('#psyHumOut').textContent=psyH+' %';renderPsy();});
+$('#bPsyRecord').addEventListener('click',function(){
+  if(!S.g.cityRows[0])S.g.cityRows[0]={};
+  S.g.cityRows[0].city='Психрометр';
+  S.g.cityRows[0].t=String(psyT);
+  S.g.cityRows[0].phi=String(psyH);
+  S.g.cityRows[0].rhoN='';
+  S.g.cityRows[0].rhoA='';
+  save();buildTableRows();
+  $('#psyMsg').textContent='✓ Записано в рядок 1 — ρн і ρа заповніть самостійно';
+  setTimeout(function(){$('#psyMsg').textContent=''},4000);
+});
+renderPsy();
+
+/* ===== WEATHER WIDGET ===== */
+var lastWeatherData=null;
+$('#bFetchWeather').addEventListener('click',function(){
+  var city=$('#selCity').value;
+  if(!city){alert('Оберіть місто');return;}
+  $('#weatherDisplay').hidden=true;
+  $('#weatherError').hidden=true;
+  $('#weatherLoading').hidden=false;
+  $('#bAddCity').disabled=true;
+  fetchWeather(city);
+});
+
+function fetchWeather(city){
+  var url='https://api.open-meteo.com/v1/forecast?latitude='+getCityCoords(city).lat+'&longitude='+getCityCoords(city).lon+'&current=temperature_2m,relativehumidity_2m,apparent_temperature,windspeed_10m,weathercode&timezone=auto';
+  fetch(url).then(function(r){return r.json();}).then(function(data){
+    $('#weatherLoading').hidden=true;
+    var c=data.current;
+    var t=Math.round(c.temperature_2m);
+    var phi=c.relativehumidity_2m;
+    var feels=Math.round(c.apparent_temperature);
+    var wind=Math.round(c.windspeed_10m);
+    lastWeatherData={city:city,t:t,phi:phi};
+    $('#wCityName').textContent=city;
+    $('#wTemp').textContent=(t>0?'+':'')+t+'°C';
+    $('#wHum').textContent=phi+' %';
+    $('#wWind').textContent=wind+' км/год';
+    $('#wFeels').textContent=(feels>0?'+':'')+feels+'°C';
+    $('#wDesc').textContent=wmoDesc(c.weathercode);
+    $('#wUpdated').textContent='Дані: open-meteo.com · '+new Date().toLocaleTimeString('uk-UA');
+    $('#weatherDisplay').hidden=false;
+    $('#bAddCity').disabled=false;
+  }).catch(function(e){
+    $('#weatherLoading').hidden=true;
+    $('#weatherError').hidden=false;
+    $('#weatherError').textContent='Не вдалося завантажити дані. Перевірте з\'єднання або введіть вручну.';
+  });
+}
+
+function wmoDesc(code){var m={0:'Ясно',1:'Переважно ясно',2:'Мінлива хмарність',3:'Хмарно',45:'Туман',48:'Туман із ожеледдю',51:'Мряка слабка',53:'Мряка помірна',55:'Мряка сильна',61:'Дощ слабкий',63:'Дощ помірний',65:'Дощ сильний',71:'Сніг слабкий',73:'Сніг помірний',75:'Сніг сильний',80:'Злива слабка',81:'Злива помірна',82:'Злива сильна',95:'Гроза'};return m[code]||'—';}
+
+function getCityCoords(city){var m={'Kyiv':{lat:50.45,lon:30.52},'Kharkiv':{lat:49.99,lon:36.23},'Dnipro':{lat:48.46,lon:35.04},'Odesa':{lat:46.48,lon:30.73},'Lviv':{lat:49.84,lon:24.03},'Zaporizhzhia':{lat:47.84,lon:35.14},'Kryvyi Rih':{lat:47.91,lon:33.39},'Mykolaiv':{lat:46.97,lon:32.00},'Vinnytsia':{lat:49.23,lon:28.47},'Poltava':{lat:49.59,lon:34.55},'Chernihiv':{lat:51.49,lon:31.30},'Sumy':{lat:50.91,lon:34.80},'Zhytomyr':{lat:50.25,lon:28.66},'Kherson':{lat:46.64,lon:32.61},'Ivano-Frankivsk':{lat:48.92,lon:24.71},'Ternopil':{lat:49.55,lon:25.59},'Uzhhorod':{lat:48.62,lon:22.30},'Cherkasy':{lat:49.44,lon:32.06},'Rivne':{lat:50.62,lon:26.25},'Khmelnytskyi':{lat:49.42,lon:27.00}};return m[city]||{lat:50.45,lon:30.52};}
+
+$('#bAddCity').addEventListener('click',function(){
+  if(!lastWeatherData)return;
+  // Always write to row 2 (index 1); warn if already filled
+  var idx=1;
+  if(S.g.cityRows[idx]&&(S.g.cityRows[idx].city||'').trim()){
+    if(!confirm('Рядок 2 вже заповнений. Замінити?'))return;
+  }
+  var d=lastWeatherData;
+  S.g.cityRows[idx]={city:d.city,t:String(d.t),phi:String(d.phi),rhoN:'',rhoA:''};
+  save();buildTableRows();
+  alert('✓ '+d.city+' записано в рядок 2.\nРядки 3–5 та стовпці ρн і ρа заповніть самостійно.');
+});
+
+/* ===== CHECK calc ===== */
+$('#bCheck').addEventListener('click',function(){
+  var t=parseFloat($('#chkT').value);var phi=parseFloat($('#chkPhi').value);var rhoA=parseFloat($('#chkRhoA').value);
+  if(isNaN(t)||isNaN(phi)||isNaN(rhoA)){$('#fbCheck').className='fb bad';$('#fbCheck').textContent='Заповніть усі поля';return;}
+  var rn=rhoN(t);if(!rn){$('#fbCheck').className='fb bad';$('#fbCheck').textContent='t поза таблицею (1–50 °C)';return;}
+  var expected=phi*rn/100;var diff=Math.abs(rhoA-expected);
+  if(diff<=expected*0.05+0.05){$('#fbCheck').className='fb ok';$('#fbCheck').textContent='Правильно! ρа ≈ '+expected.toFixed(2)+' г/м³';}
+  else{$('#fbCheck').className='fb bad';$('#fbCheck').textContent='Перевірте обчислення. ρн('+t+'°C) = '+rn+' г/м³, ρа = '+expected.toFixed(2)+' г/м³';}
+});
+
+/* ===== Q2 ===== */
+$('#bQ2').addEventListener('click',function(){
+  var v=$('#q2').value;var fb=$('#fbQ2');
+  if(!v){fb.className='fb bad';fb.textContent='Оберіть відповідь';return;}
+  if(v==='inc'){fb.className='fb ok';fb.textContent='Правильно! Холодне повітря знижує температуру кімнати → ρн зменшується, але ρа майже не змінюється → φ = ρа/ρн · 100% зростає.';}
+  else{fb.className='fb bad';fb.textContent='Підказка: холодне повітря знижує температуру → ρн зменшується → φ = ρа/ρн · 100% зростає. Правильна відповідь: «Збільшиться»';}
+});
+
+/* ===== Q3 ===== */
+$('#bQ3').addEventListener('click',function(){
+  var phi=parseFloat($('#q3phi').value);var fb=$('#fbQ3');
+  if(isNaN(phi)){fb.className='fb bad';fb.textContent='Введіть значення';return;}
+  // At 14°C walls fog → φ=100% at 14°C. rhoN(14)=12.1. rhoN(30)=30.3
+  var expected=Math.round(12.1/30.3*1000)/10; // ~39.9%
+  if(Math.abs(phi-expected)<=2){fb.className='fb ok';fb.textContent='Правильно! ρа = ρн(14°C) = 12,1 г/м³ (точка роси). φ = ρа/ρн(30°C) = 12,1/30,3 · 100% ≈ '+expected+'%';}
+  else{fb.className='fb bad';fb.textContent='Підказка: при 14°C настає точка роси → ρа = ρн(14°C) = 12,1 г/м³. φ = 12,1/30,3 · 100% ≈ '+expected+'%';}
+});
+
+/* ===== Creative ===== */
+$('#bCr').addEventListener('click',function(){
+  var phi=parseFloat($('#crPhi').value);var fb=$('#fbCr');
+  if(isNaN(phi)){fb.className='fb bad';fb.textContent='Введіть відповідь';return;}
+  // rhoN(15)=12.8, initial: rhoA=0.3*12.8=3.84 g/m3
+  // Add 1g water to 100L = 0.1m3 → add 10 g/m3
+  // new rhoA = 3.84+10=13.84 > rhoN(15)=12.8 → saturated φ=100%
+  if(phi>=98&&phi<=100){fb.className='fb ok';fb.textContent='Правильно! Після додавання 1 г у 100 л: приріст = 1/0,1 = 10 г/м³. ρа = 3,84+10 = 13,84 г/м³ > ρн(15°C) = 12,8 → пара насичена, φ = 100%.';}
+  else{fb.className='fb bad';fb.textContent='Підказка: V = 100 л = 0,1 м³; 1 г / 0,1 м³ = 10 г/м³. Початкова ρа = 0,3·12,8 = 3,84 г/м³. Нова = 13,84 > 12,8 → φ = 100%.';}
+});
+
+/* ===== DOWNLOAD ===== */
+$('#bDownload').addEventListener('click',function(){
+  var html=document.documentElement.outerHTML;
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Лабораторна_робота_7.html';a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href)},10000);
+});
+
+/* ===== PRINT ===== */
+$('#bPrint').addEventListener('click',function(){window.print();});
+
+/* ===== REPORT ===== */
+$('#bReport').addEventListener('click',function(){
+  var L=['ЛАБОРАТОРНА РОБОТА № 7 — Вологість повітря\n'];
+  L.push('Учень: '+(S.f.fio||'—')+', клас: '+(S.f.klass||'—')+', дата: '+(S.f.date||'—')+'\n');
+  L.push('Таблиця вимірювань:');
+  L.push('Місто | t, °C | φ, % | ρн, г/м³ | ρа, г/м³');
+  (S.g.cityRows||[]).forEach(function(r,i){L.push((i+1)+'. '+(r.city||'—')+' | '+(r.t||'—')+' | '+(r.phi||'—')+' | '+(r.rhoN||'—')+' | '+(r.rhoA||'—'));});
+  if(S.f.concl)L.push('\nВисновок: '+S.f.concl);
+  var txt=L.join('\n');var ta=$('#reportTxt');ta.hidden=false;ta.value=txt;
+  try{navigator.clipboard.writeText(txt).then(function(){$('#reportMsg').textContent='✓ Скопійовано!';},function(){$('#reportMsg').textContent='Виділіть текст нижче й скопіюйте вручну.';});}catch(e){$('#reportMsg').textContent='Виділіть текст у полі нижче й скопіюйте.';}
+});
+
+/* ===== CLEAR ===== */
+$('#bClear').addEventListener('click',function(){if(!confirm('Очистити всі введені дані?'))return;try{localStorage.removeItem(KEY);}catch(e){}S=fresh();location.reload();});
+
+/* ===== RESPONSE EDITORS ===== */
+function mountResponseEditors(){
+  S.g.responseEditors=S.g.responseEditors||{};
+  $$('.work').forEach(function(ta){
+    if(ta.dataset.editorMounted)return;ta.dataset.editorMounted='1';
+    var key=ta.dataset.k||ta.id;var state=S.g.responseEditors[key]||{mode:'text',draw:'',image:''};
+    S.g.responseEditors[key]=state;
+    var wrap=document.createElement('div');wrap.className='response-editor';
+    var tabs=document.createElement('div');tabs.className='response-tabs';tabs.setAttribute('role','group');
+    [['text','Ввести текст'],['draw','Малювати'],['image','Зображення']].forEach(function(it){
+      var b=document.createElement('button');b.type='button';b.className='btn';b.textContent=it[1];b.dataset.mode=it[0];tabs.appendChild(b);
+    });
+    var textPanel=document.createElement('div');textPanel.className='response-panel';textPanel.style.padding='0';
+    var drawPanel=document.createElement('div');drawPanel.className='response-panel';
+    var tools=document.createElement('div');tools.className='response-tools';
+    var pen=document.createElement('button');pen.type='button';pen.className='btn sm';pen.textContent='Ручка';
+    var er=document.createElement('button');er.type='button';er.className='btn sm';er.textContent='Гумка';
+    var clr=document.createElement('button');clr.type='button';clr.className='btn sm';clr.textContent='Очистити';
+    tools.append(pen,er,clr);
+    var rCv=document.createElement('canvas');rCv.className='response-canvas';rCv.width=900;rCv.height=220;rCv.setAttribute('aria-label','Поле рукописної відповіді');
+    var hint=document.createElement('p');hint.className='response-hint';hint.textContent='Малюйте мишею, пальцем або стилусом.';
+    drawPanel.append(tools,rCv,hint);
+    var imgPanel=document.createElement('div');imgPanel.className='response-panel';imgPanel.tabIndex=0;
+    var upLabel=document.createElement('label');upLabel.className='response-upload';upLabel.textContent='Вибрати зображення ';
+    var fileEl=document.createElement('input');fileEl.type='file';fileEl.accept='image/*';upLabel.appendChild(fileEl);
+    var pHint=document.createElement('p');pHint.className='response-hint';pHint.textContent='Або вставте через Ctrl+V.';
+    var prevImg=document.createElement('img');prevImg.className='response-image-preview';prevImg.alt='';
+    var clrImg=document.createElement('button');clrImg.type='button';clrImg.className='btn sm';clrImg.textContent='Видалити';
+    imgPanel.append(upLabel,pHint,prevImg,clrImg);
+    ta.parentNode.insertBefore(wrap,ta);
+    textPanel.appendChild(ta);wrap.append(tabs,textPanel,drawPanel,imgPanel);
+    function setMode(mode){state.mode=mode;S.g.responseEditors[key]=state;textPanel.hidden=mode!=='text';drawPanel.hidden=mode!=='draw';imgPanel.hidden=mode!=='image';Array.prototype.forEach.call(tabs.children,function(b){b.setAttribute('aria-pressed',String(b.dataset.mode===mode))});save();}
+    var rCtx=rCv.getContext('2d'),rDown=false,rLast=null,rTool='pen';rCtx.lineCap='round';rCtx.lineJoin='round';
+    if(state.draw){var rIm=new Image();rIm.onload=function(){rCtx.drawImage(rIm,0,0,rCv.width,rCv.height)};rIm.src=state.draw;}
+    function showPrev(){if(state.image){prevImg.src=state.image;prevImg.hidden=false;}else{prevImg.removeAttribute('src');prevImg.hidden=true;}}
+    showPrev();
+    function rPos(e){var r=rCv.getBoundingClientRect();return[(e.clientX-r.left)*rCv.width/r.width,(e.clientY-r.top)*rCv.height/r.height];}
+    function rLine(a,b){rCtx.globalCompositeOperation=rTool==='erase'?'destination-out':'source-over';rCtx.strokeStyle='#111';rCtx.lineWidth=rTool==='erase'?25:3;rCtx.beginPath();rCtx.moveTo(a[0],a[1]);rCtx.lineTo(b[0],b[1]);rCtx.stroke();}
+    function persD(){try{var o=document.createElement('canvas');o.width=rCv.width;o.height=rCv.height;var ox=o.getContext('2d');ox.fillStyle='#fff';ox.fillRect(0,0,o.width,o.height);ox.drawImage(rCv,0,0);state.draw=o.toDataURL('image/jpeg',.72);S.g.responseEditors[key]=state;save();}catch(e){}}
+    rCv.addEventListener('pointerdown',function(e){rDown=true;rLast=rPos(e);try{rCv.setPointerCapture(e.pointerId);}catch(z){}rLine(rLast,rLast);e.preventDefault();});
+    rCv.addEventListener('pointermove',function(e){if(!rDown)return;var p=rPos(e);rLine(rLast,p);rLast=p;});
+    ['pointerup','pointercancel'].forEach(function(ev){rCv.addEventListener(ev,function(){if(rDown){rDown=false;persD();}});});
+    pen.addEventListener('click',function(){rTool='pen';});er.addEventListener('click',function(){rTool='erase';});
+    clr.addEventListener('click',function(){rCtx.globalCompositeOperation='source-over';rCtx.clearRect(0,0,rCv.width,rCv.height);state.draw='';S.g.responseEditors[key]=state;save();});
+    function readImg(f){if(!f||f.type.indexOf('image/')!==0)return;var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas'),sc=Math.min(1,900/im.width,700/im.height);c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);try{state.image=c.toDataURL('image/jpeg',.68);S.g.responseEditors[key]=state;showPrev();save();}catch(e){}};im.src=rd.result;};rd.readAsDataURL(f);}
+    fileEl.addEventListener('change',function(){readImg(fileEl.files&&fileEl.files[0]);});
+    clrImg.addEventListener('click',function(){state.image='';S.g.responseEditors[key]=state;showPrev();fileEl.value='';save();});
+    imgPanel.addEventListener('paste',function(e){var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var i=0;i<items.length;i++){if(items[i].type.indexOf('image/')===0){readImg(items[i].getAsFile());e.preventDefault();return;}}});
+    tabs.addEventListener('click',function(e){var b=e.target.closest('button[data-mode]');if(b)setMode(b.dataset.mode);});
+    setMode(state.mode||'text');
+  });
+}
+
+/* ===== NAVIGATION ===== */
+try{
+  var navLinks=$$('.nav a');
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting)navLinks.forEach(function(a){a.setAttribute('aria-current',String(a.getAttribute('href')==='#'+en.target.id));});});},{rootMargin:'-25% 0px -65% 0px'});
+  $$('main.sheet>section').forEach(function(s){io.observe(s);});
+}catch(e){}
+
+/* ===== INIT ===== */
+fillAll();bindAll();updateProgress();mountResponseEditors();
+
+})();
+</script>
+</body></html>

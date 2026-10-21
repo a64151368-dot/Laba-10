@@ -1,0 +1,1045 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Лабораторна робота № 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Literata:wght@400;600;700&family=Marck+Script&display=swap">
+<style>
+:root{
+  --desk:#cdd6e2;--bar:#f1f5fb;--paper:#fcfdff;--grid:#d2e4f6;--grid-s:#a9c8e9;
+  --margin:#e2707b;--print:#1f2430;--muted:#5a6579;--ink:#1b3fb0;--ink-line:#8196d8;
+  --note:#eef4fc;--edge:#b4c0d3;--ok:#17794a;--bad:#bd2f2f;--btn-fg:#ffffff;
+  --tbl:#3c4557;--sky:#e6f2fc;--hov:#e2eafb;--sim:#fff8d4;--sim-edge:#e7da8c;--cell:20px;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:60px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;--sim:#38341d;--sim-edge:#665c2a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;--sim:#38341d;--sim-edge:#665c2a;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{background:var(--desk);color:var(--print);font:16px/1.55 'Literata',Georgia,'Times New Roman',serif;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bar)}
+b,strong{font-weight:700}
+a{color:var(--ink)}
+:focus-visible{outline:2px solid var(--margin);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);border-bottom:1px solid var(--edge)}
+.bar-in{max-width:900px;margin:0 auto;padding-block:6px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;gap:4px 16px;align-items:center;flex-wrap:wrap}
+.nav{display:flex;gap:4px;overflow-x:auto;flex:1 1 300px;min-width:0}
+.nav a{white-space:nowrap;padding:2px 10px;border-radius:3px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:600}
+.nav a:hover{background:var(--hov)}
+.nav a[aria-current="true"]{background:var(--ink);color:var(--btn-fg)}
+.status{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.meter{width:70px;height:6px;background:var(--note);border:1px solid var(--edge);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle}
+.meter i{display:block;height:100%;width:0;background:var(--ink);transition:width .25s}
+
+.page{max-width:980px;margin:0 auto;padding-block:10px 24px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{position:relative;background-color:var(--paper);
+  background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);padding:14px 20px 28px 50px;border-radius:3px;box-shadow:0 10px 28px rgba(10,20,40,.22)}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:40px;width:2px;background:var(--margin);opacity:.85}
+.sheet>section{margin-top:18px}
+h1{margin:0;text-align:center;font-size:22px;line-height:1.6;letter-spacing:.03em}
+h2{margin:0 0 12px;font-size:19px;line-height:1.6;border-bottom:2px solid var(--margin);display:inline-block;padding-right:18px}
+h3{margin:0;font-size:17px;line-height:1.45}
+p{margin:0 0 8px}
+.small{font-size:14px;line-height:1.5;color:var(--print)}
+.fio{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:10px}
+.fio label{display:inline-flex;align-items:baseline;gap:6px}
+.w-s{width:7em}.w-l{width:min(20em,100%)}
+
+input.ink,select.ink{font:19px/24px 'Marck Script',cursive;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid var(--ink-line);border-radius:0;padding:1px 4px;min-width:0}
+select.ink{background:var(--paper);border:1.5px solid var(--ink-line);border-radius:3px;font-size:17px}
+input.ink:focus,select.ink:focus{background:var(--note);border-bottom-color:var(--ink);outline:none}
+input.ink::placeholder,textarea.work::placeholder{color:var(--muted);opacity:.5}
+input.num{width:5.8em;text-align:center}
+textarea.work{display:block;width:100%;min-height:60px;resize:vertical;border:1.5px solid var(--edge);border-radius:3px;
+  background-color:var(--paper);background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);background-attachment:local;font:18px/20px 'Marck Script',cursive;color:var(--ink);padding:0 8px}
+textarea.work:focus{outline:none;border-color:var(--ink)}
+
+.btn{font:600 14px/18px 'Literata',serif;padding:6px 12px;border:1.5px solid #344054;background:#fff;color:#000!important;border-radius:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:background .15s,box-shadow .15s}
+.btn:hover,.btn:focus-visible{background:#fff0ad!important;color:#000!important;box-shadow:0 0 0 2px rgba(0,0,0,.12)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:#f3e7a5;color:#000!important;border-color:#8b7a2b}
+.btn.primary:hover{background:#ffe680!important}
+.btn.sm{padding:2px 9px;font-size:13px}
+.btn[aria-pressed="true"]{background:#ffe680!important;color:#000!important;border-color:#8b7a2b;box-shadow:inset 0 0 0 1.5px #8b7a2b}
+.row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+
+.box{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px;margin-block:8px}
+.box.simbox{background:#e8f3e8;border:1.5px solid #5f8c63;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);color:#111!important;font-size:16px}
+.box.simbox h3,.box.simbox label,.box.simbox .small,.box.simbox .info,.box.simbox .info b,.box.simbox .sl output,.box.simbox #simMsg{color:#111!important;opacity:1}
+.box.simbox select.ink{color:#111!important;background:#fff}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:9px;margin-block:7px;align-items:flex-start}
+.steps li>div{min-width:0}.step-dot{font-weight:700;min-width:18px;color:var(--print)}
+
+canvas.simcv{display:block;width:100%;height:auto;border:1.5px solid #5f8c63;border-radius:4px;background:#9fd6f5;margin-block:8px}
+.cfgs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.cfgs .btn{padding:4px 10px;font-size:13.5px}
+.sl{display:grid;grid-template-columns:9em 1fr 5.5em;gap:8px;align-items:center;margin-top:8px}
+.sl input[type=range]{accent-color:#b45309;width:100%;min-width:0}
+.sl output{font:500 17px/20px 'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;text-align:right}
+.fine{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.info{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:8px;font-size:14px;align-items:center}
+.info span{display:flex;gap:5px;align-items:center}
+.info b{font:500 16px/20px 'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;padding:1px 10px;border-radius:999px;font-weight:700;font-size:13.5px;background:#fff;border:1.5px solid #5f8c63;color:#111}
+.chip.uni{background:#c9f0d4;border-color:#17794a}
+
+.tbl-wrap{overflow-x:auto;margin-block:10px;background:var(--paper);border-radius:3px}
+.tbl{border-collapse:collapse;min-width:620px;width:100%;background:var(--paper)}
+.tbl th,.tbl td{border:1.5px solid var(--tbl);padding:6px 7px;text-align:center;vertical-align:middle;font-size:14px;line-height:1.4}
+.tbl th{background:var(--note);font-weight:600}
+.tbl td.lbl{text-align:left;font-weight:600}
+.tbl td input.ink{width:100%;text-align:center;background:#fff0ad!important;color:#202020!important;border:1.5px solid #c4a000!important;border-radius:2px;font-weight:700}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 3px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px 1px}
+.frac>span:last-child{padding:1px 4px 0}
+.step{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px 10px;margin-block:8px}
+.step header{display:flex;align-items:center;gap:9px}
+.no{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1.5px solid var(--margin);color:var(--margin);border-radius:50%;font-weight:700;font-size:13px}
+.formula{font-size:15.5px;line-height:24px;padding:4px 10px;background:var(--note);border-left:3px solid var(--margin);margin-block:8px;overflow-x:auto}
+.formula div{white-space:nowrap}
+.wl{display:block;font-size:14px;font-weight:700;color:var(--print);margin-bottom:4px}
+.ans-row{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:flex-end;margin-top:8px}
+.af{display:inline-flex;align-items:baseline;gap:5px}
+.af .u{color:var(--muted);font-size:13px}
+.fb{min-height:20px;margin:6px 0 0;font-size:13.5px;line-height:19px}
+.fb.ok{color:var(--ok)}.fb.ok::before{content:"✓ "}
+.fb.bad{color:var(--bad)}.fb.bad::before{content:"✗ "}
+
+.checks{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:8px;list-style:none;padding:0}
+.checks li{position:relative;padding-left:14px}
+.checks li:before{content:"•";position:absolute;left:0;color:var(--print);font-weight:700}
+
+/* Поле побудови графіка */
+.gz{border:1.5px solid var(--edge);border-radius:4px;background:var(--paper);margin-block:8px;padding:8px}
+.gz-tools{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;align-items:center}
+.gz-tools .sep{width:1px;align-self:stretch;background:var(--edge);margin-inline:3px}
+.gz-axes{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;margin-bottom:6px;font-size:14px}
+.gz-axes label{display:inline-flex;gap:6px;align-items:baseline}
+.gz-axes input[type=number]{width:6em}
+canvas#gCv{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1.5px solid var(--edge);border-radius:3px;background:#fffefa}
+.probe{margin-top:6px;padding:5px 10px;background:var(--note);border-left:3px solid var(--ink);display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:14px}
+
+.response-editor{margin:5px 0 10px;border:1px solid var(--edge);border-radius:4px;background:var(--paper);overflow:hidden}
+.response-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:5px;background:var(--note);border-bottom:1px solid var(--edge)}
+.response-tabs .btn{font-size:12px;padding:3px 9px}
+.response-panel{padding:7px}
+.response-canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1px solid var(--edge);border-radius:3px;background-color:#fff;
+  background-image:linear-gradient(to right,#d9e7f5 1px,transparent 1px),linear-gradient(to bottom,#d9e7f5 1px,transparent 1px);background-size:20px 20px}
+.response-image-preview{display:block;max-width:100%;max-height:420px;margin:8px auto;border:1px solid var(--edge);border-radius:3px}
+.response-upload{display:inline-block;padding:7px 11px;border:1px dashed var(--ink-line);border-radius:3px;cursor:pointer;background:var(--note);color:var(--print);font:600 12.5px 'Literata',serif}
+.response-tools{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px}
+.response-hint{font-size:14px;color:var(--print);margin:6px 0}
+
+.creative-task{margin-top:14px;padding:14px 16px;background:#fff3c4;border:2px solid #9a6a00;border-left:7px solid #9a6a00;border-radius:8px;color:#241900;font-size:16px;line-height:1.65}
+.creative-task h3{font-size:20px;color:#241900;margin-bottom:8px}
+.creative-task .wl{color:#241900}
+.creative-task textarea.work{background-color:#fffdf4;border-color:#9a6a00;color:#5b3215!important;font-weight:600}
+.creative-task textarea.work::placeholder{color:#795536!important;opacity:1!important}
+
+.report{width:100%;min-height:130px;font:12.5px/17px 'IBM Plex Mono',ui-monospace,monospace;background:var(--note);color:var(--print);border:1.5px solid var(--edge);border-radius:3px;padding:8px;margin-top:8px}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:28px;align-items:flex-start}
+
+@media(max-width:700px){.sl{grid-template-columns:1fr 5em}.sl label{grid-column:1/-1}}
+@media(max-width:560px){.sheet{padding:16px 10px 36px 32px}.sheet::before{left:20px}.box,.step{padding-inline:10px}}
+
+/* Поля введення: білий, жирний, контрастний текст на темному тлі */
+input.ink,.tbl td input.ink,select.ink:not(#selSurf){color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;
+  background:#1c2745!important;border:0!important;border-bottom:2px solid #8196d8!important;border-radius:2px;
+  font-weight:700;letter-spacing:.02em;text-shadow:0 0 1px rgba(255,255,255,.35)}
+.tbl td input.ink,select.ink:not(#selSurf){border:1px solid #8196d8!important;border-radius:3px}
+select.ink:not(#selSurf) option{background:#1c2745;color:#ffffff}
+input.ink:focus,.tbl td input.ink:focus,select.ink:not(#selSurf):focus{background:#10192e!important;border-bottom-color:#ffe680!important;outline:2px solid #ffe680;outline-offset:0}
+input.ink::placeholder{color:#c9d3ee!important;opacity:.6}
+textarea.work,.creative-task textarea.work{color:#ffffff!important;-webkit-text-fill-color:#ffffff;caret-color:#ffffff;font-weight:700;
+  background-color:#1c2745!important;background-image:linear-gradient(to right,#33436e 1px,transparent 1px),linear-gradient(to bottom,#33436e 1px,transparent 1px)!important;
+  border-color:#8196d8!important}
+textarea.work:focus{border-color:#ffe680!important}
+textarea.work::placeholder,.creative-task textarea.work::placeholder{color:#c9d3ee!important;opacity:.6!important}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff!important;color:#111!important;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar,.no-print,.btn,.fb,.meter,.status,.simbox,.gz-tools,.gz-axes,.probe,.response-tabs,.response-tools,.response-hint{display:none!important}
+  .page{max-width:none;margin:0;padding:0}
+  .sheet{box-shadow:none;border-radius:0;padding:8mm 7mm 8mm 12mm;background-color:#fff!important}
+  .sheet::before{left:9mm}
+  h1{font-size:17pt}h2{font-size:13pt}h3{font-size:11pt}
+  .box,.step,.creative-task,.tbl-wrap{break-inside:avoid}
+  .tbl-wrap{overflow:visible}
+  .tbl{min-width:0;width:100%;table-layout:fixed}
+  .tbl th,.tbl td{font-size:8pt;padding:3px 2px;color:#111!important;border-color:#333!important}
+  input.ink,.tbl td input.ink,select.ink,select.ink:not(#selSurf),textarea.work,.creative-task textarea.work{font:10pt Arial,sans-serif!important;font-weight:700!important;color:#111!important;-webkit-text-fill-color:#111;text-shadow:none;background:#fff!important;background-image:none!important;border:1px solid #777!important;min-height:20px;padding:2px!important}
+  textarea.work{min-height:44px;resize:none;white-space:pre-wrap}
+  textarea.work::placeholder,input::placeholder{color:transparent!important}
+  .formula{background:#f3f3f3!important;color:#111!important}
+  canvas#gCv{max-height:110mm;width:auto;max-width:100%;margin:0 auto}
+  .creative-task{background:#fff!important;border-color:#777!important;color:#111!important}
+  .small{font-size:9pt;color:#222!important}
+  .report{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <nav class="nav" aria-label="Розділи роботи">
+      <a href="#prep">1. Підготовка</a>
+      <a href="#exp">2. Дослід</a>
+      <a href="#calc">3. Опрацювання</a>
+      <a href="#concl">4. Висновок</a>
+    </nav>
+    <div class="status" aria-live="polite">
+      <span>Заповнено <b id="progTxt">0 з 0</b> <span class="meter"><i id="progBar"></i></span></span>
+      <span id="saveSt">Зберігається у цьому браузері</span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+<main class="sheet" id="top">
+
+  <div class="fio">
+    <label>Клас <input class="ink w-s" id="f-klass" data-k="klass" autocomplete="off"></label>
+    <label>Прізвище та ім’я <input class="ink w-l" id="f-fio" data-k="fio" autocomplete="off"></label>
+    <label>Дата <input class="ink w-s" id="f-date" data-k="date" autocomplete="off"></label>
+  </div>
+
+  <h1>ЛАБОРАТОРНА РОБОТА № 3</h1>
+  <p><b>Тема.</b> Вимірювання коефіцієнта тертя ковзання.</p>
+  <p><b>Мета:</b> визначити коефіцієнт тертя ковзання дерева по дереву.</p>
+  <p><b>Обладнання:</b> вбудований тренажер (два дерев’яні ящики; дівчинка; чоловік; дерев’яна поверхня; спідометр; динамометр).</p>
+
+  <!-- 1. ПІДГОТОВКА -->
+  <section id="prep">
+    <h2>1. Підготовка до експерименту</h2>
+    <p>Перед тим як виконувати роботу, згадайте відповіді на запитання:</p>
+    <ul class="checks" style="flex-direction:column;gap:2px">
+      <li>Якими є причини виникнення сили тертя?</li>
+      <li>Від чого залежить і куди напрямлена сила тертя ковзання?</li>
+      <li>За якою формулою обчислюють силу тертя ковзання?</li>
+    </ul>
+    <label class="wl" for="p1">Ваші відповіді</label>
+    <textarea class="work" id="p1" data-k="p1" rows="5" spellcheck="false"></textarea>
+  </section>
+
+  <!-- 2. ДОСЛІД -->
+  <section id="exp">
+    <h2>2. Експеримент</h2>
+    <ul class="steps">
+      <li><span class="step-dot" aria-hidden="true">1.</span><div>Оберіть дослід <b>1. Ящик</b>. Запишіть у таблицю його <b>масу</b> (вона підписана на ящику). Рухайте повзунок сили: ящик має зрушити з місця.</div></li>
+      <li><span class="step-dot" aria-hidden="true">2.</span><div>Дивіться на <b>спідометр</b> і значення <b>суми сил</b>. Підберіть прикладену силу так, щоб ящик рухався <b>рівномірно</b> (стрілка стоїть на місці, сума сил = 0). Тоді натисніть <b>«Записати силу тертя»</b>.</div></li>
+      <li><span class="step-dot" aria-hidden="true">3.</span><div><b>Повторіть дослід</b> для кожного з варіантів 2–6. Загальну масу порахуйте самостійно, додавши маси всіх тіл.</div></li>
+    </ul>
+
+    <!-- Тренажер -->
+    <div class="box simbox" id="sim">
+      <div class="row" style="justify-content:space-between;align-items:baseline">
+        <h3>Тренажер: тертя ковзання</h3>
+        <span class="small">Оберіть дослід → підберіть силу → запишіть тертя</span>
+      </div>
+
+      <div class="cfgs" id="cfgs" role="group" aria-label="Вибір досліду"></div>
+
+      <canvas class="simcv" id="simCv" width="1200" height="470" role="img" aria-label="Модель: робот штовхає дерев’яний ящик по поверхні"></canvas>
+
+      <div class="sl">
+        <label for="sF">Прикладена сила (робот)</label>
+        <input type="range" id="sF" min="0" max="300" step="1" value="0">
+        <output id="oF">0 Н</output>
+      </div>
+      <div class="fine">
+        <span class="small">Точне налаштування:</span>
+        <button class="btn sm" type="button" data-df="-10">−10</button>
+        <button class="btn sm" type="button" data-df="-1">−1</button>
+        <button class="btn sm" type="button" data-df="1">+1</button>
+        <button class="btn sm" type="button" data-df="10">+10</button>
+        <button class="btn sm" type="button" id="bZero">F = 0</button>
+      </div>
+
+      <div class="info" aria-live="off">
+        <span>Швидкість: <b id="iV">0,0 м/с</b></span>
+        <span>Сума сил: <b id="iNet">0 Н</b></span>
+        <span id="iState" class="chip">Ящик стоїть</span>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary" id="bSave" type="button">Записати силу тертя в таблицю</button>
+        <button class="btn" id="bReset" type="button">↺ Скинути</button>
+        <label class="small" style="display:inline-flex;gap:6px;align-items:center;margin-left:auto">Поверхня
+          <select class="ink" id="selSurf" aria-label="Поверхня"></select></label>
+      </div>
+      <p class="small" id="simMsg" aria-live="polite" style="margin:6px 0 0"></p>
+    </div>
+
+    <!-- Таблиця -->
+    <div class="tbl-wrap">
+    <table class="tbl" id="dataTbl">
+      <thead>
+        <tr>
+          <th>Номер досліду</th>
+          <th>Сила тертя ковзання<br><i>F</i><sub>тертя ковз</sub>, Н</th>
+          <th>Загальна маса<br><i>m</i>, кг</th>
+          <th>Сила нормальної реакції опори<br><i>N</i> = <i>mg</i>, Н</th>
+        </tr>
+      </thead>
+      <tbody id="dataTbody"></tbody>
+    </table>
+    </div>
+    <div class="row">
+      <button class="btn" type="button" id="bChkTbl">Перевірити таблицю</button>
+      <span class="small">Прийміть <i>g</i> = 9,8 Н/кг. Кнопка «Записати силу тертя» заносить лише <i>F</i><sub>тертя ковз</sub>. Масу та <i>N</i> впишіть самостійно.</span>
+    </div>
+    <p class="fb" id="fbTbl" aria-live="polite"></p>
+  </section>
+
+  <!-- 3. ОПРАЦЮВАННЯ -->
+  <section id="calc">
+    <h2>3. Опрацювання результатів</h2>
+
+    <article class="step" id="step1">
+      <header><span class="no">1</span><h3>Сила нормальної реакції опори</h3></header>
+      <div class="formula"><div><i>N</i> = <i>mg</i></div></div>
+      <label class="wl" for="w1">Хід обчислень (для кожного досліду)</label>
+      <textarea class="work" id="w1" data-k="w1" rows="5" spellcheck="false"></textarea>
+      <p class="small" style="margin-top:4px">Результати впишіть у останній стовпець таблиці.</p>
+    </article>
+
+    <article class="step" id="step2">
+      <header><span class="no">2</span><h3>Графік залежності <i>F</i><sub>тертя ковз</sub> від <i>N</i></h3></header>
+      <p class="small">Експериментальні точки можуть не лежати на одній лінії через похибки. Проводьте пряму так, щоб з обох боків від неї було приблизно однакова кількість точок. Точку, яка різко вибивається, вважайте промахом і не враховуйте.</p>
+
+      <div class="gz" id="gz">
+        <div class="gz-tools" role="toolbar" aria-label="Інструменти графіка">
+          <button class="btn sm" type="button" data-tool="pt" aria-pressed="true">● Точка</button>
+          <button class="btn sm" type="button" data-tool="ln" aria-pressed="false">╱ Пряма</button>
+          <button class="btn sm" type="button" data-tool="pen" aria-pressed="false">✎ Олівець</button>
+          <button class="btn sm" type="button" data-tool="rd" aria-pressed="false">⌖ Зчитати значення</button>
+          <button class="btn sm" type="button" data-tool="er" aria-pressed="false">⌫ Гумка</button>
+          <span class="sep" aria-hidden="true"></span>
+          <button class="btn sm" type="button" id="gUndo">↶ Скасувати</button>
+          <button class="btn sm" type="button" id="gClr">Очистити</button>
+          <button class="btn sm primary" type="button" id="gAuto">Точки з таблиці</button>
+        </div>
+        <div class="gz-axes">
+          <label for="gXmax">Шкала <i>N</i> до <input class="ink" type="number" id="gXmax" min="1" step="any" inputmode="decimal"> Н</label>
+          <label for="gYmax">Шкала <i>F</i> до <input class="ink" type="number" id="gYmax" min="1" step="any" inputmode="decimal"> Н</label>
+          <label for="gSnap"><input type="checkbox" id="gSnap" checked> Прив’язка до сітки</label>
+        </div>
+        <canvas id="gCv" width="1000" height="640" role="img" aria-label="Поле для побудови графіка"></canvas>
+        <p class="response-hint" id="gHint" aria-live="polite"></p>
+        <div class="probe" id="gProbe" hidden>
+          <span id="gProbeTxt"></span>
+          <button class="btn sm primary" type="button" id="gUse">Взяти ці значення в розрахунок</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="step" id="step3">
+      <header><span class="no">3</span><h3>Коефіцієнт тертя за графіком</h3></header>
+      <p class="small">Виберіть на прямій довільну точку (інструмент «Зчитати значення») і запишіть її координати.</p>
+      <div class="ans-row">
+        <span class="af"><i>F</i><sub>тертя ковз</sub> = <input class="ink num" id="gF" data-k="gF" inputmode="decimal" autocomplete="off" aria-label="Сила тертя в обраній точці"> <span class="u">Н</span></span>
+        <span class="af"><i>N</i> = <input class="ink num" id="gN" data-k="gN" inputmode="decimal" autocomplete="off" aria-label="Сила реакції опори в обраній точці"> <span class="u">Н</span></span>
+      </div>
+      <div class="formula"><div>μ<sub>сер</sub> = <span class="frac"><span><i>F</i><sub>тертя ковз</sub></span><span><i>N</i></span></span></div></div>
+      <label class="wl" for="w3">Обчислення</label>
+      <textarea class="work" id="w3" data-k="w3" rows="3" spellcheck="false"></textarea>
+      <div class="ans-row">
+        <span class="af">μ<sub>сер</sub> = <input class="ink num" id="mu" data-k="mu" inputmode="decimal" autocomplete="off" aria-label="Середнє значення коефіцієнта тертя"></span>
+        <button class="btn primary" type="button" id="bC3">Перевірити</button>
+      </div>
+      <p class="fb" id="fbC3" aria-live="polite"></p>
+    </article>
+
+    <article class="step" id="step4">
+      <header><span class="no">4</span><h3>Відносна похибка (дані першого досліду)</h3></header>
+      <div class="formula">
+        <div>ε<sub><i>F</i></sub> = <span class="frac"><span>Δ<i>F</i><sub>тертя ковз</sub></span><span><i>F</i><sub>тертя ковз 1 дослід</sub></span></span>, &nbsp;Δ<i>F</i><sub>тертя ковз</sub> = 1 Н</div>
+        <div>ε<sub><i>N</i></sub> = <span class="frac"><span>Δ<i>N</i></span><span><i>N</i><sub>1 дослід</sub></span></span>, &nbsp;Δ<i>N</i> = 1 Н</div>
+        <div>ε<sub>μ</sub> = ε<sub><i>F</i></sub> + ε<sub><i>N</i></sub></div>
+      </div>
+      <label class="wl" for="w4">Обчислення</label>
+      <textarea class="work" id="w4" data-k="w4" rows="4" spellcheck="false"></textarea>
+      <div class="ans-row">
+        <span class="af">ε<sub><i>F</i></sub> = <input class="ink num" id="eF" data-k="eF" inputmode="decimal" autocomplete="off" aria-label="Відносна похибка сили тертя"></span>
+        <span class="af">ε<sub><i>N</i></sub> = <input class="ink num" id="eN" data-k="eN" inputmode="decimal" autocomplete="off" aria-label="Відносна похибка сили реакції"></span>
+        <span class="af">ε<sub>μ</sub> = <input class="ink num" id="eMu" data-k="eMu" inputmode="decimal" autocomplete="off" aria-label="Відносна похибка коефіцієнта тертя"></span>
+        <button class="btn primary" type="button" id="bC4">Перевірити</button>
+      </div>
+      <p class="fb" id="fbC4" aria-live="polite"></p>
+    </article>
+
+    <article class="step" id="step5">
+      <header><span class="no">5</span><h3>Абсолютна похибка</h3></header>
+      <div class="formula"><div>Δμ = ε<sub>μ</sub> · μ<sub>сер</sub></div></div>
+      <div class="ans-row">
+        <span class="af">Δμ = <input class="ink num" id="dMu" data-k="dMu" inputmode="decimal" autocomplete="off" aria-label="Абсолютна похибка"></span>
+        <button class="btn primary" type="button" id="bC5">Перевірити</button>
+      </div>
+      <p class="fb" id="fbC5" aria-live="polite"></p>
+    </article>
+
+    <article class="step" id="step6">
+      <header><span class="no">6</span><h3>Результат вимірювання</h3></header>
+      <div class="formula"><div>μ = μ<sub>сер</sub> ± Δμ</div></div>
+      <div class="ans-row">
+        <span class="af">μ = <input class="ink num" id="resMu" data-k="resMu" inputmode="decimal" autocomplete="off" aria-label="μ середнє у результаті"> ± <input class="ink num" id="resD" data-k="resD" inputmode="decimal" autocomplete="off" aria-label="Δμ у результаті"></span>
+        <button class="btn primary" type="button" id="bC6">Перевірити</button>
+      </div>
+      <p class="fb" id="fbC6" aria-live="polite"></p>
+    </article>
+  </section>
+
+  <!-- 4. ВИСНОВОК -->
+  <section id="concl">
+    <h2>4. Аналіз, висновок і запитання</h2>
+
+    <p>У висновку зазначте:</p>
+    <ul class="checks">
+      <li>величину, яку ви вимірювали</li>
+      <li>результат вимірювання</li>
+      <li>причини похибки</li>
+    </ul>
+    <label class="wl" for="concl-t">Висновок</label>
+    <textarea class="work" id="concl-t" data-k="concl" rows="7" spellcheck="false"></textarea>
+
+    <div style="margin-top:16px">
+      <h3>Контрольні запитання</h3>
+
+      <div style="margin-top:10px">
+        <p><b>1.</b> Вкажіть, чи може коефіцієнт тертя ковзання бути більшим за одиницю, і якщо може, то наскільки.</p>
+        <label class="wl" for="q1">Відповідь</label>
+        <textarea class="work" id="q1" data-k="q1" rows="3" spellcheck="false"></textarea>
+      </div>
+
+      <div style="margin-top:10px">
+        <p><b>2.</b> Три однакових однорідних тіла поклали на поверхню столу різними гранями (I – найменша площа дотику, III – найбільша) і, потягнувши за мотузку, привели в рух. У якому випадку сила тертя найбільша?</p>
+        <div class="row" style="margin-top:4px">
+          <select class="ink" id="q2" data-k="q2" aria-label="Відповідь на запитання 2">
+            <option value="">— оберіть —</option>
+            <option value="I">У випадку I</option>
+            <option value="II">У випадку II</option>
+            <option value="III">У випадку III</option>
+            <option value="eq">Однакова в усіх випадках</option>
+          </select>
+          <button class="btn primary" type="button" id="bQ2">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ2" aria-live="polite"></p>
+      </div>
+
+      <div style="margin-top:10px">
+        <p><b>3.</b> Тіло масою 150 г, рухаючись горизонтально під дією сили тертя, пройшло до зупинки відстань 120 см за 2 с. Визначте силу тертя.</p>
+        <label class="wl" for="q3w">Розв’язання</label>
+        <textarea class="work" id="q3w" data-k="q3w" rows="4" spellcheck="false"></textarea>
+        <div class="row" style="margin-top:4px">
+          <span class="af"><i>F</i> = <input class="ink num" id="q3F" data-k="q3F" inputmode="decimal" autocomplete="off" aria-label="Сила тертя, Н"> <span class="u">Н</span></span>
+          <button class="btn primary" type="button" id="bQ3">Перевірити</button>
+        </div>
+        <p class="fb" id="fbQ3" aria-live="polite"></p>
+      </div>
+
+      <div class="creative-task"><h3>Творче завдання</h3>
+        <p>Запишіть план експерименту зі з’ясування залежності коефіцієнта тертя ковзання від роду дотичних поверхонь. Проведіть експеримент у тренажері (список «Поверхня»), запишіть результати, зробіть висновок.</p>
+        <label class="wl" for="cr1">План</label>
+        <textarea class="work" id="cr1" data-k="cr1" rows="4" spellcheck="false"></textarea>
+        <label class="wl" for="cr2" style="margin-top:8px">Результати</label>
+        <textarea class="work" id="cr2" data-k="cr2" rows="5" spellcheck="false"></textarea>
+        <label class="wl" for="cr3" style="margin-top:8px">Висновок</label>
+        <textarea class="work" id="cr3" data-k="cr3" rows="3" spellcheck="false"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot no-print">
+    <div style="flex:1 1 260px;min-width:0">
+      <button class="btn primary" id="bReport" type="button">Скопіювати звіт для вчителя</button>
+      <textarea class="report" id="reportTxt" readonly hidden aria-label="Текст звіту"></textarea>
+      <p class="small" id="reportMsg" aria-live="polite" style="margin:4px 0 0"></p>
+    </div>
+    <div style="flex:1 1 280px;min-width:0">
+      <button class="btn primary" id="bPdf" type="button">Завантажити роботу у PDF</button>
+      <p class="small">Завантаж свою роботу у форматі PDF і прикріпи файл у Classroom. У вікні друку вибери «Зберегти як PDF».</p>
+    </div>
+    <button class="btn" id="bClear" type="button">Очистити сторінку</button>
+  </div>
+
+</main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var KEY='lab3-friction-v1';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var num=function(v){var t=String(v==null?'':v).replace(',','.').replace(/\s/g,'');return /^-?(\d+\.?\d*|\.\d+)$/.test(t)?parseFloat(t):NaN};
+var fmt=function(x,d){if(d==null)d=2;return isFinite(x)?x.toFixed(d).replace('.',','):'—'};
+var trimNum=function(x,d){if(!isFinite(x))return '';var s=x.toFixed(d==null?1:d);if(s.indexOf('.')>=0)s=s.replace(/0+$/,'').replace(/\.$/,'');return s.replace('.',',')};
+
+function fresh(){return {f:{},g:{}}}
+function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&j.f){var o=fresh();o.f=j.f;o.g=j.g||{};return o}}catch(e){}return fresh()}
+// Під час кожного відкриття сторінки всі поля порожні: старі записи не підвантажуються.
+try{localStorage.removeItem(KEY)}catch(e){}
+var S=fresh();
+var saveT;
+function setSt(t){$('#saveSt').textContent=t}
+function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem(KEY,JSON.stringify(S));setSt('Збережено у браузері')}catch(e){setSt('Не вдалося зберегти')}},350)}
+function setFb(el,cls,t){el.className='fb '+cls;el.textContent=t}
+
+/* ===== ДАНІ ДОСЛІДІВ ===== */
+var G=9.8;
+var MASS={c:50,g:40,m:80};
+var CFG=[
+ {name:'Ящик',items:['c']},
+ {name:'Ящик + дівчинка',items:['c','g']},
+ {name:'Ящик + чоловік',items:['c','m']},
+ {name:'Ящик + ящик',items:['c','c']},
+ {name:'Ящик + ящик + дівчинка',items:['c','c','g']},
+ {name:'Ящик + ящик + чоловік',items:['c','c','m']}
+];
+var SURF=[
+ {n:'Дерево',k:0.20,s:0.30,c:'#b98a52',seam:'#7a5224'},
+ {n:'Крига',k:0.03,s:0.05,c:'#bfe3f2',seam:'#8fbfd6'},
+ {n:'Бетон',k:0.45,s:0.60,c:'#a4a49f',seam:'#76766f'},
+ {n:'Гума',k:0.80,s:0.95,c:'#3d3d42',seam:'#232327'}
+];
+function cfgMass(i){var m=0;CFG[i].items.forEach(function(t){m+=MASS[t]});return m}
+
+/* Таблиця (рядки) */
+(function(){
+  var h='';
+  CFG.forEach(function(c,i){var n=i+1;
+    h+='<tr><td class="lbl">'+n+'. '+c.name+'</td>'+
+    '<td><input class="ink" id="F'+n+'" data-k="F'+n+'" inputmode="decimal" autocomplete="off" aria-label="Сила тертя, дослід '+n+'"></td>'+
+    '<td><input class="ink" id="m'+n+'" data-k="m'+n+'" inputmode="decimal" autocomplete="off" aria-label="Маса, дослід '+n+'"></td>'+
+    '<td><input class="ink" id="N'+n+'" data-k="N'+n+'" inputmode="decimal" autocomplete="off" aria-label="Сила реакції опори, дослід '+n+'"></td></tr>';
+  });
+  $('#dataTbody').innerHTML=h;
+  var cf='';
+  CFG.forEach(function(c,i){cf+='<button class="btn" type="button" data-cfg="'+i+'" aria-pressed="'+(i===0)+'">'+(i+1)+'. '+c.name+'</button>'});
+  $('#cfgs').innerHTML=cf;
+  $('#selSurf').innerHTML=SURF.map(function(s,i){return '<option value="'+i+'">'+s.n+'</option>'}).join('');
+})();
+
+/* ===== ТРЕНАЖЕР ===== */
+var cv=$('#simCv'),ctx=cv.getContext('2d');
+var W=1200,H=470,GY=372,CS=108,CX=740;
+var cfgIdx=0,surfIdx=0;
+var sim={F:0,v:0,x:0,m:50,fk:0,fs:0,fr:0,net:0};
+
+function recalc(){
+  var m=cfgMass(cfgIdx),sf=SURF[surfIdx];
+  sim.m=m;sim.fk=Math.round(sf.k*m*G);sim.fs=Math.round(sf.s*m*G);
+  var mx=Math.ceil((sim.fs+150)/50)*50,sl=$('#sF');
+  sl.max=mx;if(sim.F>mx)sim.F=mx;sl.value=sim.F;updF();
+}
+function updF(){$('#oF').textContent=sim.F+' Н'}
+function resetSim(){sim.F=0;sim.v=0;sim.fr=0;sim.net=0;$('#sF').value=0;updF()}
+function setF(v){var mx=parseFloat($('#sF').max);v=Math.max(0,Math.min(mx,Math.round(v)));sim.F=v;$('#sF').value=v;updF()}
+function pickCfg(i){
+  cfgIdx=i;$$('[data-cfg]').forEach(function(b){b.setAttribute('aria-pressed',String(+b.dataset.cfg===i))});
+  resetSim();recalc();$('#simMsg').textContent='';
+}
+$$('[data-cfg]').forEach(function(b){b.addEventListener('click',function(){pickCfg(+b.dataset.cfg)})});
+$('#selSurf').addEventListener('change',function(){surfIdx=+this.value;resetSim();recalc();$('#simMsg').textContent=surfIdx?'Поверхня змінена. Основний дослід виконуйте на дереві.':''});
+$('#sF').addEventListener('input',function(){sim.F=parseFloat(this.value);updF()});
+$$('[data-df]').forEach(function(b){b.addEventListener('click',function(){setF(sim.F+parseFloat(b.dataset.df))})});
+$('#bZero').addEventListener('click',function(){setF(0)});
+$('#bReset').addEventListener('click',function(){resetSim();sim.x=0;$('#simMsg').textContent=''});
+
+function phys(dt){
+  var F=sim.F;
+  if(sim.v<=0){
+    sim.v=0;
+    if(F<=sim.fs){sim.fr=F;sim.net=0;return}
+    sim.v=0.001;
+  }
+  sim.fr=sim.fk;sim.net=F-sim.fk;
+  var nv=sim.v+sim.net/sim.m*dt;
+  if(nv<=0){sim.v=0;if(F<=sim.fs){sim.fr=F;sim.net=0}}
+  else sim.v=Math.min(nv,60);
+  sim.x+=sim.v*dt;
+}
+function isUniform(){return sim.v>0.05&&Math.abs(sim.net)<0.5}
+
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath()}
+function circ(x,y,r,c){ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fillStyle=c;ctx.fill()}
+function tag(text,cx,cy){
+  ctx.font='bold 20px sans-serif';var w=ctx.measureText(text).width+18;
+  rr(cx-w/2,cy-14,w,28,8);ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();ctx.strokeStyle='#444';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#111';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,cx,cy+1);
+}
+function arrow(x0,x1,y,color){
+  var dir=x1>=x0?1:-1,len=Math.abs(x1-x0);if(len<2)return;
+  var hd=Math.min(26,len*0.9);
+  ctx.save();ctx.lineWidth=16;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineJoin='round';
+  ctx.globalAlpha=.95;
+  ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1-dir*hd,y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x1-dir*hd,y-20);ctx.lineTo(x1-dir*hd,y+20);ctx.closePath();ctx.fill();
+  ctx.lineWidth=2;ctx.strokeStyle='rgba(0,0,0,.45)';ctx.stroke();
+  ctx.restore();
+}
+function drawCrate(x,y){
+  rr(x,y,CS,CS,4);ctx.fillStyle='#c9964f';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#6e4a1f';ctx.stroke();
+  ctx.lineWidth=9;ctx.strokeStyle='#a97a38';ctx.strokeRect(x+9,y+9,CS-18,CS-18);
+  ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(x+12,y+12);ctx.lineTo(x+CS-12,y+CS-12);ctx.moveTo(x+CS-12,y+12);ctx.lineTo(x+12,y+CS-12);ctx.stroke();
+  ctx.lineWidth=2;ctx.strokeStyle='#6e4a1f';ctx.strokeRect(x+4.5,y+4.5,CS-9,CS-9);
+}
+function drawPerson(kind,sx,sy){
+  var man=kind==='m',shirt=man?'#1f2a4d':'#f2cc1b',skin=man?'#7a4b2a':'#f0c9a0',pants=man?'#8a7b66':'#8d8a85',hair=man?'#1b1b1b':'#8a5a2b';
+  var tw=man?38:32,th=man?58:48;
+  rr(sx-tw/2-18,sy-24,64,16,7);ctx.fillStyle=pants;ctx.fill();
+  rr(sx+22,sy-46,13,40,6);ctx.fillStyle=pants;ctx.fill();
+  rr(sx+30,sy-12,24,11,5);ctx.fillStyle=man?'#2b2b2b':'#cc2f2f';ctx.fill();
+  rr(sx-tw/2-18,sy-24-th+8,tw,th,9);ctx.fillStyle=shirt;ctx.fill();
+  var hx=sx-18,hy=sy-24-th-8;
+  circ(hx,hy,man?17:16,skin);
+  ctx.beginPath();ctx.arc(hx,hy,man?17:16,Math.PI,2*Math.PI);ctx.fillStyle=hair;ctx.fill();
+  if(!man){ctx.fillRect(hx-17,hy-2,6,24)}
+  circ(hx+6,hy+2,2,'#222');
+  if(man){ctx.lineWidth=2;ctx.strokeStyle='#111';ctx.beginPath();ctx.arc(hx+3,hy+2,5,0,2*Math.PI);ctx.stroke();ctx.beginPath();ctx.arc(hx+13,hy+2,5,0,2*Math.PI);ctx.stroke()}
+  ctx.lineWidth=7;ctx.strokeStyle=skin;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(sx-6,sy-24-th+22);ctx.lineTo(sx+26,sy-40);ctx.stroke();ctx.lineCap='butt';
+}
+function drawRobot(rx,hx,hy){
+  var c='#e8761d',d='#b95510';
+  ctx.lineCap='round';
+  ctx.lineWidth=15;ctx.strokeStyle=d;ctx.beginPath();ctx.moveTo(rx-8,GY-66);ctx.lineTo(rx-12,GY-4);ctx.stroke();
+  ctx.strokeStyle=c;ctx.beginPath();ctx.moveTo(rx+8,GY-66);ctx.lineTo(rx+14,GY-4);ctx.stroke();
+  rr(rx-22,GY-138,44,76,14);ctx.fillStyle=c;ctx.fill();
+  circ(rx,GY-158,17,c);
+  ctx.lineWidth=13;ctx.strokeStyle=c;ctx.beginPath();ctx.moveTo(rx+12,GY-120);ctx.lineTo(hx,hy);ctx.stroke();
+  circ(hx,hy,8,d);
+  ctx.lineCap='butt';
+}
+function drawGauge(){
+  var gx=150,gy=150,R=108;
+  ctx.save();
+  circ(gx,gy,R+8,'rgba(255,255,255,.96)');ctx.lineWidth=3;ctx.strokeStyle='#444';ctx.beginPath();ctx.arc(gx,gy,R+8,0,2*Math.PI);ctx.stroke();
+  ctx.fillStyle='#111';ctx.font='bold 19px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Швидкість',gx,gy-R+26);
+  var MAXV=30;
+  for(var v=0;v<=MAXV;v+=5){
+    var a=Math.PI-Math.PI*v/MAXV,cx=Math.cos(a),cy=-Math.sin(a);
+    ctx.lineWidth=3;ctx.strokeStyle='#222';ctx.beginPath();ctx.moveTo(gx+cx*(R-4),gy+cy*(R-4));ctx.lineTo(gx+cx*(R-18),gy+cy*(R-18));ctx.stroke();
+    ctx.font='bold 15px sans-serif';ctx.fillText(String(v),gx+cx*(R-34),gy+cy*(R-34));
+  }
+  var va=Math.PI-Math.PI*Math.min(sim.v,MAXV)/MAXV;
+  ctx.lineWidth=4;ctx.strokeStyle='#c1121f';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+Math.cos(va)*(R-24),gy-Math.sin(va)*(R-24));ctx.stroke();
+  circ(gx,gy,7,'#222');
+  rr(gx-58,gy+22,116,34,10);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#444';ctx.stroke();
+  ctx.fillStyle='#111';ctx.font='bold 21px sans-serif';ctx.fillText(fmt(sim.v,1)+' м/с',gx,gy+40);
+  ctx.restore();
+}
+function draw(){
+  var sf=SURF[surfIdx];
+  var sky=ctx.createLinearGradient(0,0,0,GY);sky.addColorStop(0,'#8fcdf2');sky.addColorStop(1,'#e8f6fd');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+  // гори (паралакс)
+  var o2=(sim.x*9)%800,i;
+  ctx.fillStyle='#8da1b5';
+  for(i=-1;i<3;i++){var bx=i*800-o2+150;ctx.beginPath();ctx.moveTo(bx,GY);ctx.lineTo(bx+150,GY-130);ctx.lineTo(bx+300,GY);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(bx+330,GY);ctx.lineTo(bx+440,GY-90);ctx.lineTo(bx+560,GY);ctx.closePath();ctx.fill()}
+  // хмари
+  var o1=(sim.x*18)%1400;
+  ctx.fillStyle='rgba(255,255,255,.95)';
+  for(i=-1;i<2;i++){[[420,70],[900,120]].forEach(function(p){var cx=p[0]+i*1400-o1;
+    ctx.beginPath();ctx.ellipse(cx,p[1],70,26,0,0,2*Math.PI);ctx.ellipse(cx+45,p[1]-12,45,26,0,0,2*Math.PI);ctx.ellipse(cx-40,p[1]-8,38,20,0,0,2*Math.PI);ctx.fill()})}
+  // поверхня
+  ctx.fillStyle=sf.c;ctx.fillRect(0,GY,W,H-GY);
+  var off=(sim.x*45)%120;ctx.strokeStyle=sf.seam;ctx.lineWidth=2;
+  for(i=-1;i<12;i++){var lx=i*120-off;ctx.beginPath();ctx.moveTo(lx,GY+3);ctx.lineTo(lx,GY+36);ctx.stroke()}
+  ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,GY+1.5);ctx.lineTo(W,GY+1.5);ctx.moveTo(0,GY+38);ctx.lineTo(W,GY+38);ctx.stroke();
+  ctx.fillStyle='rgba(20,12,4,.62)';ctx.fillRect(0,GY+40,W,H-GY-40);
+  // предмети
+  var its=CFG[cfgIdx].items,nc=0;
+  its.forEach(function(t){if(t==='c')nc++});
+  var k;
+  for(k=0;k<nc;k++){drawCrate(CX-CS/2,GY-CS*(k+1))}
+  its.forEach(function(t){if(t!=='c')drawPerson(t,CX-4,GY-CS*nc)});
+  for(k=0;k<nc;k++)tag('50 кг',CX,GY-CS*k-CS/2);
+  its.forEach(function(t){if(t!=='c'){var top=GY-CS*nc-(t==='m'?112:102);tag(MASS[t]+' кг',CX-14,top)}});
+  drawRobot(CX-CS/2-100,CX-CS/2-2,GY-72);
+  // стрілки сил
+  var ay=GY-CS/2,mxF=Math.max(sim.F,sim.fr,100),kf=Math.min(0.9,300/mxF);
+  if(sim.F>0)arrow(CX,CX+Math.max(8,sim.F*kf),ay,'#f28c00');
+  if(sim.fr>0)arrow(CX,CX-Math.max(8,sim.fr*kf),ay,'#d1242a');
+  // підписи сил
+  ctx.font='bold 21px sans-serif';ctx.textBaseline='middle';
+  ctx.textAlign='left';ctx.fillStyle='#ffb3b3';ctx.fillText('◄ Сила тертя: '+Math.round(sim.fr)+' Н',200,GY+78);
+  ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText('Сума сил = '+trimNum(sim.net,1)+' Н',W/2+40,GY+78);
+  ctx.textAlign='right';ctx.fillStyle='#ffd08a';ctx.fillText('Прикладена сила: '+sim.F+' Н ►',W-30,GY+78);
+  drawGauge();
+}
+var cache={};
+function info(){
+  var v=fmt(sim.v,1)+' м/с',net=trimNum(sim.net,1)+' Н',st,uni=false;
+  if(sim.v<=0)st=sim.F===0?'Ящик стоїть':'Ящик стоїть (тертя спокою)';
+  else if(isUniform()){st='Рівномірний рух';uni=true}
+  else st=sim.net>0?'Прискорюється':'Гальмує';
+  if(cache.v!==v){$('#iV').textContent=v;cache.v=v}
+  if(cache.n!==net){$('#iNet').textContent=net;cache.n=net}
+  if(cache.s!==st){var e=$('#iState');e.textContent=st;e.className='chip'+(uni?' uni':'');cache.s=st}
+}
+var lastTs=null;
+function loop(ts){
+  if(lastTs==null)lastTs=ts;
+  var dt=Math.min(0.05,(ts-lastTs)/1000);lastTs=ts;
+  phys(dt);draw();info();
+  requestAnimationFrame(loop);
+}
+
+$('#bSave').addEventListener('click',function(){
+  var n=cfgIdx+1,msg=$('#simMsg');
+  if(surfIdx!==0){msg.textContent='Основний дослід виконується на дерев’яній поверхні. Оберіть у списку «Дерево».';return}
+  if(!isUniform()){msg.textContent='Рух ще не рівномірний. Ящик має їхати, а сума сил дорівнювати нулю. Підберіть прикладену силу.';return}
+  var val=String(Math.round(sim.fr));
+  S.f['F'+n]=val;$('#F'+n).value=val;save();refresh();
+  msg.textContent='У рядок '+n+' записано силу тертя ковзання '+val+' Н. Масу та N впишіть самостійно.';
+});
+
+/* ===== ПЕРЕВІРКА ТАБЛИЦІ ===== */
+$('#bChkTbl').addEventListener('click',function(){
+  var fb=$('#fbTbl'),bad=[],filled=0;
+  for(var i=1;i<=6;i++){
+    var m=num(S.f['m'+i]),N=num(S.f['N'+i]),F=num(S.f['F'+i]),em=cfgMass(i-1),eF=Math.round(0.2*em*G);
+    if(!isNaN(m)||!isNaN(N)||!isNaN(F))filled++;
+    if(!isNaN(m)&&Math.abs(m-em)>0.01)bad.push('рядок '+i+': перевірте масу (додайте маси всіх тіл)');
+    if(!isNaN(N)&&!isNaN(m)){var ok=Math.abs(N-m*9.8)/N<=0.03||Math.abs(N-m*10)/N<=0.03;if(!ok)bad.push('рядок '+i+': N має дорівнювати m·g')}
+    if(!isNaN(F)&&Math.abs(F-eF)>2)bad.push('рядок '+i+': при рівномірному русі сила тертя дорівнює прикладеній силі, спробуйте виміряти ще раз');
+  }
+  if(!filled){setFb(fb,'','Спочатку заповніть таблицю.');return}
+  if(bad.length)setFb(fb,'bad',bad.join('; ')+'.');
+  else setFb(fb,'ok','Помилок не знайдено (заповнено рядків: '+filled+' з 6).');
+});
+
+/* ===== ПЕРЕВІРКИ РОЗРАХУНКІВ ===== */
+function near(a,b,rel,abs){return isFinite(a)&&isFinite(b)&&Math.abs(a-b)<=Math.max(Math.abs(b)*rel,abs||0)}
+$('#bC3').addEventListener('click',function(){
+  var F=num(S.f.gF),N=num(S.f.gN),mu=num(S.f.mu),fb=$('#fbC3');
+  if(isNaN(F)||isNaN(N)||F<=0||N<=0){setFb(fb,'','Спочатку впишіть F і N з графіка.');return}
+  if(isNaN(mu)){setFb(fb,'','Впишіть μ.');return}
+  var e=F/N;
+  if(near(mu,e,0.03,0.0005)){
+    var d=Math.abs(mu-0.2)<=0.04?'':' Порівняйте з очікуванням для дерева по дереву.';
+    setFb(fb,'ok','Правильно: μ = '+fmt(F,1)+'/'+fmt(N,1)+' ≈ '+fmt(e,3)+'.'+d);
+  } else setFb(fb,'bad','Перевірте: μ = F/N. З ваших значень виходить приблизно '+fmt(e,3)+'.');
+});
+$('#bC4').addEventListener('click',function(){
+  var F1=num(S.f.F1),N1=num(S.f.N1),eF=num(S.f.eF),eN=num(S.f.eN),eM=num(S.f.eMu),fb=$('#fbC4');
+  if(isNaN(F1)||isNaN(N1)||F1<=0||N1<=0){setFb(fb,'','Спочатку заповніть у таблиці F і N першого досліду.');return}
+  var msg=[],ok=true;
+  var xF=1/F1,xN=1/N1;
+  if(isNaN(eF)||!near(eF,xF,0.06,0.0003)){ok=false;msg.push('ε_F = ΔF/F₁ = 1/'+trimNum(F1,2)+', перевірте')}
+  if(isNaN(eN)||!near(eN,xN,0.06,0.0003)){ok=false;msg.push('ε_N = ΔN/N₁ = 1/'+trimNum(N1,2)+', перевірте')}
+  if(isNaN(eM)||!near(eM,xF+xN,0.06,0.0003)){ok=false;msg.push('ε_μ = ε_F + ε_N, перевірте')}
+  if(ok)setFb(fb,'ok','Правильно: ε_μ ≈ '+fmt(xF+xN,4)+'.');else setFb(fb,'bad',msg.join('; ')+'.');
+});
+$('#bC5').addEventListener('click',function(){
+  var eM=num(S.f.eMu),mu=num(S.f.mu),d=num(S.f.dMu),fb=$('#fbC5');
+  if(isNaN(eM)||isNaN(mu)){setFb(fb,'','Спочатку знайдіть μ_сер і ε_μ.');return}
+  if(isNaN(d)){setFb(fb,'','Впишіть Δμ.');return}
+  var x=eM*mu;
+  if(near(d,x,0.06,0.0003))setFb(fb,'ok','Правильно: Δμ = ε_μ · μ_сер ≈ '+fmt(x,4)+'.');
+  else setFb(fb,'bad','Перевірте: Δμ = ε_μ · μ_сер. З ваших значень виходить приблизно '+fmt(x,4)+'.');
+});
+$('#bC6').addEventListener('click',function(){
+  var mu=num(S.f.mu),d=num(S.f.dMu),rm=num(S.f.resMu),rd=num(S.f.resD),fb=$('#fbC6');
+  if(isNaN(rm)||isNaN(rd)){setFb(fb,'','Впишіть обидва числа.');return}
+  if(isNaN(mu)||isNaN(d)){setFb(fb,'','Спочатку знайдіть μ_сер і Δμ.');return}
+  var ok1=near(rm,mu,0.05,0.001),ok2=near(rd,d,0.1,0.001);
+  if(ok1&&ok2)setFb(fb,'ok','Результат записано правильно: μ = '+fmt(rm,2)+' ± '+fmt(rd,2)+'.');
+  else setFb(fb,'bad','Перенесіть у запис ваші значення μ_сер та Δμ.');
+});
+
+/* ===== КОНТРОЛЬНІ ЗАПИТАННЯ ===== */
+$('#bQ2').addEventListener('click',function(){
+  var v=S.f.q2,fb=$('#fbQ2');
+  if(!v){setFb(fb,'','Оберіть відповідь.');return}
+  if(v==='eq')setFb(fb,'ok','Правильно. Сила тертя ковзання не залежить від площі дотику: F = μN, а N однакова.');
+  else setFb(fb,'bad','Подумайте: від чого залежить F = μN? Чи змінюється N, коли міняється грань?');
+});
+$('#bQ3').addEventListener('click',function(){
+  var v=num(S.f.q3F),fb=$('#fbQ3');
+  if(isNaN(v)){setFb(fb,'','Впишіть відповідь.');return}
+  // v0 = 2s/t = 1,2 м/с; a = v0/t = 0,6 м/с²; F = ma = 0,09 Н
+  if(near(v,0.09,0.04,0.002))setFb(fb,'ok','Правильно! v₀ = 2s/t = 1,2 м/с; a = v₀/t = 0,6 м/с²; F = ma = 0,15 · 0,6 = 0,09 Н.');
+  else setFb(fb,'bad','Перевірте: 150 г = 0,15 кг; 120 см = 1,2 м. Тіло зупиняється: s = v₀t/2, a = v₀/t, F = ma.');
+});
+
+/* ===== ГРАФІК ===== */
+var gcv=$('#gCv'),gx=gcv.getContext('2d');
+var GW=1000,GH=640,ML=88,MR=40,MT=40,MB=76;
+var GS=S.g.graph=S.g.graph||{xmax:2000,ymax:400,snap:true,objs:[]};
+var gTool='pt',gTemp=null,gProbe=null,gDown=false,gPen=null;
+var HINTS={pt:'Точка: торкніться поля там, де має бути точка (N; F).',ln:'Пряма: натисніть, перетягніть і відпустіть. Проведіть пряму через область точок.',pen:'Олівець: малюйте від руки пальцем, стилусом або мишею.',rd:'Зчитати: торкніться прямої або будь-якого місця. З’являться значення F та N.',er:'Гумка: торкніться точки, прямої чи лінії, щоб стерти.'};
+function nstep(t){var p=Math.pow(10,Math.floor(Math.log10(t))),m=t/p;return (m<=1?1:m<=2?2:m<=5?5:10)*p}
+function steps(){return {x:nstep(GS.xmax/20),y:nstep(GS.ymax/20)}}
+function PX(v){return ML+v/GS.xmax*(GW-ML-MR)}
+function PY(v){return GH-MB-v/GS.ymax*(GH-MT-MB)}
+function DX(p){return (p-ML)/(GW-ML-MR)*GS.xmax}
+function DY(p){return (GH-MB-p)/(GH-MT-MB)*GS.ymax}
+function numLab(v,st){return st<1?trimNum(v,2):String(Math.round(v))}
+function gDraw(){
+  var st=steps(),i,v;
+  gx.clearRect(0,0,GW,GH);gx.fillStyle='#fffefa';gx.fillRect(0,0,GW,GH);
+  // сітка
+  for(i=0;i*st.x<=GS.xmax+1e-9;i++){v=i*st.x;gx.strokeStyle=(i%5)?'#cfe0f1':'#8fb4da';gx.lineWidth=(i%5)?1:1.6;gx.beginPath();gx.moveTo(PX(v),MT);gx.lineTo(PX(v),GH-MB);gx.stroke()}
+  for(i=0;i*st.y<=GS.ymax+1e-9;i++){v=i*st.y;gx.strokeStyle=(i%5)?'#cfe0f1':'#8fb4da';gx.lineWidth=(i%5)?1:1.6;gx.beginPath();gx.moveTo(ML,PY(v));gx.lineTo(GW-MR,PY(v));gx.stroke()}
+  // осі
+  gx.strokeStyle='#111';gx.fillStyle='#111';gx.lineWidth=2.5;
+  gx.beginPath();gx.moveTo(ML,GH-MB);gx.lineTo(GW-MR+18,GH-MB);gx.moveTo(ML,GH-MB);gx.lineTo(ML,MT-18);gx.stroke();
+  gx.beginPath();gx.moveTo(GW-MR+20,GH-MB);gx.lineTo(GW-MR+6,GH-MB-6);gx.lineTo(GW-MR+6,GH-MB+6);gx.closePath();gx.fill();
+  gx.beginPath();gx.moveTo(ML,MT-20);gx.lineTo(ML-6,MT-6);gx.lineTo(ML+6,MT-6);gx.closePath();gx.fill();
+  gx.font='17px sans-serif';gx.textBaseline='top';gx.textAlign='center';
+  for(i=0;i*st.x<=GS.xmax+1e-9;i+=5){v=i*st.x;if(i>0){gx.fillText(numLab(v,st.x),PX(v),GH-MB+8)}}
+  gx.textAlign='right';gx.textBaseline='middle';
+  for(i=0;i*st.y<=GS.ymax+1e-9;i+=5){v=i*st.y;gx.fillText(i===0?'0':numLab(v,st.y),ML-8,PY(v)+(i===0?10:0))}
+  gx.font='italic 20px serif';gx.textAlign='right';gx.textBaseline='bottom';gx.fillText('N, Н',GW-8,GH-MB+48);
+  gx.textAlign='left';gx.textBaseline='top';gx.fillText('F тертя ковз, Н',ML+14,6);
+  // об’єкти
+  gx.lineCap='round';gx.lineJoin='round';
+  GS.objs.forEach(function(o){
+    if(o.t==='pen'){gx.strokeStyle='#222';gx.lineWidth=2.5;gx.beginPath();o.p.forEach(function(q,k){k?gx.lineTo(PX(q[0]),PY(q[1])):gx.moveTo(PX(q[0]),PY(q[1]))});gx.stroke()}
+    else if(o.t==='ln')dLine(o,'#1b3fb0');
+  });
+  if(gTemp)dLine(gTemp,'rgba(27,63,176,.6)');
+  if(gPen&&gPen.length>1){gx.strokeStyle='#222';gx.lineWidth=2.5;gx.beginPath();gPen.forEach(function(q,k){k?gx.lineTo(PX(q[0]),PY(q[1])):gx.moveTo(PX(q[0]),PY(q[1]))});gx.stroke()}
+  GS.objs.forEach(function(o){if(o.t==='p'){gx.beginPath();gx.arc(PX(o.x),PY(o.y),6,0,2*Math.PI);gx.fillStyle='#c1121f';gx.fill();gx.lineWidth=2;gx.strokeStyle='#fff';gx.stroke()}});
+  // зчитування
+  if(gProbe){
+    var px=PX(gProbe.x),py=PY(gProbe.y);
+    gx.save();gx.setLineDash([7,5]);gx.strokeStyle='#0b7a43';gx.lineWidth=2;
+    gx.beginPath();gx.moveTo(px,GH-MB);gx.lineTo(px,py);gx.lineTo(ML,py);gx.stroke();gx.restore();
+    gx.beginPath();gx.arc(px,py,7,0,2*Math.PI);gx.fillStyle='#0b7a43';gx.fill();
+    var t='N = '+trimNum(gProbe.x,1)+' Н;  F = '+trimNum(gProbe.y,1)+' Н';
+    gx.font='bold 18px sans-serif';var w=gx.measureText(t).width+16,bx=Math.min(px+12,GW-w-6),by=Math.max(py-44,MT+4);
+    gx.fillStyle='rgba(255,255,255,.96)';gx.fillRect(bx,by,w,30);gx.strokeStyle='#0b7a43';gx.lineWidth=1.5;gx.strokeRect(bx,by,w,30);
+    gx.fillStyle='#0b4d2b';gx.textAlign='left';gx.textBaseline='middle';gx.fillText(t,bx+8,by+15);
+  }
+}
+function dLine(o,c){gx.strokeStyle=c;gx.lineWidth=3;gx.beginPath();gx.moveTo(PX(o.x1),PY(o.y1));gx.lineTo(PX(o.x2),PY(o.y2));gx.stroke()}
+function gPos(e){var r=gcv.getBoundingClientRect();return [(e.clientX-r.left)*GW/r.width,(e.clientY-r.top)*GH/r.height]}
+function inPlot(p){return p[0]>=ML-2&&p[0]<=GW-MR+2&&p[1]>=MT-2&&p[1]<=GH-MB+2}
+function toData(p,snap){
+  var x=Math.max(0,Math.min(GS.xmax,DX(p[0]))),y=Math.max(0,Math.min(GS.ymax,DY(p[1])));
+  if(snap&&GS.snap){var st=steps();x=Math.round(x/st.x)*st.x;y=Math.round(y/st.y)*st.y}
+  return [x,y];
+}
+function segDist(px,py,ax,ay,bx,by){
+  var dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy,t=l?Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/l)):0;
+  var cx=ax+t*dx,cy=ay+t*dy;return {d:Math.hypot(px-cx,py-cy),x:cx,y:cy};
+}
+function eraseAt(p){
+  var n=GS.objs.length;
+  GS.objs=GS.objs.filter(function(o){
+    if(o.t==='p')return Math.hypot(PX(o.x)-p[0],PY(o.y)-p[1])>14;
+    if(o.t==='ln')return segDist(p[0],p[1],PX(o.x1),PY(o.y1),PX(o.x2),PY(o.y2)).d>12;
+    for(var k=1;k<o.p.length;k++){if(segDist(p[0],p[1],PX(o.p[k-1][0]),PY(o.p[k-1][1]),PX(o.p[k][0]),PY(o.p[k][1])).d<=12)return false}
+    return true;
+  });
+  if(GS.objs.length!==n){gDraw();save()}
+}
+function probeAt(p){
+  var best=null;
+  GS.objs.forEach(function(o){if(o.t==='ln'){var s=segDist(p[0],p[1],PX(o.x1),PY(o.y1),PX(o.x2),PY(o.y2));if(s.d<=18&&(!best||s.d<best.d))best=s}});
+  var d=best?[DX(best.x),DY(best.y)]:toData(p,false);
+  gProbe={x:Math.max(0,Math.min(GS.xmax,d[0])),y:Math.max(0,Math.min(GS.ymax,d[1]))};
+  $('#gProbe').hidden=false;
+  $('#gProbeTxt').textContent='N = '+trimNum(gProbe.x,1)+' Н, F = '+trimNum(gProbe.y,1)+' Н';
+  gDraw();
+}
+gcv.addEventListener('pointerdown',function(e){
+  var p=gPos(e);e.preventDefault();
+  try{gcv.setPointerCapture(e.pointerId)}catch(x){}
+  if(gTool==='er'){gDown=true;eraseAt(p);return}
+  if(gTool==='rd'){gDown=true;if(inPlot(p))probeAt(p);return}
+  if(!inPlot(p))return;
+  gDown=true;
+  if(gTool==='pt'){var d=toData(p,true);GS.objs.push({t:'p',x:d[0],y:d[1]});gDown=false;gDraw();save()}
+  else if(gTool==='ln'){var a=toData(p,true);gTemp={t:'ln',x1:a[0],y1:a[1],x2:a[0],y2:a[1]};gDraw()}
+  else if(gTool==='pen'){gPen=[toData(p,false)];gDraw()}
+});
+gcv.addEventListener('pointermove',function(e){
+  if(!gDown)return;var p=gPos(e);
+  if(gTool==='er')eraseAt(p);
+  else if(gTool==='rd'){if(inPlot(p))probeAt(p)}
+  else if(gTool==='ln'&&gTemp){var b=toData(p,true);gTemp.x2=b[0];gTemp.y2=b[1];gDraw()}
+  else if(gTool==='pen'&&gPen){gPen.push(toData(p,false));gDraw()}
+});
+['pointerup','pointercancel'].forEach(function(ev){gcv.addEventListener(ev,function(){
+  if(!gDown)return;gDown=false;
+  if(gTool==='ln'&&gTemp){
+    if(Math.hypot(PX(gTemp.x2)-PX(gTemp.x1),PY(gTemp.y2)-PY(gTemp.y1))>8)GS.objs.push(gTemp);
+    gTemp=null;gDraw();save();
+  } else if(gTool==='pen'&&gPen){
+    if(gPen.length>1)GS.objs.push({t:'pen',p:gPen});
+    gPen=null;gDraw();save();
+  }
+})});
+$$('[data-tool]').forEach(function(b){b.addEventListener('click',function(){
+  gTool=b.dataset.tool;$$('[data-tool]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+  $('#gHint').textContent=HINTS[gTool];gcv.style.cursor=gTool==='er'?'cell':'crosshair';
+})});
+$('#gUndo').addEventListener('click',function(){GS.objs.pop();gDraw();save()});
+$('#gClr').addEventListener('click',function(){
+  if(!GS.objs.length)return;
+  if(!confirm('Стерти все з графіка?'))return;
+  GS.objs=[];gProbe=null;$('#gProbe').hidden=true;gDraw();save();
+});
+function niceCeil(v){var p=Math.pow(10,Math.floor(Math.log10(v))),m=v/p,pick=[1,1.2,1.5,2,2.5,3,4,5,6,8,10];for(var i=0;i<pick.length;i++){if(m<=pick[i]+1e-9)return pick[i]*p}return 10*p}
+$('#gAuto').addEventListener('click',function(){
+  var pts=[],i;
+  for(i=1;i<=6;i++){var Nn=num(S.f['N'+i]),Ff=num(S.f['F'+i]);if(Nn>0&&Ff>0)pts.push([Nn,Ff])}
+  if(!pts.length){$('#gHint').textContent='Заповніть у таблиці F і N: тоді точки з’являться автоматично.';return}
+  GS.objs=GS.objs.filter(function(o){return !o.auto});
+  var mx=0,my=0;
+  pts.forEach(function(q){GS.objs.push({t:'p',x:q[0],y:q[1],auto:true});mx=Math.max(mx,q[0]);my=Math.max(my,q[1])});
+  GS.xmax=niceCeil(mx*1.1);GS.ymax=niceCeil(my*1.1);
+  $('#gXmax').value=GS.xmax;$('#gYmax').value=GS.ymax;
+  $('#gHint').textContent='Точки з таблиці нанесено ('+pts.length+'). Тепер проведіть пряму інструментом «Пряма».';
+  gDraw();save();
+});
+$('#gXmax').addEventListener('input',function(){var v=num(this.value);if(v>0){GS.xmax=v;gDraw();save()}});
+$('#gYmax').addEventListener('input',function(){var v=num(this.value);if(v>0){GS.ymax=v;gDraw();save()}});
+$('#gSnap').addEventListener('change',function(){GS.snap=this.checked;save()});
+$('#gUse').addEventListener('click',function(){
+  if(!gProbe)return;
+  var f=trimNum(gProbe.y,1),n=trimNum(gProbe.x,1);
+  S.f.gF=f;S.f.gN=n;$('#gF').value=f;$('#gN').value=n;save();refresh();
+  $('#gProbeTxt').textContent='Записано: F = '+f+' Н, N = '+n+' Н (крок 3).';
+});
+
+/* ===== ПОЛЯ ФОРМИ ===== */
+var TRACK=['p1','F1','m1','N1','F2','m2','N2','F3','m3','N3','F4','m4','N4','F5','m5','N5','F6','m6','N6','w1','gF','gN','mu','eF','eN','eMu','dMu','resMu','resD','concl','q1','q2','q3F','cr1'];
+function fillAll(){$$('[data-k]').forEach(function(el){el.value=S.f[el.dataset.k]||''})}
+function bindAll(){$$('[data-k]').forEach(function(el){var h=function(){S.f[el.dataset.k]=el.value;save();refresh()};el.addEventListener('input',h);el.addEventListener('change',h)})}
+function refresh(){
+  var n=TRACK.filter(function(k){return String(S.f[k]||'').trim()!==''}).length;
+  $('#progTxt').textContent=n+' з '+TRACK.length;
+  $('#progBar').style.width=(100*n/TRACK.length)+'%';
+}
+function initDate(){if(!S.f.date){try{S.f.date=new Date().toLocaleDateString('uk-UA')}catch(e){}}}
+
+/* ===== PDF / ЗВІТ / ОЧИЩЕННЯ ===== */
+$('#bPdf').addEventListener('click',function(){
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  window.print();
+});
+$('#bReport').addEventListener('click',function(){
+  var L=['ЛАБОРАТОРНА РОБОТА № 3 — коефіцієнт тертя ковзання\n'];
+  L.push('Учень: '+(S.f.fio||'—')+', клас: '+(S.f.klass||'—')+', дата: '+(S.f.date||'—')+'\n');
+  for(var i=1;i<=6;i++)L.push(i+'. '+CFG[i-1].name+': F='+(S.f['F'+i]||'—')+' Н, m='+(S.f['m'+i]||'—')+' кг, N='+(S.f['N'+i]||'—')+' Н');
+  L.push('\nμ_сер = '+(S.f.mu||'—')+';  ε_μ = '+(S.f.eMu||'—')+';  Δμ = '+(S.f.dMu||'—'));
+  L.push('Результат: μ = '+(S.f.resMu||'—')+' ± '+(S.f.resD||'—'));
+  if(S.f.concl)L.push('\nВисновок: '+S.f.concl);
+  var txt=L.join('\n'),ta=$('#reportTxt');ta.hidden=false;ta.value=txt;
+  try{navigator.clipboard.writeText(txt).then(function(){$('#reportMsg').textContent='Скопійовано!'},function(){$('#reportMsg').textContent='Виділіть текст і скопіюйте вручну.'})}catch(e){$('#reportMsg').textContent='Виділіть текст у полі нижче й скопіюйте.'}
+});
+$('#bClear').addEventListener('click',function(){
+  if(!confirm('Очистити всі введені дані?'))return;
+  try{localStorage.removeItem(KEY)}catch(e){}
+  S=fresh();location.reload();
+});
+
+/* ===== РЕДАКТОРИ ВІДПОВІДЕЙ (текст / малювання / зображення) ===== */
+function mountResponseEditors(){
+  S.g.responseEditors=S.g.responseEditors||{};
+  $$('.work').forEach(function(ta){
+    if(ta.dataset.editorMounted)return;ta.dataset.editorMounted='1';
+    var key=ta.dataset.k||ta.id,state=S.g.responseEditors[key]||{mode:'text',draw:'',image:''};
+    S.g.responseEditors[key]=state;
+    var wrap=document.createElement('div');wrap.className='response-editor';
+    var tabs=document.createElement('div');tabs.className='response-tabs';tabs.setAttribute('role','group');
+    [['text','Ввести текст'],['draw','Малювати від руки'],['image','Вставити зображення']].forEach(function(it){
+      var b=document.createElement('button');b.type='button';b.className='btn';b.textContent=it[1];b.dataset.mode=it[0];tabs.appendChild(b);
+    });
+    var textPanel=document.createElement('div');textPanel.className='response-panel';textPanel.style.padding='0';
+    var drawPanel=document.createElement('div');drawPanel.className='response-panel';
+    var tools=document.createElement('div');tools.className='response-tools';
+    var pen=document.createElement('button');pen.type='button';pen.className='btn sm';pen.textContent='Ручка';
+    var er=document.createElement('button');er.type='button';er.className='btn sm';er.textContent='Гумка';
+    var clr=document.createElement('button');clr.type='button';clr.className='btn sm';clr.textContent='Очистити';
+    tools.append(pen,er,clr);
+    var rCv=document.createElement('canvas');rCv.className='response-canvas';rCv.width=900;rCv.height=220;rCv.setAttribute('aria-label','Поле рукописної відповіді');
+    var hint=document.createElement('p');hint.className='response-hint';hint.textContent='Малюйте мишею, пальцем або стилусом.';
+    drawPanel.append(tools,rCv,hint);
+    var imgPanel=document.createElement('div');imgPanel.className='response-panel';imgPanel.tabIndex=0;
+    var upLabel=document.createElement('label');upLabel.className='response-upload';upLabel.textContent='Вибрати зображення ';
+    var fileEl=document.createElement('input');fileEl.type='file';fileEl.accept='image/*';upLabel.appendChild(fileEl);
+    var pHint=document.createElement('p');pHint.className='response-hint';pHint.textContent='Або вставте через Ctrl+V.';
+    var prevImg=document.createElement('img');prevImg.className='response-image-preview';prevImg.alt='';
+    var clrImg=document.createElement('button');clrImg.type='button';clrImg.className='btn sm';clrImg.textContent='Видалити';
+    imgPanel.append(upLabel,pHint,prevImg,clrImg);
+    ta.parentNode.insertBefore(wrap,ta);
+    textPanel.appendChild(ta);wrap.append(tabs,textPanel,drawPanel,imgPanel);
+    function setMode(mode){
+      state.mode=mode;S.g.responseEditors[key]=state;
+      textPanel.hidden=mode!=='text';drawPanel.hidden=mode!=='draw';imgPanel.hidden=mode!=='image';
+      Array.prototype.forEach.call(tabs.children,function(b){b.setAttribute('aria-pressed',String(b.dataset.mode===mode))});
+      save();
+    }
+    var rCtx=rCv.getContext('2d'),rDown=false,rLast=null,rTool='pen';rCtx.lineCap='round';rCtx.lineJoin='round';
+    if(state.draw){var rIm=new Image();rIm.onload=function(){rCtx.drawImage(rIm,0,0,rCv.width,rCv.height)};rIm.src=state.draw}
+    function showPrev(){if(state.image){prevImg.src=state.image;prevImg.hidden=false}else{prevImg.removeAttribute('src');prevImg.hidden=true}}
+    showPrev();
+    function rPos(e){var r=rCv.getBoundingClientRect();return [(e.clientX-r.left)*rCv.width/r.width,(e.clientY-r.top)*rCv.height/r.height]}
+    function rLine(a,b){rCtx.globalCompositeOperation=rTool==='erase'?'destination-out':'source-over';rCtx.strokeStyle='#111';rCtx.lineWidth=rTool==='erase'?25:3;rCtx.beginPath();rCtx.moveTo(a[0],a[1]);rCtx.lineTo(b[0],b[1]);rCtx.stroke()}
+    function persD(){try{var o=document.createElement('canvas');o.width=rCv.width;o.height=rCv.height;var ox=o.getContext('2d');ox.fillStyle='#fff';ox.fillRect(0,0,o.width,o.height);ox.drawImage(rCv,0,0);state.draw=o.toDataURL('image/jpeg',.72);S.g.responseEditors[key]=state;save()}catch(e){}}
+    rCv.addEventListener('pointerdown',function(e){rDown=true;rLast=rPos(e);try{rCv.setPointerCapture(e.pointerId)}catch(z){}rLine(rLast,rLast);e.preventDefault()});
+    rCv.addEventListener('pointermove',function(e){if(!rDown)return;var p=rPos(e);rLine(rLast,p);rLast=p});
+    ['pointerup','pointercancel'].forEach(function(ev){rCv.addEventListener(ev,function(){if(rDown){rDown=false;persD()}})});
+    pen.addEventListener('click',function(){rTool='pen'});er.addEventListener('click',function(){rTool='erase'});
+    clr.addEventListener('click',function(){rCtx.globalCompositeOperation='source-over';rCtx.clearRect(0,0,rCv.width,rCv.height);state.draw='';S.g.responseEditors[key]=state;save()});
+    function readImg(f){
+      if(!f||f.type.indexOf('image/')!==0)return;
+      var rd=new FileReader();
+      rd.onload=function(){var im=new Image();im.onload=function(){
+        var c=document.createElement('canvas'),sc=Math.min(1,900/im.width,700/im.height);
+        c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));
+        var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+        try{state.image=c.toDataURL('image/jpeg',.68);S.g.responseEditors[key]=state;showPrev();save()}catch(e){}
+      };im.src=rd.result};
+      rd.readAsDataURL(f);
+    }
+    fileEl.addEventListener('change',function(){readImg(fileEl.files&&fileEl.files[0])});
+    clrImg.addEventListener('click',function(){state.image='';S.g.responseEditors[key]=state;showPrev();fileEl.value='';save()});
+    imgPanel.addEventListener('paste',function(e){var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var i=0;i<items.length;i++){if(items[i].type.indexOf('image/')===0){readImg(items[i].getAsFile());e.preventDefault();return}}});
+    tabs.addEventListener('click',function(e){var b=e.target.closest('button[data-mode]');if(b)setMode(b.dataset.mode)});
+    setMode(state.mode||'text');
+  });
+}
+
+/* ===== НАВІГАЦІЯ ===== */
+try{
+  var navLinks=$$('.nav a');
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting)navLinks.forEach(function(a){a.setAttribute('aria-current',String(a.getAttribute('href')==='#'+en.target.id))})})},{rootMargin:'-25% 0px -65% 0px'});
+  $$('main.sheet>section').forEach(function(s){io.observe(s)});
+}catch(e){}
+
+/* ===== СТАРТ ===== */
+fillAll();bindAll();refresh();mountResponseEditors();
+$('#gXmax').value=GS.xmax;$('#gYmax').value=GS.ymax;$('#gSnap').checked=!!GS.snap;
+$('#gHint').textContent=HINTS.pt;
+recalc();gDraw();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body></html>

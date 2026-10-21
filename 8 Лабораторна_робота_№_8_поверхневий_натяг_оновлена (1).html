@@ -1,0 +1,323 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Лабораторна робота № 8 — Вимірювання поверхневого натягу</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Literata:wght@400;600;700&family=Marck+Script&display=swap"><style>
+:root{
+  --desk:#cdd6e2;--bar:#f1f5fb;--paper:#fcfdff;--grid:#d2e4f6;--grid-s:#a9c8e9;
+  --margin:#e2707b;--print:#1f2430;--muted:#5a6579;--ink:#1b3fb0;--ink-line:#8196d8;
+  --note:#eef4fc;--edge:#b4c0d3;--ok:#17794a;--bad:#bd2f2f;--btn-fg:#ffffff;
+  --tbl:#3c4557;--sky:#e6f2fc;--hov:#e2eafb;--sim:#fff8d4;--sim-edge:#e7da8c;--cell:20px;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:60px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;--sim:#38341d;--sim-edge:#665c2a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#0e1118;--bar:#141926;--paper:#181d2b;--grid:#27345a;--grid-s:#3a4d7a;
+  --margin:#bb525d;--print:#e6eaf4;--muted:#9ca7be;--ink:#8cb0ff;--ink-line:#5370c0;
+  --note:#1f2638;--edge:#3a4560;--ok:#55c78f;--bad:#ff8383;--btn-fg:#0f1730;
+  --sky:#202a44;--hov:#252f4a;--sim:#38341d;--sim-edge:#665c2a;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{background:var(--desk);color:var(--print);font:16px/1.55 'Literata',Georgia,'Times New Roman',serif;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bar)}
+b,strong{font-weight:700}
+a{color:var(--ink)}
+:focus-visible{outline:2px solid var(--margin);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);border-bottom:1px solid var(--edge)}
+.bar-in{max-width:900px;margin:0 auto;padding-block:6px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;gap:4px 16px;align-items:center;flex-wrap:wrap}
+.nav{display:flex;gap:4px;overflow-x:auto;flex:1 1 300px;min-width:0}
+.nav a{white-space:nowrap;padding:2px 10px;border-radius:3px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:600}
+.nav a:hover{background:var(--hov)}
+.nav a[aria-current="true"]{background:var(--ink);color:var(--btn-fg)}
+.status{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.meter{width:70px;height:6px;background:var(--note);border:1px solid var(--edge);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle}
+.meter i{display:block;height:100%;width:0;background:var(--ink);transition:width .25s}
+
+.page{max-width:980px;margin:0 auto;padding-block:10px 24px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{position:relative;background-color:var(--paper);
+  background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);padding:14px 20px 28px 50px;border-radius:3px;box-shadow:0 10px 28px rgba(10,20,40,.22)}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:40px;width:2px;background:var(--margin);opacity:.85}
+.sheet>section{margin-top:18px}
+h1{margin:0;text-align:center;font-size:22px;line-height:1.6;letter-spacing:.03em}
+h2{margin:0 0 12px;font-size:19px;line-height:1.6;border-bottom:2px solid var(--margin);display:inline-block;padding-right:18px}
+h3{margin:0;font-size:17px;line-height:1.45}
+p{margin:0 0 8px}
+.small{font-size:14px;line-height:1.5;color:var(--print)}
+.fio{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:10px}
+.fio label{display:inline-flex;align-items:baseline;gap:6px}
+.w-s{width:7em}.w-l{width:min(20em,100%)}
+
+input.ink,select.ink{font:19px/24px 'Marck Script',cursive;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid var(--ink-line);border-radius:0;padding:1px 4px;min-width:0}
+select.ink{background:var(--paper);border:1.5px solid var(--ink-line);border-radius:3px;font-size:17px}
+input.ink:focus,select.ink:focus{background:var(--note);border-bottom-color:var(--ink);outline:none}
+input.ink::placeholder,textarea.work::placeholder{color:var(--muted);opacity:.5}
+input.num{width:5.8em;text-align:center}
+textarea.work{display:block;width:100%;min-height:60px;resize:vertical;border:1.5px solid var(--edge);border-radius:3px;
+  background-color:var(--paper);background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);background-attachment:local;font:18px/20px 'Marck Script',cursive;color:var(--ink);padding:0 8px}
+textarea.work:focus{outline:none;border-color:var(--ink)}
+
+.btn{font:600 14px/18px 'Literata',serif;padding:6px 12px;border:1.5px solid #344054;background:#fff;color:#000!important;border-radius:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:background .15s,box-shadow .15s}
+.btn:hover,.btn:focus-visible{background:#fff0ad!important;color:#000!important;box-shadow:0 0 0 2px rgba(0,0,0,.12)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:#f3e7a5;color:#000!important;border-color:#8b7a2b}
+.btn.primary:hover{background:#ffe680!important}
+.btn.sm{padding:2px 9px;font-size:13px}
+.btn[aria-pressed="true"]{background:#ffe680!important;color:#000!important;border-color:#8b7a2b;box-shadow:inset 0 0 0 1.5px #8b7a2b}
+.row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+
+.box{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px;margin-block:8px}
+.box.simbox{background:#e8f3e8;border:1.5px solid #5f8c63;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);color:#111!important;font-size:16px}
+.box.simbox h3,.box.simbox label,.box.simbox .small,.box.simbox .info,.box.simbox .info b,.box.simbox .sl output,.box.simbox #simMsg{color:#111!important;opacity:1}
+.box.simbox select.ink{color:#111!important;background:#fff}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:9px;margin-block:7px;align-items:flex-start}
+.steps li>div{min-width:0}.step-dot{font-weight:700;min-width:18px;color:var(--print)}
+
+canvas.simcv{display:block;width:100%;height:auto;border:1.5px solid #5f8c63;border-radius:4px;background:#9fd6f5;margin-block:8px}
+.cfgs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.cfgs .btn{padding:4px 10px;font-size:13.5px}
+.sl{display:grid;grid-template-columns:9em 1fr 5.5em;gap:8px;align-items:center;margin-top:8px}
+.sl input[type=range]{accent-color:#b45309;width:100%;min-width:0}
+.sl output{font:500 17px/20px 'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;text-align:right}
+.fine{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.info{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:8px;font-size:14px;align-items:center}
+.info span{display:flex;gap:5px;align-items:center}
+.info b{font:500 16px/20px 'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;padding:1px 10px;border-radius:999px;font-weight:700;font-size:13.5px;background:#fff;border:1.5px solid #5f8c63;color:#111}
+.chip.uni{background:#c9f0d4;border-color:#17794a}
+
+.tbl-wrap{overflow-x:auto;margin-block:10px;background:var(--paper);border-radius:3px}
+.tbl{border-collapse:collapse;min-width:620px;width:100%;background:var(--paper)}
+.tbl th,.tbl td{border:1.5px solid var(--tbl);padding:6px 7px;text-align:center;vertical-align:middle;font-size:14px;line-height:1.4}
+.tbl th{background:var(--note);font-weight:600}
+.tbl td.lbl{text-align:left;font-weight:600}
+.tbl td input.ink{width:100%;text-align:center;background:#fff0ad!important;color:#202020!important;border:1.5px solid #c4a000!important;border-radius:2px;font-weight:700}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 3px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px 1px}
+.frac>span:last-child{padding:1px 4px 0}
+.step{background:var(--paper);border:1.5px solid var(--edge);border-radius:4px;padding:8px 12px 10px;margin-block:8px}
+.step header{display:flex;align-items:center;gap:9px}
+.no{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1.5px solid var(--margin);color:var(--margin);border-radius:50%;font-weight:700;font-size:13px}
+.formula{font-size:15.5px;line-height:24px;padding:4px 10px;background:var(--note);border-left:3px solid var(--margin);margin-block:8px;overflow-x:auto}
+.formula div{white-space:nowrap}
+.wl{display:block;font-size:14px;font-weight:700;color:var(--print);margin-bottom:4px}
+.ans-row{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:flex-end;margin-top:8px}
+.af{display:inline-flex;align-items:baseline;gap:5px}
+.af .u{color:var(--muted);font-size:13px}
+.fb{min-height:20px;margin:6px 0 0;font-size:13.5px;line-height:19px}
+.fb.ok{color:var(--ok)}.fb.ok::before{content:"✓ "}
+.fb.bad{color:var(--bad)}.fb.bad::before{content:"✗ "}
+
+.checks{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:8px;list-style:none;padding:0}
+.checks li{position:relative;padding-left:14px}
+.checks li:before{content:"•";position:absolute;left:0;color:var(--print);font-weight:700}
+
+/* Поле побудови графіка */
+.gz{border:1.5px solid var(--edge);border-radius:4px;background:var(--paper);margin-block:8px;padding:8px}
+.gz-tools{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;align-items:center}
+.gz-tools .sep{width:1px;align-self:stretch;background:var(--edge);margin-inline:3px}
+.gz-axes{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;margin-bottom:6px;font-size:14px}
+.gz-axes label{display:inline-flex;gap:6px;align-items:baseline}
+.gz-axes input[type=number]{width:6em}
+canvas#gCv{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1.5px solid var(--edge);border-radius:3px;background:#fffefa}
+.probe{margin-top:6px;padding:5px 10px;background:var(--note);border-left:3px solid var(--ink);display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:14px}
+
+.response-editor{margin:5px 0 10px;border:1px solid var(--edge);border-radius:4px;background:var(--paper);overflow:hidden}
+.response-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:5px;background:var(--note);border-bottom:1px solid var(--edge)}
+.response-tabs .btn{font-size:12px;padding:3px 9px}
+.response-panel{padding:7px}
+.response-canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border:1px solid var(--edge);border-radius:3px;background-color:#fff;
+  background-image:linear-gradient(to right,#d9e7f5 1px,transparent 1px),linear-gradient(to bottom,#d9e7f5 1px,transparent 1px);background-size:20px 20px}
+.response-image-preview{display:block;max-width:100%;max-height:420px;margin:8px auto;border:1px solid var(--edge);border-radius:3px}
+.response-upload{display:inline-block;padding:7px 11px;border:1px dashed var(--ink-line);border-radius:3px;cursor:pointer;background:var(--note);color:var(--print);font:600 12.5px 'Literata',serif}
+.response-tools{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px}
+.response-hint{font-size:14px;color:var(--print);margin:6px 0}
+
+
+/* Вбудована інтерактивна модель відриву крапель */
+.drop-lab{margin:12px 0 16px;padding:12px;border:1.5px solid var(--edge);border-radius:7px;background:var(--paper)}
+.drop-lab-grid{display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr);gap:12px;align-items:center}
+.drop-stage{position:relative;min-height:230px;border:1px solid var(--edge);border-radius:6px;background:linear-gradient(#eef8ff,#fff);overflow:hidden}
+.drop-stage svg{display:block;width:100%;height:230px}
+.drop-fall{transform-origin:center;opacity:0}
+.drop-fall.go{animation:dropFall 1s ease-in forwards}
+@keyframes dropFall{0%{transform:translateY(0) scale(.75);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateY(118px) scale(1.05);opacity:0}}
+.drop-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}
+.drop-stat{padding:8px;border:1px solid var(--edge);border-radius:5px;background:var(--note)}
+.drop-stat strong{display:block;font:700 25px/1.2 'IBM Plex Mono',monospace;color:var(--ink)}
+.drop-controls{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.drop-controls label{display:flex;gap:6px;align-items:center;font-size:13px}
+.drop-controls select,.drop-controls input{max-width:110px;padding:6px;border:1px solid var(--edge);border-radius:4px;background:var(--paper);color:var(--print)}
+.drop-note{font-size:12px;color:var(--muted);margin:7px 0 0}
+@media(max-width:650px){.drop-lab-grid{grid-template-columns:1fr}.drop-stage,.drop-stage svg{min-height:190px;height:190px}}
+@media(prefers-reduced-motion:reduce){.drop-fall.go{animation-duration:.01ms}}
+.creative-task{margin-top:14px;padding:14px 16px;background:#fff3c4;border:2px solid #9a6a00;border-left:7px solid #9a6a00;border-radius:8px;color:#241900;font-size:16px;line-height:1.65}
+.creative-task h3{font-size:20px;color:#241900;margin-bottom:8px}
+.creative-task .wl{color:#241900}
+.creative-task textarea.work{background-color:#fffdf4;border-color:#9a6a00;color:#5b3215!important;font-weight:600}
+.creative-task textarea.work::placeholder{color:#795536!important;opacity:1!important}
+/* Поля «Хід обчислень»: збільшений, контрастний і читабельний текст */
+.step textarea.work[id^="calc"]{font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.55;letter-spacing:.15px;color:#f7faff!important;background-color:#263449!important;background-image:linear-gradient(to right,rgba(255,255,255,.10) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.10) 1px,transparent 1px);background-size:24px 31px;padding:9px 11px;min-height:118px;border:1.5px solid #8196b5}
+.step textarea.work[id^="calc"]:focus{border-color:#b8d6ff;box-shadow:0 0 0 2px rgba(184,214,255,.22)}
+
+.report{width:100%;min-height:130px;font:12.5px/17px 'IBM Plex Mono',ui-monospace,monospace;background:var(--note);color:var(--print);border:1.5px solid var(--edge);border-radius:3px;padding:8px;margin-top:8px}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:28px;align-items:flex-start}
+
+@media(max-width:700px){.sl{grid-template-columns:1fr 5em}.sl label{grid-column:1/-1}}
+@media(max-width:560px){.sheet{padding:16px 10px 36px 32px}.sheet::before{left:20px}.box,.step{padding-inline:10px}}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff!important;color:#111!important;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar,.no-print,.btn,.fb,.meter,.status,.simbox,.gz-tools,.gz-axes,.probe,.response-tabs,.response-tools,.response-hint{display:none!important}
+  .page{max-width:none;margin:0;padding:0}
+  .sheet{box-shadow:none;border-radius:0;padding:8mm 7mm 8mm 12mm;background-color:#fff!important}
+  .sheet::before{left:9mm}
+  h1{font-size:17pt}h2{font-size:13pt}h3{font-size:11pt}
+  .box,.step,.creative-task,.tbl-wrap{break-inside:avoid}
+  .tbl-wrap{overflow:visible}
+  .tbl{min-width:0;width:100%;table-layout:fixed}
+  .tbl th,.tbl td{font-size:8pt;padding:3px 2px;color:#111!important;border-color:#333!important}
+  input.ink,select.ink{font:10pt Arial,sans-serif!important;color:#111!important;background:#fff!important;border:1px solid #777!important;min-height:20px;padding:2px!important}
+  textarea.work{font:10pt Arial,sans-serif!important;color:#111!important;background:#fff!important;background-image:none!important;border:1px solid #777!important;min-height:44px;resize:none;white-space:pre-wrap}
+  textarea.work::placeholder,input::placeholder{color:transparent!important}
+  .formula{background:#f3f3f3!important;color:#111!important}
+  canvas#gCv{max-height:110mm;width:auto;max-width:100%;margin:0 auto}
+  .creative-task{background:#fff!important;border-color:#777!important;color:#111!important}
+  .small{font-size:9pt;color:#222!important}
+  .report{display:none!important}
+}
+
+/* Адаптація шаблону для лабораторної роботи про поверхневий натяг */
+.tbl input.ink{width:100%;min-width:45px;text-align:center;padding:5px 3px;background:var(--paper);border:1px solid var(--ink-line);border-radius:3px;color:var(--ink)}
+.tbl th{vertical-align:middle}.tbl-wrap{overflow-x:auto}.response-editor{margin:5px 0 12px}.response-tabs,.response-tools{display:flex;gap:5px;flex-wrap:wrap;margin:5px 0}.response-panel{border:1px solid var(--edge);border-radius:5px;background:var(--note);padding:8px;margin-top:5px}.response-canvas{display:block;width:100%;height:auto;min-height:100px;border:1px solid var(--edge);background:#fff;touch-action:none;border-radius:4px}.response-upload{display:inline-flex;gap:8px;align-items:center;padding:7px;border:1px dashed var(--edge);border-radius:4px}.response-upload input{max-width:100%}.response-image-preview{display:block;max-width:100%;max-height:480px;margin:8px 0}.response-hint{font-size:12px;color:var(--muted);margin:5px 0}.response-panel[hidden]{display:none!important}.work{width:100%;min-height:110px}.tbl-wrap{margin:10px 0}.foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+@media(max-width:650px){.tbl{min-width:700px}.fio{gap:8px}.response-tabs .btn{font-size:12px}}
+
+/* Єдиний читабельний стиль для всіх полів, у які учень вводить відповідь */
+textarea.work,
+input.ink:not([type="range"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]){
+  box-sizing:border-box;
+  color:#ffffff !important;
+  background-color:#263449 !important;
+  background-image:none !important;
+  font-family:Arial, Helvetica, sans-serif !important;
+  font-size:18px !important;
+  font-weight:400;
+  line-height:1.55 !important;
+  letter-spacing:0;
+  padding:10px 12px !important;
+  border:1.5px solid #8196b5 !important;
+  border-radius:5px;
+  caret-color:#ffffff;
+}
+textarea.work{min-height:112px;resize:vertical}
+textarea.work:focus,
+input.ink:not([type="range"]):not([type="file"]):focus{
+  outline:none;
+  border-color:#c5dcff !important;
+  box-shadow:0 0 0 2px rgba(197,220,255,.22);
+}
+textarea.work::placeholder,
+input.ink::placeholder{
+  color:#d5deec !important;
+  opacity:1 !important;
+  font-weight:400;
+}
+/* Поля творчого завдання теж мають контрастний стиль, попри жовтий блок */
+.creative-task textarea.work{
+  color:#ffffff !important;
+  background-color:#263449 !important;
+  background-image:none !important;
+  border-color:#8196b5 !important;
+}
+.creative-task textarea.work::placeholder{color:#d5deec !important;opacity:1 !important}
+/* Усі поля введення, включно з таблицею: білий жирний текст на темному тлі, збільшений шрифт */
+.tbl td input.ink,.tbl input.ink{color:#ffffff !important;-webkit-text-fill-color:#ffffff;background:#263449 !important;border:1.5px solid #8196b5 !important;text-align:center}
+textarea.work,.step textarea.work[id^="calc"],.creative-task textarea.work,
+input.ink:not([type="range"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]),.tbl td input.ink{
+  -webkit-text-fill-color:#ffffff;color:#ffffff !important;font-weight:700 !important;font-size:22px !important;line-height:1.5 !important}
+textarea.work,.step textarea.work[id^="calc"],.creative-task textarea.work{font-size:23px !important;line-height:30px !important}
+.tbl td input.ink{font-size:20px !important;min-width:3.8em}
+input.num,.w-s{min-width:6.5em}
+/* Поля «Клас», «Прізвище та ім'я», «Дата» — рядок з підкресленням, а не віконце */
+.fio input.ink{border:0 !important;border-bottom:2px solid #8196b5 !important;border-radius:0 !important;padding:2px 6px !important;line-height:1.3 !important;box-shadow:none !important}
+.fio input.ink:focus{border-bottom-color:#ffe680 !important;box-shadow:none !important}
+@media print{
+  .fio input.ink{border:0 !important;border-bottom:1px solid #333 !important}
+  textarea.work,.step textarea.work[id^="calc"],.creative-task textarea.work,input.ink,.tbl td input.ink,.tbl input.ink,select.ink{
+    color:#111 !important;-webkit-text-fill-color:#111;background:#fff !important;background-image:none !important;border:1px solid #777 !important;
+    font-family:Arial,sans-serif !important;font-size:10pt !important;font-weight:700 !important;line-height:1.3 !important;padding:2px !important;min-height:20px}
+  textarea.work{min-height:44px}
+}
+
+</style></head><body>
+<header class="bar no-print"><div class="bar-in"><nav class="nav"><a href="#prep">Підготовка</a><a href="#exp">Експеримент</a><a href="#calc">Опрацювання</a><a href="#concl">Висновок</a><a href="#creative">Творче завдання</a></nav><div class="small">Автозбереження: <b id="saveStatus">увімкнено</b></div></div></header>
+<div class="page"><main class="sheet" id="top">
+<div class="fio"><label>Клас <input class="ink w-s" data-field="klass" autocomplete="off"></label><label>Прізвище та ім’я <input class="ink w-l" data-field="fio" autocomplete="off"></label><label>Дата <input class="ink w-s" data-field="date" autocomplete="off"></label></div>
+<h1>ЛАБОРАТОРНА РОБОТА № 8</h1><p><b>Тема.</b> Вимірювання поверхневого натягу рідини.</p><p><b>Мета:</b> виміряти поверхневий натяг води методом відриву крапель.</p><p><b>Обладнання:</b> медичний шприц об’ємом 5 мл без голки, вода, склянка.</p>
+<section id="prep"><h2>1. Підготовка до експерименту</h2><div class="box"><h3>Теоретичні відомості</h3><p>Відрив краплі відбувається, коли сила тяжіння зрівнюється із силою поверхневого натягу:</p><div class="formula">F<sub>пов</sub> = F<sub>тяж</sub>, або m<sub>0</sub>g = σπd</div><p>Маса однієї краплі: <b>m<sub>0</sub> = ρV/N</b>.</p><p>Коефіцієнт поверхневого натягу:</p><div class="formula">σ = ρVg / (Nπd)</div><p class="small">ρ — густина води; V — об’єм води; N — кількість крапель; d — внутрішній діаметр отвору; g — прискорення вільного падіння.</p></div>
+<label class="wl" for="prep-answer">Запишіть коротко, за якої умови відривається крапля.</label><textarea class="work" id="prep-answer" data-k="prep-answer" rows="3"></textarea></section>
+<section id="exp"><h2>2. Експеримент</h2><ol><li>Діаметр вихідного отвору шприца — 2 мм.</li><li>Запустіть вбудовану модель нижче: краплі відриватимуться від носика, а лічильник рахуватиме їх прямо на цій сторінці.</li><li>Задайте об’єм води для досліду, спостерігайте за лічильником і натисніть «Записати в таблицю», щоб перенести результат у вибраний рядок. Повторіть для інших дослідів.</li></ol>
+<div class="drop-lab" id="dropLab"><h3>Інтерактивна модель: відрив крапель</h3><div class="drop-lab-grid"><div class="drop-stage" aria-label="Анімація шприца, крапель і склянки"><svg viewBox="0 0 420 250" role="img" aria-label="Краплі падають зі шприца у склянку"><defs><linearGradient id="water" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#9dd9ff"/><stop offset="1" stop-color="#4c9fd8"/></linearGradient></defs><rect x="165" y="12" width="90" height="18" rx="3" fill="#d5e1ec" stroke="#637b91" stroke-width="2"/><rect x="177" y="30" width="66" height="75" rx="4" fill="#f9fdff" stroke="#637b91" stroke-width="2"/><rect x="183" y="43" width="54" height="53" fill="url(#water)" opacity=".75"/><path d="M177 52h66M177 64h66M177 76h66" stroke="#6d9dbb" stroke-width="1"/><rect x="195" y="105" width="30" height="17" fill="#d5e1ec" stroke="#637b91" stroke-width="2"/><path d="M210 122v11" stroke="#637b91" stroke-width="4"/><path d="M145 162h130l-10 69q-1 8-10 8h-90q-9 0-10-8z" fill="#eaf8ff" fill-opacity=".55" stroke="#5e9abf" stroke-width="3"/><path d="M151 190h118l-5 38q-1 5-8 5h-91q-7 0-8-5z" fill="url(#water)" opacity=".8"/><path d="M145 162h130" stroke="#5e9abf" stroke-width="4"/><ellipse cx="210" cy="132" rx="5" ry="7" fill="#3498db" class="drop-fall" id="fallDrop"/><g fill="#2f91cf"><circle cx="189" cy="207" r="3"/><circle cx="215" cy="217" r="2.5"/><circle cx="237" cy="201" r="2"/></g><text x="12" y="22" fill="#35536b" font-size="12">Шприц</text><path d="M52 26h110" stroke="#7a9db4" stroke-dasharray="3 3"/><text x="12" y="244" fill="#35536b" font-size="12">Склянка</text></svg></div><div><p class="small">Параметри спостереження</p><div class="drop-stats"><div class="drop-stat"><span class="small">Крапель нараховано</span><strong id="dropCount" aria-live="polite">0</strong></div><div class="drop-stat"><span class="small">Об’єм для досліду</span><strong><span id="dropVolumeLabel">1.0</span> мл</strong></div></div><div class="drop-controls"><label for="dropVolume">Об’єм, мл <input id="dropVolume" type="number" min="0.1" max="5" step="0.1" value="1.0"></label><label for="dropRate">Швидкість <select id="dropRate"><option value="1200">Повільно</option><option value="800" selected>Звичайно</option><option value="450">Швидко</option></select></label></div><div class="drop-controls"><button class="btn primary" type="button" id="dropStart">Почати</button><button class="btn" type="button" id="dropPause" disabled>Пауза</button><button class="btn" type="button" id="dropReset">Скинути</button></div><div class="drop-controls"><label for="dropTrial">Рядок таблиці <select id="dropTrial"><option value="1">Дослід 1</option><option value="2">Дослід 2</option><option value="3">Дослід 3</option><option value="4">Дослід 4</option><option value="5">Дослід 5</option></select></label><button class="btn" type="button" id="dropRecord">Записати в таблицю</button></div><p class="drop-note">Це навчальна анімаційна модель: лічильник рахує згенеровані краплі, а не аналізує реальне відео. Об’єм і кількість можна змінити вручну після спостереження.</p></div></div></div>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>№ досліду</th><th>Діаметр отвору<br>d, ×10⁻³ м</th><th>Об’єм води<br>V, ×10⁻⁶ м³</th><th>Кількість крапель<br>N</th><th>Середня кількість крапель<br>N<sub>сер</sub></th><th>Поверхневий натяг<br>σ<sub>сер</sub>, ×10⁻³ Н/м</th></tr></thead><tbody><tr><td>1</td><td><input class="ink" data-table="d1" aria-label="Дослід 1, діаметр" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="v1" aria-label="Дослід 1, об’єм води" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="n1" aria-label="Дослід 1, кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="navg1" aria-label="Дослід 1, середня кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="sigma1" aria-label="Дослід 1, коефіцієнт поверхневого натягу" inputmode="decimal" autocomplete="off"></td></tr><tr><td>2</td><td><input class="ink" data-table="d2" aria-label="Дослід 2, діаметр" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="v2" aria-label="Дослід 2, об’єм води" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="n2" aria-label="Дослід 2, кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="navg2" aria-label="Дослід 2, середня кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="sigma2" aria-label="Дослід 2, коефіцієнт поверхневого натягу" inputmode="decimal" autocomplete="off"></td></tr><tr><td>3</td><td><input class="ink" data-table="d3" aria-label="Дослід 3, діаметр" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="v3" aria-label="Дослід 3, об’єм води" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="n3" aria-label="Дослід 3, кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="navg3" aria-label="Дослід 3, середня кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="sigma3" aria-label="Дослід 3, коефіцієнт поверхневого натягу" inputmode="decimal" autocomplete="off"></td></tr><tr><td>4</td><td><input class="ink" data-table="d4" aria-label="Дослід 4, діаметр" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="v4" aria-label="Дослід 4, об’єм води" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="n4" aria-label="Дослід 4, кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="navg4" aria-label="Дослід 4, середня кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="sigma4" aria-label="Дослід 4, коефіцієнт поверхневого натягу" inputmode="decimal" autocomplete="off"></td></tr><tr><td>5</td><td><input class="ink" data-table="d5" aria-label="Дослід 5, діаметр" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="v5" aria-label="Дослід 5, об’єм води" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="n5" aria-label="Дослід 5, кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="navg5" aria-label="Дослід 5, середня кількість крапель" inputmode="decimal" autocomplete="off"></td><td><input class="ink" data-table="sigma5" aria-label="Дослід 5, коефіцієнт поверхневого натягу" inputmode="decimal" autocomplete="off"></td></tr></tbody></table></div><p class="small">Усі клітинки таблиці заповнюються вручну. Сторінка не підставляє вимірювання та не обчислює відповіді замість учня.</p></section>
+<section id="calc"><h2>3. Опрацювання результатів</h2><article class="step"><header><span class="no">1</span><h3>Середня кількість крапель</h3></header><div class="formula">N<sub>сер</sub> = (N₁ + N₂ + N₃ + N₄ + N₅) / 5</div><label class="wl" for="calc1">Хід обчислень</label><textarea class="work" id="calc1" data-k="calc1" rows="5"></textarea><label class="wl" for="calc1result">Результат</label><input class="ink" id="calc1result" data-field="calc1result" autocomplete="off"></article>
+<article class="step"><header><span class="no">2</span><h3>Середнє значення коефіцієнта поверхневого натягу</h3></header><p>Вважайте, що густина води ρ = 1000 кг/м³.</p><div class="formula">σ<sub>сер</sub> = ρVg / (N<sub>сер</sub>πd)</div><label class="wl" for="calc2">Хід обчислень</label><textarea class="work" id="calc2" data-k="calc2" rows="5"></textarea><label class="wl" for="calc2result">Результат, σ<sub>сер</sub></label><input class="ink" id="calc2result" data-field="calc2result" autocomplete="off"></article>
+<article class="step"><header><span class="no">3</span><h3>Відносна похибка експерименту</h3></header><div class="formula">ε = |1 − σ<sub>сер</sub> / σ<sub>табл</sub>| · 100%, де σ<sub>табл</sub> = 0,072 Н/м</div><label class="wl" for="calc3">Хід обчислень</label><textarea class="work" id="calc3" data-k="calc3" rows="5"></textarea><label class="wl" for="calc3result">Результат, ε</label><input class="ink" id="calc3result" data-field="calc3result" autocomplete="off"></article></section>
+<section id="concl"><h2>4. Аналіз експерименту та його результатів</h2><p>У висновку зазначте: 1) величину, яку вимірювали; 2) отриманий результат; 3) причини похибки; 4) чи здається вам запропонований спосіб зручним.</p><label class="wl" for="conclusion">Висновок</label><textarea class="work" id="conclusion" data-k="conclusion" rows="7"></textarea>
+<h3 style="margin-top:18px">Контрольні запитання</h3><p><b>1.</b> Під час видування мильної бульбашки за допомогою соломинки площу поверхні бульбашки збільшили вдвічі. Як зміниться поверхнева енергія бульбашки?</p><label class="wl" for="q1">Відповідь</label><textarea class="work" id="q1" data-k="q1" rows="4"></textarea>
+<p><b>2.</b> Яка з рідин і у скільки разів вище підніметься по однакових вертикальних капілярах: молоко чи вода, якщо густини рідин приблизно однакові? Коефіцієнти поверхневого натягу молока та води відповідно дорівнюють 46 мН/м та 73 мН/м.</p><label class="wl" for="q2">Відповідь</label><textarea class="work" id="q2" data-k="q2" rows="4"></textarea>
+<p><b>3.</b> Визначте масу краплі води, що при кімнатній температурі відривається від піпетки, внутрішній діаметр якої 0,5 мм. Коефіцієнт поверхневого натягу води дорівнює 73 мН/м.</p><label class="wl" for="q3">Відповідь</label><textarea class="work" id="q3" data-k="q3" rows="4"></textarea></section>
+<section id="creative" class="creative-task">
+<h3>Творче завдання</h3>
+<p>Запропонуйте експеримент щодо виявлення залежності поверхневого натягу рідини від температури рідини та від наявності в рідині домішок. Проведіть експерименти, зробіть висновок.</p>
+<p><b>Пам’ятайте:</b> змінюйте лише один чинник за раз, а інші умови досліду залишайте однаковими. Для досліду з домішками можна порівняти чисту воду та воду з невеликою кількістю мийного засобу. Гарячу воду використовуйте лише з дотриманням правил безпеки.</p>
+<label class="wl" for="creative-plan">План експерименту</label>
+<textarea class="work" id="creative-plan" data-k="creative-plan" rows="4" placeholder="Обладнання, послідовність дій, що вимірюватимете…"></textarea>
+<label class="wl" for="creative-results" style="margin-top:8px">Результати спостережень</label>
+<textarea class="work" id="creative-results" data-k="creative-results" rows="5" placeholder="Температура / домішки / спостереження…"></textarea>
+<label class="wl" for="creative-conclusion" style="margin-top:8px">Висновок</label>
+<textarea class="work" id="creative-conclusion" data-k="creative-conclusion" rows="3" placeholder="Як вплинули температура та домішки на поверхневий натяг?"></textarea>
+</section>
+<div class="foot no-print">
+<div style="flex:1 1 260px;min-width:0">
+<button class="btn primary" id="bReport" type="button">Скопіювати звіт для вчителя</button>
+<textarea class="report" id="reportTxt" readonly hidden aria-label="Текст звіту"></textarea>
+<p class="small" id="reportMsg" aria-live="polite" style="margin:4px 0 0"></p>
+</div>
+<div style="flex:1 1 280px;min-width:0">
+<button class="btn primary" id="bPdf" type="button">Завантажити роботу у PDF</button>
+<p class="small">У вікні друку виберіть «Зберегти як PDF», а потім прикріпіть файл у Classroom.</p>
+</div>
+<button class="btn primary" id="bDownload" type="button">Завантажити виконану роботу (HTML)</button>
+<button class="btn" id="bClear" type="button">Очистити сторінку</button>
+<span class="small">Текст, рукописні записи та вставлені зображення зберігаються в браузері.</span></div>
+</main></div>
+<script>
+(function(){'use strict';const KEY='lab-surface-tension-v2', $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));let S={fields:{},table:{},editors:{}};/* Під час кожного відкриття сторінки всі поля порожні: старі записи не підвантажуються. */try{localStorage.removeItem(KEY)}catch(e){}try{const saved=JSON.parse('{}');if(saved&&typeof saved==='object'){S.fields=saved.fields&&typeof saved.fields==='object'?saved.fields:{};S.table=saved.table&&typeof saved.table==='object'?saved.table:{};S.editors=saved.editors&&typeof saved.editors==='object'?saved.editors:{}}}catch(e){try{localStorage.removeItem(KEY)}catch(_){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));$('#saveStatus').textContent='збережено'}catch(e){$('#saveStatus').textContent='лише в поточній вкладці'}}
+if(!S.fields.date){try{S.fields.date=new Date().toLocaleDateString('uk-UA')}catch(e){}}
+$$('[data-field]').forEach(el=>{let k=el.dataset.field;el.value=S.fields[k]||'';el.addEventListener('input',()=>{S.fields[k]=el.value;save()})});$$('[data-table]').forEach(el=>{let k=el.dataset.table;el.value=S.table[k]||'';el.addEventListener('input',()=>{S.table[k]=el.value;save()})});
+function mountEditors(){ $$('.work').forEach(ta=>{let key=ta.dataset.k||ta.id,st=S.editors[key]||{mode:'text',draw:'',image:''};S.editors[key]=st;ta.value=st.text||ta.value||'';ta.addEventListener('input',()=>{st.text=ta.value;S.editors[key]=st;save()});let wrap=document.createElement('div');wrap.className='response-editor';let tabs=document.createElement('div');tabs.className='response-tabs no-print';[['text','Ввести текст'],['draw','Писати від руки'],['image','Вставити фото']].forEach(([m,t])=>{let b=document.createElement('button');b.type='button';b.className='btn';b.dataset.mode=m;b.textContent=t;tabs.append(b)});let textp=document.createElement('div');textp.className='response-panel';textp.style.padding='0';let drawp=document.createElement('div');drawp.className='response-panel';drawp.hidden=true;let tools=document.createElement('div');tools.className='response-tools no-print';let pen=document.createElement('button');pen.className='btn';pen.type='button';pen.textContent='Ручка';let er=document.createElement('button');er.className='btn';er.type='button';er.textContent='Гумка';let clr=document.createElement('button');clr.className='btn';clr.type='button';clr.textContent='Очистити';tools.append(pen,er,clr);let cv=document.createElement('canvas');cv.className='response-canvas';cv.width=900;cv.height=220;cv.setAttribute('aria-label','Поле рукописної відповіді');drawp.append(tools,cv);let imgp=document.createElement('div');imgp.className='response-panel';imgp.hidden=true;imgp.tabIndex=0;let lab=document.createElement('label');lab.className='response-upload no-print';lab.textContent='Вибрати фото ';let fi=document.createElement('input');fi.type='file';fi.accept='image/*';lab.append(fi);let hint=document.createElement('p');hint.className='response-hint no-print';hint.textContent='Або вставте скопійоване зображення через Ctrl+V / ⌘V.';let im=document.createElement('img');im.className='response-image-preview';im.alt='Додане учнем зображення';let rm=document.createElement('button');rm.type='button';rm.className='btn no-print';rm.textContent='Видалити фото';imgp.append(lab,hint,im,rm);const originalParent=ta.parentNode;originalParent.insertBefore(wrap,ta);wrap.append(tabs,textp,drawp,imgp);textp.append(ta);
+function mode(m){st.mode=m;st.text=ta.value;S.editors[key]=st;textp.hidden=m!=='text';drawp.hidden=m!=='draw';imgp.hidden=m!=='image';$$('[data-mode]',tabs).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===m)));save()}tabs.addEventListener('click',e=>{let b=e.target.closest('[data-mode]');if(b)mode(b.dataset.mode)});
+let c=cv.getContext('2d'),down=false,last=null,tool='pen';c.lineCap='round';c.lineJoin='round';if(st.draw){let pic=new Image();pic.onload=()=>c.drawImage(pic,0,0,cv.width,cv.height);pic.src=st.draw}function persistDraw(){let out=document.createElement('canvas');out.width=cv.width;out.height=cv.height;let x=out.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,out.width,out.height);x.drawImage(cv,0,0);st.draw=out.toDataURL('image/jpeg',.75);S.editors[key]=st;save()}function point(e){let r=cv.getBoundingClientRect();return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]}function line(a,b){c.globalCompositeOperation=tool==='erase'?'destination-out':'source-over';c.strokeStyle='#111';c.lineWidth=tool==='erase'?26:3;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()}cv.addEventListener('pointerdown',e=>{down=true;last=point(e);cv.setPointerCapture(e.pointerId);line(last,last);e.preventDefault()});cv.addEventListener('pointermove',e=>{if(down){let p=point(e);line(last,p);last=p}});['pointerup','pointercancel'].forEach(ev=>cv.addEventListener(ev,()=>{if(down){down=false;persistDraw()}}));pen.onclick=()=>tool='pen';er.onclick=()=>tool='erase';clr.onclick=()=>{c.clearRect(0,0,cv.width,cv.height);st.draw='';S.editors[key]=st;save()};function showImg(){if(st.image){im.src=st.image;im.hidden=false}else{im.removeAttribute('src');im.hidden=true}}function readFile(f){if(!f||!f.type.startsWith('image/'))return;let rd=new FileReader();rd.onload=()=>{let pic=new Image();pic.onload=()=>{let out=document.createElement('canvas'),scale=Math.min(1,1200/pic.width,900/pic.height);out.width=Math.max(1,pic.width*scale);out.height=Math.max(1,pic.height*scale);let x=out.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,out.width,out.height);x.drawImage(pic,0,0,out.width,out.height);st.image=out.toDataURL('image/jpeg',.75);S.editors[key]=st;showImg();save()};pic.src=rd.result};rd.readAsDataURL(f)}fi.addEventListener('change',()=>readFile(fi.files&&fi.files[0]));rm.onclick=()=>{st.image='';S.editors[key]=st;showImg();fi.value='';save()};imgp.addEventListener('paste',e=>{let items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(let it of items)if(it.type.startsWith('image/')){readFile(it.getAsFile());e.preventDefault();break}});document.addEventListener('paste',e=>{if(st.mode!=='image'||!wrap.contains(document.activeElement))return;let items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(let it of items)if(it.type.startsWith('image/')){readFile(it.getAsFile());e.preventDefault();break}});showImg();mode(st.mode||'text');});}
+mountEditors();save();
+// Локальний лічильник крапель — без переходу на інші сторінки
+const dropCountEl=$('#dropCount'),dropVolume=$('#dropVolume'),dropVolumeLabel=$('#dropVolumeLabel'),dropRate=$('#dropRate'),dropStart=$('#dropStart'),dropPause=$('#dropPause'),dropReset=$('#dropReset'),dropTrial=$('#dropTrial'),dropRecord=$('#dropRecord'),fallDrop=$('#fallDrop');let dropCount=0,dropTimer=null;
+function renderDropCount(){dropCountEl.textContent=String(dropCount);dropVolumeLabel.textContent=(Number(dropVolume.value)||0).toFixed(1)}
+function stopDrops(){if(dropTimer!==null){clearInterval(dropTimer);dropTimer=null}dropStart.disabled=false;dropPause.disabled=true;dropStart.textContent='Продовжити'}
+function spawnDrop(){dropCount++;renderDropCount();if(fallDrop){fallDrop.classList.remove('go');void fallDrop.getBoundingClientRect();fallDrop.classList.add('go')}}
+dropStart.addEventListener('click',()=>{if(dropTimer!==null)return;dropStart.disabled=true;dropPause.disabled=false;dropTimer=setInterval(spawnDrop,Math.max(250,Number(dropRate.value)||800))});dropPause.addEventListener('click',stopDrops);dropReset.addEventListener('click',()=>{stopDrops();dropCount=0;renderDropCount();dropStart.textContent='Почати';if(fallDrop)fallDrop.classList.remove('go')});dropRate.addEventListener('change',()=>{if(dropTimer!==null){stopDrops();dropStart.click()}});dropVolume.addEventListener('input',renderDropCount);dropRecord.addEventListener('click',()=>{const n=String(dropTrial.value),nCell=$(`[data-table="n${n}"]`),vCell=$(`[data-table="v${n}"]`);if(nCell){nCell.value=String(dropCount);nCell.dispatchEvent(new Event('input',{bubbles:true}))}if(vCell){vCell.value=(Number(dropVolume.value)||0).toFixed(1);vCell.dispatchEvent(new Event('input',{bubbles:true}))}const tableTop=$('#exp .tbl-wrap');if(tableTop)tableTop.scrollIntoView({behavior:'smooth',block:'center'});});renderDropCount();
+$('#bReport').onclick=async()=>{save();const lines=['ЗВІТ ДЛЯ ВЧИТЕЛЯ — ЛАБОРАТОРНА РОБОТА: ВИМІРЮВАННЯ ПОВЕРХНЕВОГО НАТЯГУ',''];const klass=$('[data-field="klass"]').value,fio=$('[data-field="fio"]').value,date=$('[data-field="date"]').value;lines.push('Клас: '+klass,'Учень/учениця: '+fio,'Дата: '+date,'');$$('section').forEach(sec=>{const title=sec.querySelector('h2,h3');if(title)lines.push(title.innerText);sec.querySelectorAll('textarea.work,input[data-field],input[data-table]').forEach(el=>{const label=el.id?(document.querySelector('label[for="'+el.id+'"]')||{}).innerText||el.getAttribute('aria-label')||el.id:el.getAttribute('aria-label')||el.dataset.field||el.dataset.table;const value=(el.value||'').trim();if(value)lines.push(label+': '+value)});const table=sec.querySelector('table');if(table){table.querySelectorAll('tbody tr').forEach((tr,i)=>{const vals=Array.from(tr.querySelectorAll('td')).map(td=>{const inp=td.querySelector('input');return inp?inp.value.trim():td.innerText.trim()});lines.push('Рядок '+(i+1)+': '+vals.join(' | '))})}lines.push('')});const txt=lines.join('\n');$('#reportTxt').hidden=false;$('#reportTxt').value=txt;try{await navigator.clipboard.writeText(txt);$('#reportMsg').textContent='Звіт скопійовано. Його можна вставити у повідомлення або документ.'}catch(e){$('#reportTxt').focus();$('#reportTxt').select();$('#reportMsg').textContent='Автоматичне копіювання недоступне. Виділіть текст у полі звіту й скопіюйте вручну.'}};
+$('#bPdf').onclick=()=>window.print();$('#bClear').onclick=()=>{if(confirm('Очистити всі введені дані, рукописні записи й фото?')){localStorage.removeItem(KEY);location.reload()}};
+$('#bDownload').onclick=()=>{save();let clone=document.documentElement.cloneNode(true);clone.querySelectorAll('.no-print').forEach(e=>e.remove());clone.querySelectorAll('.drop-controls').forEach(e=>e.remove());clone.querySelectorAll('[data-field]').forEach(e=>{let live=$(`[data-field="${e.dataset.field}"]`);if(e.tagName==='INPUT')e.setAttribute('value',live.value)});clone.querySelectorAll('[data-table]').forEach(e=>{let live=$(`[data-table="${e.dataset.table}"]`);e.setAttribute('value',live.value)});clone.querySelectorAll('textarea.work').forEach(e=>{let live=$('#'+e.id);e.textContent=live.value});clone.querySelectorAll('.response-tabs').forEach(e=>e.remove());/* Спочатку переносимо вміст усіх редакторів, і лише потім прибираємо приховані панелі: інакше зсув індексів міг прикріпити чуже рукописне поле до відповіді. */clone.querySelectorAll('canvas.response-canvas').forEach((cv,i)=>{let live=$$('.response-canvas')[i];let im=document.createElement('img');try{im.src=live.toDataURL('image/png');im.style.cssText='width:100%;max-height:220px;border:1px solid #aaa';cv.replaceWith(im)}catch(e){cv.replaceWith(document.createTextNode('[Рукописна відповідь]'))}});clone.querySelectorAll('.response-image-preview').forEach((im,i)=>{let live=$$('.response-image-preview')[i];if(live&&live.src)im.src=live.src});clone.querySelectorAll('.response-panel').forEach(p=>{if(p.hidden)p.remove()});let blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Лабораторна_робота_Поверхневий_натяг.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)};
+})();</script></body></html>
